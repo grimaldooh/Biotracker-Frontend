@@ -1,0 +1,48 @@
+import { Routes } from '@angular/router';
+
+export const routes: Routes = [
+  {
+    path: 'patients/register',
+    loadComponent: () =>
+      import('./modules/patients/register-patient/register-patient.component')
+        .then(m => m.RegisterPatientComponent)
+  },
+  {
+    path: 'reception/dashboard',
+    loadComponent: () =>
+      import('./modules/reception/dashboard/dashboard.component')
+        .then(m => m.DashboardRecepcionComponent)
+  },
+  {
+    path: 'patients',
+    loadComponent: () =>
+      import('./modules/patients/patients-list/patients-list.component')
+        .then(m => m.PatientsListComponent)
+  },
+  {
+    path: 'appointments',
+    loadComponent: () =>
+      import('./modules/appointments/appointments-list/appointments-list.component')
+        .then(m => m.AppointmentsListComponent)
+  },
+  {
+    path: 'medical-visits/patient/:patientId',
+    loadComponent: () =>
+      import('./modules/appointments/patient-visits/patient-visits.component')
+        .then(m => m.PatientVisitsComponent)
+  },
+  {
+    path: 'samples',
+    loadComponent: () =>
+      import('./modules/samples/samples-list/samples-list.component')
+        .then(m => m.SamplesListComponent)
+  },
+  {
+    path: 'samples/patient/:patientId',
+    loadComponent: () =>
+      import('./modules/samples/patient-samples/patient-samples.component')
+        .then(m => m.PatientSamplesComponent)
+  },
+  { path: '', redirectTo: 'patients/register', pathMatch: 'full' },
+  { path: '**', redirectTo: 'patients/register' }
+];

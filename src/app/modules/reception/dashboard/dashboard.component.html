@@ -1,0 +1,46 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col items-center py-10">
+  <div class="w-full max-w-3xl bg-white rounded-3xl shadow-xl p-8 border border-blue-100">
+    <h1 class="text-3xl font-extrabold text-blue-900 mb-6 text-center">Panel Recepcionista</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <!-- Opción: Crear nuevo paciente -->
+      <button
+        class="flex flex-col items-center justify-center bg-blue-700 hover:bg-blue-800 text-white rounded-xl p-6 shadow transition-all duration-200"
+        (click)="goToRegisterPatient()">
+        <span class="material-icons text-4xl mb-2">person_add</span>
+        <span class="font-semibold text-lg">Registrar nuevo paciente</span>
+      </button>
+      <!-- Opción: Ver pacientes registrados -->
+      <button
+        class="flex flex-col items-center justify-center bg-blue-100 hover:bg-blue-200 text-blue-900 rounded-xl p-6 shadow transition-all duration-200"
+        (click)="goToPatientsList()">
+        <span class="material-icons text-4xl mb-2">groups</span>
+        <span class="font-semibold text-lg">Pacientes registrados</span>
+      </button>
+      <!-- Opción: Ver citas del día -->
+      <button
+        class="flex flex-col items-center justify-center bg-blue-100 hover:bg-blue-200 text-blue-900 rounded-xl p-6 shadow transition-all duration-200"
+        (click)="goToAppointments()">
+        <span class="material-icons text-4xl mb-2">event</span>
+        <span class="font-semibold text-lg">Citas del día</span>
+      </button>
+      <!-- Opción: Buscar paciente -->
+      <button
+        class="flex flex-col items-center justify-center bg-blue-100 hover:bg-blue-200 text-blue-900 rounded-xl p-6 shadow transition-all duration-200"
+        (click)="goToSamples()">
+        <span class="material-icons text-4xl mb-2">search</span>
+        <span class="font-semibold text-lg">Search samples</span>
+      </button>
+    </div>
+    <!-- Resumen rápido -->
+    <div class="bg-blue-50 rounded-xl p-6 flex flex-col md:flex-row justify-between items-center">
+      <div>
+        <div class="text-blue-900 font-bold text-xl">Pacientes hoy:</div>
+        <div class="text-blue-700 text-2xl">12</div>
+      </div>
+      <div>
+        <div class="text-blue-900 font-bold text-xl">Citas pendientes:</div>
+        <div class="text-blue-700 text-2xl">5</div>
+      </div>
+    </div>
+  </div>
+</div>

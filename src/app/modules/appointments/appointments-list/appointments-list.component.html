@@ -1,0 +1,37 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col items-center py-10">
+  <div class="w-full max-w-4xl bg-white rounded-3xl shadow-xl p-8 border border-blue-100">
+    <h2 class="text-2xl font-bold text-blue-900 mb-6 text-center">Citas médicas</h2>
+    <div *ngIf="loading" class="text-blue-700 text-center py-8">Cargando...</div>
+    <div *ngIf="!loading">
+      <!-- Próximas citas -->
+      <h3 class="text-xl font-semibold text-blue-800 mb-4">Próximas citas</h3>
+      <div *ngIf="upcomingVisits.length === 0" class="text-blue-500 mb-6">No hay próximas citas.</div>
+      <div *ngFor="let visit of upcomingVisits" class="bg-blue-50 rounded-xl shadow border border-blue-100 px-6 py-4 mb-4 flex flex-col md:flex-row md:items-center justify-between">
+        <div>
+          <div class="font-bold text-blue-900 text-lg">{{ visit.patientName }}</div>
+          <div class="text-blue-700 text-sm">Doctor: {{ visit.doctorName }}</div>
+          <div class="text-blue-700 text-sm">Fecha: {{ visit.visitDate | date:'medium' }}</div>
+          <div class="text-blue-500 text-xs">Tipo: {{ visit.type }}</div>
+        </div>
+        <div class="mt-2 md:mt-0">
+          <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-semibold">Pendiente</span>
+        </div>
+      </div>
+      <!-- Citas pasadas -->
+      <h3 class="text-xl font-semibold text-blue-800 mt-8 mb-4">Citas completadas</h3>
+      <div *ngIf="pastVisits.length === 0" class="text-blue-500 mb-6">No hay citas completadas.</div>
+      <div *ngFor="let visit of pastVisits" class="bg-gray-50 rounded-xl shadow border border-gray-100 px-6 py-4 mb-4 flex flex-col md:flex-row md:items-center justify-between">
+        <div>
+          <div class="font-bold text-blue-900 text-lg">{{ visit.patientName }}</div>
+          <div class="text-blue-700 text-sm">Doctor: {{ visit.doctorName }}</div>
+          <div class="text-blue-700 text-sm">Fecha: {{ visit.visitDate | date:'medium' }}</div>
+          <div class="text-blue-500 text-xs">Tipo: {{ visit.type }}</div>
+          <div class="text-gray-600 text-xs mt-2">Diagnóstico: {{ visit.diagnosis }}</div>
+        </div>
+        <div class="mt-2 md:mt-0">
+          <span class="px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-semibold">Completada</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

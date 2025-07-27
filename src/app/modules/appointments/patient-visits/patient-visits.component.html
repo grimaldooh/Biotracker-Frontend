@@ -1,0 +1,28 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col items-center py-10">
+  <div class="w-full max-w-3xl bg-white rounded-3xl shadow-xl p-8 border border-blue-100">
+    <h2 class="text-2xl font-bold text-blue-900 mb-6 text-center">Histórico de citas del paciente</h2>
+    <div *ngIf="loading" class="text-blue-700 text-center py-8">Cargando...</div>
+    <div *ngIf="!loading">
+      <!-- Próximas citas -->
+      <h3 class="text-xl font-semibold text-blue-800 mb-4">Próximas citas</h3>
+      <div *ngIf="upcomingVisits.length === 0" class="text-blue-500 mb-6">No hay próximas citas.</div>
+      <div *ngFor="let visit of upcomingVisits" class="bg-blue-50 rounded-xl shadow border border-blue-100 px-6 py-4 mb-4">
+        <div class="font-bold text-blue-900 text-lg">{{ visit.type }}</div>
+        <div class="text-blue-700 text-sm">Doctor: {{ visit.doctorName }}</div>
+        <div class="text-blue-700 text-sm">Fecha: {{ visit.visitDate | date:'medium' }}</div>
+        <div class="text-blue-500 text-xs">Notas: {{ visit.notes }}</div>
+      </div>
+      <!-- Citas pasadas -->
+      <h3 class="text-xl font-semibold text-blue-800 mt-8 mb-4">Citas completadas</h3>
+      <div *ngIf="pastVisits.length === 0" class="text-blue-500 mb-6">No hay citas completadas.</div>
+      <div *ngFor="let visit of pastVisits" class="bg-gray-50 rounded-xl shadow border border-gray-100 px-6 py-4 mb-4">
+        <div class="font-bold text-blue-900 text-lg">{{ visit.type }}</div>
+        <div class="text-blue-700 text-sm">Doctor: {{ visit.doctorName }}</div>
+        <div class="text-blue-700 text-sm">Fecha: {{ visit.visitDate | date:'medium' }}</div>
+        <div class="text-blue-500 text-xs">Notas: {{ visit.notes }}</div>
+        <div class="text-gray-600 text-xs mt-2">Diagnóstico: {{ visit.diagnosis }}</div>
+        <div class="text-gray-600 text-xs mt-2">Recomendaciones: {{ visit.recommendations }}</div>
+      </div>
+    </div>
+  </div>
+</div>

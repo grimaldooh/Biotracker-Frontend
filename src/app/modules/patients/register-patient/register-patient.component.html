@@ -1,0 +1,99 @@
+<div class="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
+  <div class="w-full max-w-lg bg-white rounded-3xl shadow-xl p-10 border border-blue-100">
+    <div class="flex flex-col items-center mb-8">
+      <img src="/assets/patient.svg" alt="Paciente" class="w-16 h-16 mb-2 opacity-80" />
+      <h2 class="text-3xl font-extrabold text-blue-900 mb-1 tracking-tight">Nuevo Paciente</h2>
+      <p class="text-blue-500 text-sm">Registra la información básica del paciente</p>
+    </div>
+    <form [formGroup]="patientForm" (ngSubmit)="submit()" class="space-y-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- Nombre -->
+        <div>
+          <label class="block text-blue-900 font-semibold mb-2" for="firstName">Nombre</label>
+          <input id="firstName" matInput formControlName="firstName" required
+            class="w-full px-4 py-2 rounded-xl border border-blue-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all bg-blue-50 text-blue-900 placeholder-blue-300"
+            placeholder="Nombre" autocomplete="given-name">
+          <div *ngIf="patientForm.get('firstName')?.invalid && patientForm.get('firstName')?.touched" class="text-red-500 text-xs mt-1">Campo requerido</div>
+        </div>
+        <!-- Apellido -->
+        <div>
+          <label class="block text-blue-900 font-semibold mb-2" for="lastName">Apellido</label>
+          <input id="lastName" matInput formControlName="lastName" required
+            class="w-full px-4 py-2 rounded-xl border border-blue-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all bg-blue-50 text-blue-900 placeholder-blue-300"
+            placeholder="Apellido" autocomplete="family-name">
+          <div *ngIf="patientForm.get('lastName')?.invalid && patientForm.get('lastName')?.touched" class="text-red-500 text-xs mt-1">Campo requerido</div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- Fecha de nacimiento -->
+        <div>
+          <label class="block text-blue-900 font-semibold mb-2" for="birthDate">Fecha de nacimiento</label>
+          <input id="birthDate" matInput type="date" formControlName="birthDate" required
+            class="w-full px-4 py-2 rounded-xl border border-blue-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all bg-blue-50 text-blue-900 placeholder-blue-300">
+          <div *ngIf="patientForm.get('birthDate')?.invalid && patientForm.get('birthDate')?.touched" class="text-red-500 text-xs mt-1">Campo requerido</div>
+        </div>
+        <!-- Género -->
+        <div>
+          <label class="block text-blue-900 font-semibold mb-2" for="gender">Género</label>
+          <mat-select id="gender" formControlName="gender" required
+            class="w-full rounded-xl border border-blue-200 bg-blue-50 text-blue-900">
+            <mat-option value="MALE">Masculino</mat-option>
+            <mat-option value="FEMALE">Femenino</mat-option>
+            <mat-option value="OTHER">Otro</mat-option>
+          </mat-select>
+          <div *ngIf="patientForm.get('gender')?.invalid && patientForm.get('gender')?.touched" class="text-red-500 text-xs mt-1">Campo requerido</div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- Email -->
+        <div>
+          <label class="block text-blue-900 font-semibold mb-2" for="email">Email</label>
+          <input id="email" matInput type="email" formControlName="email" required
+            class="w-full px-4 py-2 rounded-xl border border-blue-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all bg-blue-50 text-blue-900 placeholder-blue-300"
+            placeholder="ejemplo@correo.com" autocomplete="email">
+          <div *ngIf="patientForm.get('email')?.invalid && patientForm.get('email')?.touched" class="text-red-500 text-xs mt-1">
+            <span *ngIf="patientForm.get('email')?.hasError('required')">Campo requerido</span>
+            <span *ngIf="patientForm.get('email')?.hasError('email')">Email inválido</span>
+          </div>
+        </div>
+        <!-- Teléfono -->
+        <div>
+          <label class="block text-blue-900 font-semibold mb-2" for="phoneNumber">Teléfono</label>
+          <input id="phoneNumber" matInput formControlName="phoneNumber" required
+            class="w-full px-4 py-2 rounded-xl border border-blue-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all bg-blue-50 text-blue-900 placeholder-blue-300"
+            placeholder="Teléfono" autocomplete="tel">
+          <div *ngIf="patientForm.get('phoneNumber')?.invalid && patientForm.get('phoneNumber')?.touched" class="text-red-500 text-xs mt-1">Campo requerido</div>
+        </div>
+      </div>
+      <!-- Password -->
+      <div>
+        <label class="block text-blue-900 font-semibold mb-2" for="password">Contraseña</label>
+        <input id="password" matInput type="password" formControlName="password" required
+          class="w-full px-4 py-2 rounded-xl border border-blue-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all bg-blue-50 text-blue-900 placeholder-blue-300"
+          placeholder="Contraseña" autocomplete="new-password">
+        <div *ngIf="patientForm.get('password')?.invalid && patientForm.get('password')?.touched" class="text-red-500 text-xs mt-1">Campo requerido</div>
+      </div>
+      <!-- CURP -->
+      <div>
+        <label class="block text-blue-900 font-semibold mb-2" for="curp">CURP</label>
+        <input id="curp" matInput formControlName="curp"
+          class="w-full px-4 py-2 rounded-xl border border-blue-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all bg-blue-50 text-blue-900 placeholder-blue-300"
+          placeholder="CURP" autocomplete="off">
+      </div>
+      <!-- Botón -->
+      <button mat-raised-button color="primary"
+        class="w-full py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-semibold text-lg shadow transition-all duration-200 mt-2"
+        [disabled]="loading || patientForm.invalid">
+        <span *ngIf="!loading">Registrar Paciente</span>
+        <span *ngIf="loading">
+          <svg class="animate-spin h-5 w-5 inline-block mr-2" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4" fill="none"></circle>
+            <path class="opacity-75" fill="white"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+          </svg>
+          Registrando...
+        </span>
+      </button>
+    </form>
+  </div>
+</div>
