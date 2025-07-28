@@ -35,5 +35,5 @@ export class DashboardRecepcionComponent {
 
   goToInventory() {
     this.router.navigate(['/inventory']);
-  }
+  } 
 }
