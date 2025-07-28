@@ -1,0 +1,63 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col items-center py-10">
+  <div class="w-full max-w-5xl bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+    <h2 class="text-2xl font-bold text-gray-900 mb-8 text-center">Inventario</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Medicinas -->
+      <div>
+        <h3 class="text-xl font-semibold text-blue-800 mb-4">Medicinas</h3>
+        <form [formGroup]="medicineForm" (ngSubmit)="addMedicine()" class="space-y-2 mb-6">
+          <input formControlName="name" placeholder="Nombre" class="w-full px-3 py-2 rounded border border-gray-200 mb-2" />
+          <input formControlName="brand" placeholder="Marca" class="w-full px-3 py-2 rounded border border-gray-200 mb-2" />
+          <input formControlName="activeSubstance" placeholder="Sustancia activa" class="w-full px-3 py-2 rounded border border-gray-200 mb-2" />
+          <input formControlName="dosage" placeholder="Dosis" class="w-full px-3 py-2 rounded border border-gray-200 mb-2" />
+          <input formControlName="quantity" type="number" placeholder="Cantidad" class="w-full px-3 py-2 rounded border border-gray-200 mb-2" />
+          <input formControlName="expirationDate" type="date" placeholder="Fecha de expiración" class="w-full px-3 py-2 rounded border border-gray-200 mb-2" />
+          <input formControlName="location" placeholder="Ubicación" class="w-full px-3 py-2 rounded border border-gray-200 mb-2" />
+          <button type="submit" class="w-full py-2 rounded bg-blue-700 text-white font-semibold hover:bg-blue-800">Agregar medicina</button>
+        </form>
+        <input [(ngModel)]="searchMedicine" [ngModelOptions]="{standalone: true}" placeholder="Buscar medicina..." class="w-full px-3 py-2 rounded border border-gray-200 mb-4" />
+        <div *ngIf="loadingMedicines" class="text-blue-700 text-center py-4">Cargando...</div>
+        <div *ngFor="let medicine of filteredMedicines" class="flex items-center justify-between bg-blue-50 rounded-xl shadow border border-blue-100 px-4 py-3 mb-2">
+          <div>
+            <div class="font-bold text-blue-900">{{ medicine.name }}</div>
+            <div class="text-blue-700 text-sm">{{ medicine.brand }} | {{ medicine.dosage }}</div>
+            <div class="text-xs text-blue-500">Ubicación: {{ medicine.location }}</div>
+            <div class="text-xs text-blue-500">Expira: {{ medicine.expirationDate | date:'mediumDate' }}</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button (click)="updateMedicineQuantity(medicine.id, -1)" class="px-2 py-1 rounded bg-red-100 text-red-700 hover:bg-red-200">-</button>
+            <span class="font-bold text-lg">{{ medicine.quantity }}</span>
+            <button (click)="updateMedicineQuantity(medicine.id, 1)" class="px-2 py-1 rounded bg-green-100 text-green-700 hover:bg-green-200">+</button>
+          </div>
+        </div>
+      </div>
+      <!-- Items -->
+      <div>
+        <h3 class="text-xl font-semibold text-green-800 mb-4">Items</h3>
+        <form [formGroup]="itemForm" (ngSubmit)="addItem()" class="space-y-2 mb-6">
+          <input formControlName="name" placeholder="Nombre" class="w-full px-3 py-2 rounded border border-gray-200 mb-2" />
+          <input formControlName="description" placeholder="Descripción" class="w-full px-3 py-2 rounded border border-gray-200 mb-2" />
+          <input formControlName="quantity" type="number" placeholder="Cantidad" class="w-full px-3 py-2 rounded border border-gray-200 mb-2" />
+          <input formControlName="location" placeholder="Ubicación" class="w-full px-3 py-2 rounded border border-gray-200 mb-2" />
+          <input formControlName="category" placeholder="Categoría" class="w-full px-3 py-2 rounded border border-gray-200 mb-2" />
+          <button type="submit" class="w-full py-2 rounded bg-green-700 text-white font-semibold hover:bg-green-800">Agregar item</button>
+        </form>
+        <input [(ngModel)]="searchItem" [ngModelOptions]="{standalone: true}" placeholder="Buscar item..." class="w-full px-3 py-2 rounded border border-gray-200 mb-4" />
+        <div *ngIf="loadingItems" class="text-green-700 text-center py-4">Cargando...</div>
+        <div *ngFor="let item of filteredItems" class="flex items-center justify-between bg-green-50 rounded-xl shadow border border-green-100 px-4 py-3 mb-2">
+          <div>
+            <div class="font-bold text-green-900">{{ item.name }}</div>
+            <div class="text-green-700 text-sm">{{ item.category }}</div>
+            <div class="text-xs text-green-500">Ubicación: {{ item.location }}</div>
+            <div class="text-xs text-green-500">Descripción: {{ item.description }}</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button (click)="updateItemQuantity(item.id, -1)" class="px-2 py-1 rounded bg-red-100 text-red-700 hover:bg-red-200">-</button>
+            <span class="font-bold text-lg">{{ item.quantity }}</span>
+            <button (click)="updateItemQuantity(item.id, 1)" class="px-2 py-1 rounded bg-green-100 text-green-700 hover:bg-green-200">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

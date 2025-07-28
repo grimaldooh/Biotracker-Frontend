@@ -32,4 +32,8 @@ export class DashboardRecepcionComponent {
   goToCreateAppointment() {
     this.router.navigate(['/appointments/create']);
   }
+
+  goToInventory() {
+    this.router.navigate(['/inventory']);
+  }
 }
