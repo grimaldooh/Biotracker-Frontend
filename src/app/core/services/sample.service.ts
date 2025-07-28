@@ -14,4 +14,8 @@ export class SampleService {
   getSamplesByPatient(patientId: string) {
     return this.http.get<SampleDTO[]>(`http://localhost:8080/api/samples/patient/${patientId}`);
   }
+
+  registerSample(sample: any) {
+    return this.http.post('http://localhost:8080/api/samples', sample);
+  }
 }

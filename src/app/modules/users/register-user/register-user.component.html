@@ -1,0 +1,19 @@
+<div class="min-h-screen bg-gradient-to-br from-purple-50 to-purple-100 flex flex-col items-center py-10">
+  <div class="w-full max-w-lg bg-white rounded-3xl shadow-xl p-10 border border-purple-100">
+    <h2 class="text-2xl font-bold text-purple-900 mb-6 text-center">Registro de Usuario</h2>
+    <form [formGroup]="userForm" (ngSubmit)="submit()" class="space-y-4">
+      <input formControlName="name" placeholder="Nombre completo" class="w-full px-4 py-2 rounded-xl border border-purple-200 mb-2" />
+      <input formControlName="phoneNumber" placeholder="Teléfono" class="w-full px-4 py-2 rounded-xl border border-purple-200 mb-2" />
+      <input formControlName="email" type="email" placeholder="Email" class="w-full px-4 py-2 rounded-xl border border-purple-200 mb-2" />
+      <input formControlName="password" type="password" placeholder="Contraseña" class="w-full px-4 py-2 rounded-xl border border-purple-200 mb-2" />
+      <select formControlName="role" class="w-full px-4 py-2 rounded-xl border border-purple-200 mb-2">
+        <option value="" disabled selected>Selecciona el rol</option>
+        <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+      </select>
+      <input formControlName="specialty" placeholder="Especialidad (solo para médicos)" class="w-full px-4 py-2 rounded-xl border border-purple-200 mb-2" />
+      <button type="submit" class="w-full py-3 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-semibold text-lg shadow transition-all duration-200" [disabled]="userForm.invalid">
+        Registrar usuario
+      </button>
+    </form>
+  </div>
+</div>

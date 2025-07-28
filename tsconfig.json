@@ -15,6 +15,7 @@
     "importHelpers": true,
     "target": "ES2022",
     "module": "ES2022"
+    // Ensure there is no "types" or "typeRoots" field referencing missing types
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

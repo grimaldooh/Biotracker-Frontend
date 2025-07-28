@@ -36,4 +36,8 @@ export class DashboardRecepcionComponent {
   goToInventory() {
     this.router.navigate(['/inventory']);
   } 
+
+  goToRegisterUser() {
+    this.router.navigate(['/users/register']);
+  }
 }

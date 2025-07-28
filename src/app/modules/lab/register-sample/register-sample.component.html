@@ -1,0 +1,120 @@
+<div class="min-h-screen bg-gradient-to-br from-purple-50 to-purple-100 flex flex-col items-center py-10">
+  <div class="w-full max-w-2xl bg-white rounded-3xl shadow-xl p-10 border border-purple-100">
+    <h2 class="text-2xl font-bold text-purple-900 mb-6 text-center">Registrar muestra</h2>
+    <div class="flex justify-center gap-4 mb-8">
+      <button type="button" (click)="selectType('BLOOD')" [class.bg-purple-700]="sampleType==='BLOOD'" class="px-4 py-2 rounded-xl bg-purple-100 text-purple-900 font-semibold hover:bg-purple-200">Sangre</button>
+      <button type="button" (click)="selectType('DNA')" [class.bg-purple-700]="sampleType==='DNA'" class="px-4 py-2 rounded-xl bg-purple-100 text-purple-900 font-semibold hover:bg-purple-200">DNA</button>
+      <button type="button" (click)="selectType('SALIVA')" [class.bg-purple-700]="sampleType==='SALIVA'" class="px-4 py-2 rounded-xl bg-purple-100 text-purple-900 font-semibold hover:bg-purple-200">Saliva</button>
+    </div>
+    <form [formGroup]="sampleForm" (ngSubmit)="submit()" class="space-y-4">
+      <input formControlName="patientId" placeholder="ID paciente" class="w-full px-4 py-2 rounded-xl border border-purple-200 mb-2" />
+      <input formControlName="registeredById" placeholder="ID laboratorista" class="w-full px-4 py-2 rounded-xl border border-purple-200 mb-2" />
+      <input formControlName="collectionDate" type="date" class="w-full px-4 py-2 rounded-xl border border-purple-200 mb-2" />
+      <input formControlName="notes" placeholder="Notas" class="w-full px-4 py-2 rounded-xl border border-purple-200 mb-2" />
+      <!-- Formulario Sangre -->
+      <div *ngIf="sampleType==='BLOOD'">
+        <div [formGroup]="bloodGroup" class="space-y-2">
+          <input formControlName="glucoseMgDl" type="number" placeholder="Glucosa (mg/dL)" />
+          <input formControlName="cholesterolTotalMgDl" type="number" placeholder="Colesterol total (mg/dL)" />
+          <input formControlName="cholesterolHdlMgDl" type="number" placeholder="Colesterol HDL (mg/dL)" />
+          <input formControlName="cholesterolLdlMgDl" type="number" placeholder="Colesterol LDL (mg/dL)" />
+          <input formControlName="triglyceridesMgDl" type="number" placeholder="Triglicéridos (mg/dL)" />
+          <input formControlName="creatinineMgDl" type="number" placeholder="Creatinina (mg/dL)" />
+          <input formControlName="ureaMgDl" type="number" placeholder="Urea (mg/dL)" />
+          <input formControlName="hemoglobinGDl" type="number" placeholder="Hemoglobina (g/dL)" />
+          <input formControlName="hematocritPercent" type="number" placeholder="Hematocrito (%)" />
+          <input formControlName="redBloodCellsMillionUl" type="number" placeholder="Eritrocitos (mill/µL)" />
+          <input formControlName="whiteBloodCellsThousandUl" type="number" placeholder="Leucocitos (mil/µL)" />
+          <input formControlName="plateletsThousandUl" type="number" placeholder="Plaquetas (mil/µL)" />
+          <input formControlName="altSgptUL" type="number" placeholder="ALT/SGPT (U/L)" />
+          <input formControlName="astSgotUL" type="number" placeholder="AST/SGOT (U/L)" />
+          <input formControlName="bilirubinTotalMgDl" type="number" placeholder="Bilirrubina total (mg/dL)" />
+          <input formControlName="alkalinePhosphataseUL" type="number" placeholder="Fosfatasa alcalina (U/L)" />
+          <input formControlName="bunMgDl" type="number" placeholder="BUN (mg/dL)" />
+          <input formControlName="gfrMlMin" type="number" placeholder="GFR (ml/min)" />
+          <input formControlName="totalProteinGDl" type="number" placeholder="Proteína total (g/dL)" />
+          <input formControlName="albuminGDl" type="number" placeholder="Albúmina (g/dL)" />
+          <input formControlName="sodiumMeqL" type="number" placeholder="Sodio (mEq/L)" />
+          <input formControlName="potassiumMeqL" type="number" placeholder="Potasio (mEq/L)" />
+          <input formControlName="chlorideMeqL" type="number" placeholder="Cloruro (mEq/L)" />
+          <input formControlName="cReactiveProteinMgL" type="number" placeholder="Proteína C reactiva (mg/L)" />
+          <input formControlName="esrMmHr" type="number" placeholder="ESR (mm/hr)" />
+          <input formControlName="geneticMarkersDetected" type="number" placeholder="Marcadores genéticos detectados" />
+          <input formControlName="geneticQualityScore" type="number" placeholder="Calidad genética (%)" />
+          <input formControlName="labReferenceValues" type="text" placeholder="Valores de referencia" />
+          <input formControlName="analyzerModel" type="text" placeholder="Modelo de analizador" />
+          <input formControlName="centrifugationSpeedRpm" type="number" placeholder="Velocidad de centrifugación (rpm)" />
+          <input formControlName="storageTemperatureCelsius" type="number" placeholder="Temperatura de almacenamiento (°C)" />
+        </div>
+      </div>
+      <!-- Formulario DNA -->
+      <div *ngIf="sampleType==='DNA'">
+        <div [formGroup]="dnaGroup" class="space-y-2">
+          <input formControlName="concentrationNgUl" type="number" placeholder="Concentración DNA (ng/µl)" />
+          <input formControlName="purity260280Ratio" type="number" placeholder="Pureza 260/280" />
+          <input formControlName="purity260230Ratio" type="number" placeholder="Pureza 260/230" />
+          <input formControlName="integrityNumber" type="number" placeholder="Número de integridad" />
+          <input formControlName="extractionMethod" type="text" placeholder="Método de extracción" />
+          <input formControlName="extractionDate" type="datetime-local" placeholder="Fecha de extracción" />
+          <input formControlName="extractionTechnician" type="text" placeholder="Técnico de extracción" />
+          <input formControlName="storageBuffer" type="text" placeholder="Buffer de almacenamiento" />
+          <input formControlName="aliquotVolumeUl" type="number" placeholder="Volumen alícuota (µl)" />
+          <input formControlName="freezerLocation" type="text" placeholder="Ubicación en congelador" />
+          <input formControlName="sequencingPlatform" type="text" placeholder="Plataforma de secuenciación" />
+          <input formControlName="sequencingDepth" type="number" placeholder="Profundidad de secuenciación" />
+          <input formControlName="libraryPrepProtocol" type="text" placeholder="Protocolo de preparación de librería" />
+          <input formControlName="totalReads" type="number" placeholder="Lecturas totales" />
+          <input formControlName="mappedReads" type="number" placeholder="Lecturas mapeadas" />
+          <input formControlName="mappingQualityScore" type="number" placeholder="Calidad de mapeo" />
+          <input formControlName="variantsDetected" type="number" placeholder="Variantes detectadas" />
+          <input formControlName="snpsDetected" type="number" placeholder="SNPs detectados" />
+          <input formControlName="indelsDetected" type="number" placeholder="Indels detectados" />
+          <input formControlName="fastqR1Url" type="text" placeholder="FASTQ R1 URL" />
+          <input formControlName="fastqR2Url" type="text" placeholder="FASTQ R2 URL" />
+          <input formControlName="vcfFileUrl" type="text" placeholder="VCF File URL" />
+          <input formControlName="bamFileUrl" type="text" placeholder="BAM File URL" />
+        </div>
+      </div>
+      <!-- Formulario Saliva -->
+      <div *ngIf="sampleType==='SALIVA'">
+        <div [formGroup]="salivaGroup" class="space-y-2">
+          <input formControlName="volumeMl" type="number" placeholder="Volumen (ml)" />
+          <input formControlName="phLevel" type="number" placeholder="pH" />
+          <input formControlName="viscosity" type="text" placeholder="Viscosidad" />
+          <input formControlName="dnaYieldNg" type="number" placeholder="DNA yield (ng)" />
+          <input formControlName="cellCountPerMl" type="number" placeholder="Conteo celular por ml" />
+          <input formControlName="collectionMethod" type="text" placeholder="Método de colección" />
+          <input formControlName="storageTemperatureCelsius" type="number" placeholder="Temperatura de almacenamiento (°C)" />
+        </div>
+      </div>
+      <button type="submit" class="w-full py-3 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-semibold text-lg shadow transition-all duration-200" [disabled]="loading || sampleForm.invalid">
+        <span *ngIf="!loading">Registrar muestra</span>
+        <span *ngIf="loading">Registrando...</span>
+      </button>
+    </form>
+    <div class="relative mb-4 mt-6">
+      <input
+        type="text"
+        [(ngModel)]="searchPatientTerm"
+        [ngModelOptions]="{standalone: true}"
+        (keydown.enter)="searchPatients()"
+        placeholder="Buscar paciente por nombre..."
+        class="w-full px-4 py-2 rounded-xl border border-gray-200 bg-gray-50 text-purple-900 placeholder-gray-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition-all"
+      />
+      <div *ngIf="loadingPatients" class="absolute right-4 top-2 text-purple-400 animate-spin">
+        <span class="material-icons">autorenew</span>
+      </div>
+      <div *ngIf="filteredPatients.length > 0" class="absolute left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-purple-100 z-10">
+        <div
+          *ngFor="let patient of filteredPatients"
+          (click)="selectPatient(patient)"
+          class="px-4 py-2 cursor-pointer hover:bg-purple-50 text-purple-900"
+        >
+          <span class="font-semibold">{{ patient.firstName }} {{ patient.lastName }}</span>
+          <span class="text-xs text-purple-500 ml-2">{{ patient.email }}</span>
+          <span class="text-xs text-gray-500 ml-2">Nacimiento: {{ patient.birthDate | date:'mediumDate' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

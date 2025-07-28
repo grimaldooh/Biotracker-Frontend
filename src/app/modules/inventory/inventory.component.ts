@@ -20,6 +20,8 @@ export class InventoryComponent implements OnInit {
   searchItem = '';
   medicineForm: FormGroup;
   itemForm: FormGroup;
+  medicineOrder: string[] = [];
+  itemOrder: string[] = [];
 
   constructor(private fb: FormBuilder, private inventoryService: InventoryService) {
     this.medicineForm = this.fb.group({
@@ -47,14 +49,31 @@ export class InventoryComponent implements OnInit {
 
   loadMedicines() {
     this.inventoryService.getMedicines().subscribe({
-      next: (data) => { this.medicines = data; this.loadingMedicines = false; },
+      next: (data) => {
+        if (this.medicineOrder.length === 0) {
+          this.medicineOrder = data.map(m => m.id!);
+        }
+        // Ordena según el orden original
+        this.medicines = this.medicineOrder
+          .map(id => data.find(m => m.id === id))
+          .filter(Boolean) as InventoryMedicine[];
+        this.loadingMedicines = false;
+      },
       error: () => { this.loadingMedicines = false; }
     });
   }
 
   loadItems() {
     this.inventoryService.getItems().subscribe({
-      next: (data) => { this.items = data; this.loadingItems = false; },
+      next: (data) => {
+        if (this.itemOrder.length === 0) {
+          this.itemOrder = data.map(i => i.id!);
+        }
+        this.items = this.itemOrder
+          .map(id => data.find(i => i.id === id))
+          .filter(Boolean) as InventoryItem[];
+        this.loadingItems = false;
+      },
       error: () => { this.loadingItems = false; }
     });
   }
@@ -101,6 +120,31 @@ export class InventoryComponent implements OnInit {
   get filteredItems() {
     const term = this.searchItem.toLowerCase();
     return this.items.filter(i => i.name.toLowerCase().includes(term) || i.category.toLowerCase().includes(term));
+  }
+
+  trackByMedicineId(index: number, medicine: InventoryMedicine) {
+    return medicine.id;
+  }
+  trackByItemId(index: number, item: InventoryItem) {
+    return item.id;
+  }
+
+  confirmUpdateMedicineQuantity(medicine: InventoryMedicine, delta: number) {
+    const newQuantity = medicine.quantity + delta;
+    if (newQuantity < 0) return;
+    if (confirm(`¿Seguro que deseas ${delta > 0 ? 'aumentar' : 'disminuir'} la cantidad de "${medicine.name}" a ${newQuantity}?`)) {
+      const updated = { ...medicine, quantity: newQuantity };
+      this.inventoryService.updateMedicineQuantity(medicine.id!, updated).subscribe(() => this.loadMedicines());
+    }
+  }
+
+  confirmUpdateItemQuantity(item: InventoryItem, delta: number) {
+    const newQuantity = item.quantity + delta;
+    if (newQuantity < 0) return;
+    if (confirm(`¿Seguro que deseas ${delta > 0 ? 'aumentar' : 'disminuir'} la cantidad de "${item.name}" a ${newQuantity}?`)) {
+      const updated = { ...item, quantity: newQuantity };
+      this.inventoryService.updateItemQuantity(item.id!, updated).subscribe(() => this.loadItems());
+    }
   }
 }
 

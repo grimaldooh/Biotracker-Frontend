@@ -55,6 +55,24 @@ export const routes: Routes = [
       import('./modules/inventory/inventory.component')
         .then(m => m.InventoryComponent)
   },
+  {
+    path: 'users/register',
+    loadComponent: () =>
+      import('./modules/users/register-user/register-user.component')
+        .then(m => m.RegisterUserComponent)
+  },
+  {
+    path: 'lab/dashboard',
+    loadComponent: () =>
+      import('./modules/lab/dashboard/dashboard.component')
+        .then(m => m.DashboardComponent)
+  },
+  {
+    path: 'lab/register-sample',
+    loadComponent: () =>
+      import('./modules/lab/register-sample/register-sample.component')
+        .then(m => m.RegisterSampleComponent)
+  },
   { path: '', redirectTo: 'patients/register', pathMatch: 'full' },
   { path: '**', redirectTo: 'patients/register' }
 ];
