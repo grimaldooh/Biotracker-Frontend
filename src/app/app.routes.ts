@@ -43,6 +43,12 @@ export const routes: Routes = [
       import('./modules/samples/patient-samples/patient-samples.component')
         .then(m => m.PatientSamplesComponent)
   },
+  {
+    path: 'appointments/create',
+    loadComponent: () =>
+      import('./modules/appointments/create-appointment/create-appointment.component')
+        .then(m => m.CreateAppointmentComponent)
+  },
   { path: '', redirectTo: 'patients/register', pathMatch: 'full' },
   { path: '**', redirectTo: 'patients/register' }
 ];

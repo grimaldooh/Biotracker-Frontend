@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HospitalService } from '../../../core/services/hospital.service';
 import { MedicalVisitDTO } from '../medical-visit.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-appointments-list',
@@ -15,7 +16,7 @@ export class AppointmentsListComponent implements OnInit {
   visits: MedicalVisitDTO[] = [];
   loading = true;
 
-  constructor(private hospitalService: HospitalService) {}
+  constructor(private hospitalService: HospitalService, private router: Router) {}
 
   ngOnInit() {
     this.hospitalService.getMedicalVisitsByHospital(this.medicalEntityId).subscribe({
@@ -35,5 +36,9 @@ export class AppointmentsListComponent implements OnInit {
 
   get pastVisits() {
     return this.visits.filter(v => v.visitCompleted);
+  }
+
+  goToCreateAppointment() {
+    this.router.navigate(['/appointments/create']);
   }
 }

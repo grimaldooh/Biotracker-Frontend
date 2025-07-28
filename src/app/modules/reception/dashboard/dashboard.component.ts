@@ -28,4 +28,8 @@ export class DashboardRecepcionComponent {
     // Implementa la navegación a búsqueda de pacientes
     this.router.navigate(['/samples']);
   }
+
+  goToCreateAppointment() {
+    this.router.navigate(['/appointments/create']);
+  }
 }

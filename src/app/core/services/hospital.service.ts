@@ -3,6 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { MedicalVisitDTO } from '../../modules/appointments/medical-visit.model';
 
+
+interface Medic {
+  id: string;
+  name: string;
+  specialty: string | null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -15,5 +22,13 @@ export class HospitalService {
 
   getPatientVisits(patientId: string) {
     return this.http.get<MedicalVisitDTO[]>(`http://localhost:8080/api/medical-visits/patient/${patientId}`);
+  }
+
+  getMedicsByHospital(hospitalId: string) {
+    return this.http.get<Medic[]>(`http://localhost:8080/api/users/hospital/${hospitalId}/medics`);
+  }
+
+  createMedicalVisit(hospitalId: string, body: any) {
+    return this.http.post(`http://localhost:8080/api/medical-visits/${hospitalId}`, body);
   }
 }

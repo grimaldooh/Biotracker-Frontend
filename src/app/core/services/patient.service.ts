@@ -25,4 +25,11 @@ export class PatientService {
     return this.http.delete(`http://localhost:8080/api/patients/${id}`);
   }
 
+  getPatientsByName(firstName: string, lastName: string) {
+    const params = new URLSearchParams();
+    if (firstName) params.append('firstName', firstName);
+    if (lastName) params.append('lastName', lastName);
+    return this.http.get<Patient[]>(`http://localhost:8080/api/patients/getPatientsByName?${params.toString()}`);
+  }
+
 }

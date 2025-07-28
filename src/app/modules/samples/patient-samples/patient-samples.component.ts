@@ -23,10 +23,12 @@ export class PatientSamplesComponent implements OnInit {
     this.patientId = this.route.snapshot.paramMap.get('patientId') || '';
     this.sampleService.getSamplesByPatient(this.patientId).subscribe({
       next: (data) => {
+        console.log('Muestras del paciente cargadas:', data);
         this.samples = data;
         this.loading = false;
       },
       error: () => {
+        console.error('Error al cargar muestras del paciente');
         this.loading = false;
       }
     });
