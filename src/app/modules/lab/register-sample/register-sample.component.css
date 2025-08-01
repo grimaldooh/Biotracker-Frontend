@@ -1,0 +1,117 @@
+/* Glass effect */
+.glass {
+  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* Input focus effects */
+.input-focus:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Sample card animations */
+.sample-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sample-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Fade in animation */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Section divider */
+.section-divider {
+  background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+}
+
+/* Sample input styling */
+.sample-input {
+  @apply w-full px-3 py-3 rounded-xl border border-slate-200 bg-white/50 text-slate-700 placeholder-slate-400 focus:border-slate-400 focus:ring-0 focus:outline-none transition-all duration-300 text-sm;
+}
+
+.sample-input:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom scrollbar for dropdown */
+.max-h-60::-webkit-scrollbar {
+  width: 6px;
+}
+
+.max-h-60::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.max-h-60::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.max-h-60::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .glass {
+    margin: 1rem;
+    border-radius: 1.5rem;
+  }
+  
+  .sample-card {
+    padding: 1rem;
+  }
+  
+  .sample-input {
+    padding: 0.75rem;
+  }
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Form validation styles */
+.ng-invalid.ng-touched {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.ng-valid.ng-touched {
+  border-color: #10b981;
+}
+
+/* Error message styling */
+.error-message {
+  @apply text-red-500 text-xs mt-1;
+}
+
+/* Success message styling */
+.success-message {
+  @apply text-green-500 text-xs mt-1;
+}

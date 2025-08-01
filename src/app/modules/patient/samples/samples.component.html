@@ -1,0 +1,89 @@
+<div class="min-h-screen bg-slate-50 p-4 sm:p-6 lg:p-8">
+  <div class="w-full max-w-3xl mx-auto">
+    <div class="mb-6">
+      <h2 class="text-3xl font-bold text-slate-800">Tus Estudios Clínicos</h2>
+      <p class="text-slate-500 mt-1">Aquí puedes ver el historial y los detalles de tus muestras.</p>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200">
+      <div *ngIf="loading" class="text-center text-slate-500 p-12">
+        <p>Cargando estudios...</p>
+      </div>
+
+      <div *ngIf="!loading && samples.length === 0" class="text-center text-slate-500 p-12">
+        <p>No tienes estudios registrados por el momento.</p>
+      </div>
+
+      <div *ngIf="!loading && samples.length > 0">
+        <ul class="divide-y divide-slate-200">
+          <li *ngFor="let sample of samples">
+            <button (click)="showDetails(sample)" class="w-full text-left flex items-center p-4 hover:bg-slate-50 transition-colors duration-200">
+              <div class="flex items-center gap-4 flex-1">
+                <span class="material-icons text-indigo-500 bg-indigo-50 p-2 rounded-full">science</span>
+                <div>
+                  <p class="font-semibold text-slate-800">{{ sample.type }}</p>
+                  <p class="text-sm text-slate-500">Registrado por: {{ sample.registeredByName }}</p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-4 text-sm text-right">
+                <div class="hidden sm:block">
+                  <p class="font-medium text-slate-600">{{ sample.collectionDate | date:'mediumDate' }}</p>
+                  <span [ngClass]="sample.status | statusColor" class="px-2 py-0.5 text-xs font-semibold rounded-full">
+                    {{ sample.status }}
+                  </span>
+                </div>
+                <span class="material-icons text-slate-400">chevron_right</span>
+              </div>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="selectedSample" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between p-6 border-b border-slate-200">
+      <h3 class="text-xl font-bold text-slate-800">Detalles del Estudio</h3>
+      <button (click)="closeModal()" class="text-slate-400 hover:bg-slate-100 rounded-full p-1 transition-colors">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="p-6">
+      <dl class="detail-list">
+        <dt>Tipo</dt>
+        <dd>{{ selectedSample.type }}</dd>
+
+        <dt>Registrado por</dt>
+        <dd>{{ selectedSample.registeredByName }}</dd>
+
+        <dt>Fecha de colección</dt>
+        <dd>{{ selectedSample.collectionDate | date:'fullDate' }}</dd>
+
+        <dt>Estado</dt>
+        <dd>
+          <span [ngClass]="selectedSample.status | statusColor" class="px-2 py-0.5 text-xs font-semibold rounded-full">
+            {{ selectedSample.status }}
+          </span>
+        </dd>
+
+        <dt>Notas</dt>
+        <dd class="whitespace-pre-wrap">{{ selectedSample.notes || 'Sin notas.' }}</dd>
+      </dl>
+
+      <div *ngIf="selectedSample.bloodData" class="mt-6">
+        <h4 class="font-semibold text-slate-700 mb-2 border-b pb-2">Datos de Sangre</h4>
+        <dl class="detail-list">
+          <ng-container *ngFor="let item of (selectedSample.bloodData | keyvalue)">
+            <dt>{{ item.key }}</dt>
+            <dd>{{ item.value }}</dd>
+          </ng-container>
+        </dl>
+      </div>
+
+      </div>
+  </div>
+</div>

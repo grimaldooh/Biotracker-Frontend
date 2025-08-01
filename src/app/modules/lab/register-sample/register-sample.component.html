@@ -1,120 +1,425 @@
-<div class="min-h-screen bg-gradient-to-br from-purple-50 to-purple-100 flex flex-col items-center py-10">
-  <div class="w-full max-w-2xl bg-white rounded-3xl shadow-xl p-10 border border-purple-100">
-    <h2 class="text-2xl font-bold text-purple-900 mb-6 text-center">Registrar muestra</h2>
-    <div class="flex justify-center gap-4 mb-8">
-      <button type="button" (click)="selectType('BLOOD')" [class.bg-purple-700]="sampleType==='BLOOD'" class="px-4 py-2 rounded-xl bg-purple-100 text-purple-900 font-semibold hover:bg-purple-200">Sangre</button>
-      <button type="button" (click)="selectType('DNA')" [class.bg-purple-700]="sampleType==='DNA'" class="px-4 py-2 rounded-xl bg-purple-100 text-purple-900 font-semibold hover:bg-purple-200">DNA</button>
-      <button type="button" (click)="selectType('SALIVA')" [class.bg-purple-700]="sampleType==='SALIVA'" class="px-4 py-2 rounded-xl bg-purple-100 text-purple-900 font-semibold hover:bg-purple-200">Saliva</button>
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-light text-slate-800 mb-2">Registro de Muestras</h1>
+      <p class="text-slate-500 font-light">Sistema de laboratorio clínico</p>
     </div>
-    <form [formGroup]="sampleForm" (ngSubmit)="submit()" class="space-y-4">
-      <input formControlName="patientId" placeholder="ID paciente" class="w-full px-4 py-2 rounded-xl border border-purple-200 mb-2" />
-      <input formControlName="registeredById" placeholder="ID laboratorista" class="w-full px-4 py-2 rounded-xl border border-purple-200 mb-2" />
-      <input formControlName="collectionDate" type="date" class="w-full px-4 py-2 rounded-xl border border-purple-200 mb-2" />
-      <input formControlName="notes" placeholder="Notas" class="w-full px-4 py-2 rounded-xl border border-purple-200 mb-2" />
-      <!-- Formulario Sangre -->
-      <div *ngIf="sampleType==='BLOOD'">
-        <div [formGroup]="bloodGroup" class="space-y-2">
-          <input formControlName="glucoseMgDl" type="number" placeholder="Glucosa (mg/dL)" />
-          <input formControlName="cholesterolTotalMgDl" type="number" placeholder="Colesterol total (mg/dL)" />
-          <input formControlName="cholesterolHdlMgDl" type="number" placeholder="Colesterol HDL (mg/dL)" />
-          <input formControlName="cholesterolLdlMgDl" type="number" placeholder="Colesterol LDL (mg/dL)" />
-          <input formControlName="triglyceridesMgDl" type="number" placeholder="Triglicéridos (mg/dL)" />
-          <input formControlName="creatinineMgDl" type="number" placeholder="Creatinina (mg/dL)" />
-          <input formControlName="ureaMgDl" type="number" placeholder="Urea (mg/dL)" />
-          <input formControlName="hemoglobinGDl" type="number" placeholder="Hemoglobina (g/dL)" />
-          <input formControlName="hematocritPercent" type="number" placeholder="Hematocrito (%)" />
-          <input formControlName="redBloodCellsMillionUl" type="number" placeholder="Eritrocitos (mill/µL)" />
-          <input formControlName="whiteBloodCellsThousandUl" type="number" placeholder="Leucocitos (mil/µL)" />
-          <input formControlName="plateletsThousandUl" type="number" placeholder="Plaquetas (mil/µL)" />
-          <input formControlName="altSgptUL" type="number" placeholder="ALT/SGPT (U/L)" />
-          <input formControlName="astSgotUL" type="number" placeholder="AST/SGOT (U/L)" />
-          <input formControlName="bilirubinTotalMgDl" type="number" placeholder="Bilirrubina total (mg/dL)" />
-          <input formControlName="alkalinePhosphataseUL" type="number" placeholder="Fosfatasa alcalina (U/L)" />
-          <input formControlName="bunMgDl" type="number" placeholder="BUN (mg/dL)" />
-          <input formControlName="gfrMlMin" type="number" placeholder="GFR (ml/min)" />
-          <input formControlName="totalProteinGDl" type="number" placeholder="Proteína total (g/dL)" />
-          <input formControlName="albuminGDl" type="number" placeholder="Albúmina (g/dL)" />
-          <input formControlName="sodiumMeqL" type="number" placeholder="Sodio (mEq/L)" />
-          <input formControlName="potassiumMeqL" type="number" placeholder="Potasio (mEq/L)" />
-          <input formControlName="chlorideMeqL" type="number" placeholder="Cloruro (mEq/L)" />
-          <input formControlName="cReactiveProteinMgL" type="number" placeholder="Proteína C reactiva (mg/L)" />
-          <input formControlName="esrMmHr" type="number" placeholder="ESR (mm/hr)" />
-          <input formControlName="geneticMarkersDetected" type="number" placeholder="Marcadores genéticos detectados" />
-          <input formControlName="geneticQualityScore" type="number" placeholder="Calidad genética (%)" />
-          <input formControlName="labReferenceValues" type="text" placeholder="Valores de referencia" />
-          <input formControlName="analyzerModel" type="text" placeholder="Modelo de analizador" />
-          <input formControlName="centrifugationSpeedRpm" type="number" placeholder="Velocidad de centrifugación (rpm)" />
-          <input formControlName="storageTemperatureCelsius" type="number" placeholder="Temperatura de almacenamiento (°C)" />
+
+    <!-- Main Card -->
+    <div class="glass rounded-3xl shadow-xl border border-white/20 overflow-hidden">
+      <!-- Sample Type Selection -->
+      <div class="p-8 border-b border-slate-100">
+        <h2 class="text-xl font-medium text-slate-700 mb-6 text-center">Tipo de muestra</h2>
+        <div class="grid grid-cols-3 gap-4 max-w-md mx-auto">
+          <button 
+            type="button"
+            (click)="selectSampleType('BLOOD')" 
+            [class.border-red-400]="sampleType === 'BLOOD'"
+            [class.bg-red-50]="sampleType === 'BLOOD'"
+            [class.border-slate-200]="sampleType !== 'BLOOD'"
+            class="sample-card group p-6 rounded-2xl border-2 hover:border-red-300 transition-all duration-300 text-center"
+          >
+            <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-red-100 group-hover:bg-red-200 flex items-center justify-center">
+              <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 2L3 7v11a1 1 0 001 1h12a1 1 0 001-1V7l-7-5z"/>
+              </svg>
+            </div>
+            <span class="text-sm font-medium text-slate-700 group-hover:text-red-700">Sangre</span>
+          </button>
+
+          <button 
+            type="button"
+            (click)="selectSampleType('DNA')" 
+            [class.border-blue-400]="sampleType === 'DNA'"
+            [class.bg-blue-50]="sampleType === 'DNA'"
+            [class.border-slate-200]="sampleType !== 'DNA'"
+            class="sample-card group p-6 rounded-2xl border-2 hover:border-blue-300 transition-all duration-300 text-center"
+          >
+            <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-blue-100 group-hover:bg-blue-200 flex items-center justify-center">
+              <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <span class="text-sm font-medium text-slate-700 group-hover:text-blue-700">DNA</span>
+          </button>
+
+          <button 
+            type="button"
+            (click)="selectSampleType('SALIVA')" 
+            [class.border-green-400]="sampleType === 'SALIVA'"
+            [class.bg-green-50]="sampleType === 'SALIVA'"
+            [class.border-slate-200]="sampleType !== 'SALIVA'"
+            class="sample-card group p-6 rounded-2xl border-2 hover:border-green-300 transition-all duration-300 text-center"
+          >
+            <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-green-100 group-hover:bg-green-200 flex items-center justify-center">
+              <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+              </svg>
+            </div>
+            <span class="text-sm font-medium text-slate-700 group-hover:text-green-700">Saliva</span>
+          </button>
         </div>
       </div>
-      <!-- Formulario DNA -->
-      <div *ngIf="sampleType==='DNA'">
-        <div [formGroup]="dnaGroup" class="space-y-2">
-          <input formControlName="concentrationNgUl" type="number" placeholder="Concentración DNA (ng/µl)" />
-          <input formControlName="purity260280Ratio" type="number" placeholder="Pureza 260/280" />
-          <input formControlName="purity260230Ratio" type="number" placeholder="Pureza 260/230" />
-          <input formControlName="integrityNumber" type="number" placeholder="Número de integridad" />
-          <input formControlName="extractionMethod" type="text" placeholder="Método de extracción" />
-          <input formControlName="extractionDate" type="datetime-local" placeholder="Fecha de extracción" />
-          <input formControlName="extractionTechnician" type="text" placeholder="Técnico de extracción" />
-          <input formControlName="storageBuffer" type="text" placeholder="Buffer de almacenamiento" />
-          <input formControlName="aliquotVolumeUl" type="number" placeholder="Volumen alícuota (µl)" />
-          <input formControlName="freezerLocation" type="text" placeholder="Ubicación en congelador" />
-          <input formControlName="sequencingPlatform" type="text" placeholder="Plataforma de secuenciación" />
-          <input formControlName="sequencingDepth" type="number" placeholder="Profundidad de secuenciación" />
-          <input formControlName="libraryPrepProtocol" type="text" placeholder="Protocolo de preparación de librería" />
-          <input formControlName="totalReads" type="number" placeholder="Lecturas totales" />
-          <input formControlName="mappedReads" type="number" placeholder="Lecturas mapeadas" />
-          <input formControlName="mappingQualityScore" type="number" placeholder="Calidad de mapeo" />
-          <input formControlName="variantsDetected" type="number" placeholder="Variantes detectadas" />
-          <input formControlName="snpsDetected" type="number" placeholder="SNPs detectados" />
-          <input formControlName="indelsDetected" type="number" placeholder="Indels detectados" />
-          <input formControlName="fastqR1Url" type="text" placeholder="FASTQ R1 URL" />
-          <input formControlName="fastqR2Url" type="text" placeholder="FASTQ R2 URL" />
-          <input formControlName="vcfFileUrl" type="text" placeholder="VCF File URL" />
-          <input formControlName="bamFileUrl" type="text" placeholder="BAM File URL" />
+
+      <!-- Form Content -->
+      <form [formGroup]="sampleForm" (ngSubmit)="onSubmit()" class="p-8">
+        <!-- Patient Search -->
+        <div class="mb-8">
+          <label class="block text-sm font-medium text-slate-700 mb-3">Buscar paciente</label>
+          <div class="relative">
+            <input 
+              type="text" 
+              [(ngModel)]="searchPatientTerm"
+              [ngModelOptions]="{standalone: true}"
+              (input)="onSearchPatients()"
+              (keydown.enter)="$event.preventDefault()"
+              placeholder="Escriba el nombre del paciente..."
+              class="w-full pl-12 pr-4 py-4 rounded-2xl border border-slate-200 bg-white/70 text-slate-700 placeholder-slate-400 focus:border-slate-400 focus:ring-0 focus:outline-none input-focus transition-all duration-300"
+            />
+            <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            
+            <!-- Loading spinner -->
+            <div *ngIf="loadingPatients" class="absolute right-4 top-1/2 transform -translate-y-1/2">
+              <svg class="animate-spin h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+
+            <!-- Patient Dropdown -->
+            <div *ngIf="filteredPatients.length > 0 && searchPatientTerm.trim()" 
+                 class="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-slate-200 z-20 max-h-60 overflow-y-auto">
+              <div *ngFor="let patient of filteredPatients" 
+                   (click)="selectPatient(patient)"
+                   class="p-4 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-b-0">
+                <div class="font-medium text-slate-800">{{patient.firstName}} {{patient.lastName}}</div>
+                <div class="text-sm text-slate-500">{{patient.email}} • Nacimiento: {{patient.birthDate | date:'mediumDate'}}</div>
+              </div>
+            </div>
+
+            <!-- No results message -->
+            <div *ngIf="searchPatientTerm.trim() && !loadingPatients && filteredPatients.length === 0"
+                 class="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-slate-200 z-20">
+              <div class="p-4 text-slate-500 text-center">No se encontraron pacientes</div>
+            </div>
+          </div>
         </div>
-      </div>
-      <!-- Formulario Saliva -->
-      <div *ngIf="sampleType==='SALIVA'">
-        <div [formGroup]="salivaGroup" class="space-y-2">
-          <input formControlName="volumeMl" type="number" placeholder="Volumen (ml)" />
-          <input formControlName="phLevel" type="number" placeholder="pH" />
-          <input formControlName="viscosity" type="text" placeholder="Viscosidad" />
-          <input formControlName="dnaYieldNg" type="number" placeholder="DNA yield (ng)" />
-          <input formControlName="cellCountPerMl" type="number" placeholder="Conteo celular por ml" />
-          <input formControlName="collectionMethod" type="text" placeholder="Método de colección" />
-          <input formControlName="storageTemperatureCelsius" type="number" placeholder="Temperatura de almacenamiento (°C)" />
+
+        <!-- Basic Information -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-3">ID Laboratorista</label>
+            <input 
+              type="text" 
+              formControlName="registeredById"
+              placeholder="Ingrese ID del laboratorista"
+              class="w-full px-4 py-4 rounded-2xl border border-slate-200 bg-white/70 text-slate-700 placeholder-slate-400 focus:border-slate-400 focus:ring-0 focus:outline-none input-focus transition-all duration-300"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-3">Fecha de recolección</label>
+            <input 
+              type="date" 
+              formControlName="collectionDate"
+              class="w-full px-4 py-4 rounded-2xl border border-slate-200 bg-white/70 text-slate-700 focus:border-slate-400 focus:ring-0 focus:outline-none input-focus transition-all duration-300"
+            />
+          </div>
         </div>
-      </div>
-      <button type="submit" class="w-full py-3 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-semibold text-lg shadow transition-all duration-200" [disabled]="loading || sampleForm.invalid">
-        <span *ngIf="!loading">Registrar muestra</span>
-        <span *ngIf="loading">Registrando...</span>
-      </button>
-    </form>
-    <div class="relative mb-4 mt-6">
-      <input
-        type="text"
-        [(ngModel)]="searchPatientTerm"
-        [ngModelOptions]="{standalone: true}"
-        (keydown.enter)="searchPatients()"
-        placeholder="Buscar paciente por nombre..."
-        class="w-full px-4 py-2 rounded-xl border border-gray-200 bg-gray-50 text-purple-900 placeholder-gray-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition-all"
-      />
-      <div *ngIf="loadingPatients" class="absolute right-4 top-2 text-purple-400 animate-spin">
-        <span class="material-icons">autorenew</span>
-      </div>
-      <div *ngIf="filteredPatients.length > 0" class="absolute left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-purple-100 z-10">
-        <div
-          *ngFor="let patient of filteredPatients"
-          (click)="selectPatient(patient)"
-          class="px-4 py-2 cursor-pointer hover:bg-purple-50 text-purple-900"
-        >
-          <span class="font-semibold">{{ patient.firstName }} {{ patient.lastName }}</span>
-          <span class="text-xs text-purple-500 ml-2">{{ patient.email }}</span>
-          <span class="text-xs text-gray-500 ml-2">Nacimiento: {{ patient.birthDate | date:'mediumDate' }}</span>
+
+        <!-- Notes -->
+        <div class="mb-8">
+          <label class="block text-sm font-medium text-slate-700 mb-3">Notas (opcional)</label>
+          <textarea 
+            formControlName="notes"
+            rows="3"
+            placeholder="Observaciones adicionales..."
+            class="w-full px-4 py-4 rounded-2xl border border-slate-200 bg-white/70 text-slate-700 placeholder-slate-400 focus:border-slate-400 focus:ring-0 focus:outline-none input-focus transition-all duration-300 resize-none"
+          ></textarea>
         </div>
-      </div>
+
+        <!-- Sample-specific fields -->
+        <div *ngIf="sampleType" class="animate-fade-in">
+          <div class="section-divider h-px mb-8"></div>
+          <h3 class="text-lg font-medium text-slate-700 mb-6">{{getSampleTitle()}}</h3>
+          
+          <!-- Blood Fields -->
+          <div *ngIf="sampleType === 'BLOOD'" [formGroup]="bloodGroup" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Glucosa (mg/dL)</label>
+              <input type="number" formControlName="glucoseMgDl" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Colesterol total (mg/dL)</label>
+              <input type="number" formControlName="cholesterolTotalMgDl" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Colesterol HDL (mg/dL)</label>
+              <input type="number" formControlName="cholesterolHdlMgDl" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Colesterol LDL (mg/dL)</label>
+              <input type="number" formControlName="cholesterolLdlMgDl" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Triglicéridos (mg/dL)</label>
+              <input type="number" formControlName="triglyceridesMgDl" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Creatinina (mg/dL)</label>
+              <input type="number" formControlName="creatinineMgDl" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Urea (mg/dL)</label>
+              <input type="number" formControlName="ureaMgDl" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Hemoglobina (g/dL)</label>
+              <input type="number" formControlName="hemoglobinGDl" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Hematocrito (%)</label>
+              <input type="number" formControlName="hematocritPercent" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Eritrocitos (mill/µL)</label>
+              <input type="number" formControlName="redBloodCellsMillionUl" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Leucocitos (mil/µL)</label>
+              <input type="number" formControlName="whiteBloodCellsThousandUl" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Plaquetas (mil/µL)</label>
+              <input type="number" formControlName="plateletsThousandUl" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">ALT/SGPT (U/L)</label>
+              <input type="number" formControlName="altSgptUL" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">AST/SGOT (U/L)</label>
+              <input type="number" formControlName="astSgotUL" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Bilirrubina total (mg/dL)</label>
+              <input type="number" formControlName="bilirubinTotalMgDl" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Fosfatasa alcalina (U/L)</label>
+              <input type="number" formControlName="alkalinePhosphataseUL" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">BUN (mg/dL)</label>
+              <input type="number" formControlName="bunMgDl" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">GFR (ml/min)</label>
+              <input type="number" formControlName="gfrMlMin" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Proteína total (g/dL)</label>
+              <input type="number" formControlName="totalProteinGDl" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Albúmina (g/dL)</label>
+              <input type="number" formControlName="albuminGDl" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Sodio (mEq/L)</label>
+              <input type="number" formControlName="sodiumMeqL" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Potasio (mEq/L)</label>
+              <input type="number" formControlName="potassiumMeqL" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Cloruro (mEq/L)</label>
+              <input type="number" formControlName="chlorideMeqL" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Proteína C reactiva (mg/L)</label>
+              <input type="number" formControlName="cReactiveProteinMgL" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">ESR (mm/hr)</label>
+              <input type="number" formControlName="esrMmHr" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Marcadores genéticos detectados</label>
+              <input type="number" formControlName="geneticMarkersDetected" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Calidad genética (%)</label>
+              <input type="number" formControlName="geneticQualityScore" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Valores de referencia</label>
+              <input type="text" formControlName="labReferenceValues" placeholder="Ingrese valores" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Modelo de analizador</label>
+              <input type="text" formControlName="analyzerModel" placeholder="Ingrese modelo" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Velocidad de centrifugación (rpm)</label>
+              <input type="number" formControlName="centrifugationSpeedRpm" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Temperatura de almacenamiento (°C)</label>
+              <input type="number" formControlName="storageTemperatureCelsius" placeholder="0" class="sample-input" />
+            </div>
+          </div>
+
+          <!-- DNA Fields -->
+          <div *ngIf="sampleType === 'DNA'" [formGroup]="dnaGroup" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Concentración DNA (ng/µL)</label>
+              <input type="number" formControlName="concentrationNgUl" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Pureza 260/280</label>
+              <input type="number" step="0.01" formControlName="purity260280Ratio" placeholder="0.00" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Pureza 260/230</label>
+              <input type="number" step="0.01" formControlName="purity260230Ratio" placeholder="0.00" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Número de integridad</label>
+              <input type="number" formControlName="integrityNumber" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Método de extracción</label>
+              <input type="text" formControlName="extractionMethod" placeholder="Ingrese método" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Fecha de extracción</label>
+              <input type="datetime-local" formControlName="extractionDate" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Técnico de extracción</label>
+              <input type="text" formControlName="extractionTechnician" placeholder="Ingrese técnico" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Buffer de almacenamiento</label>
+              <input type="text" formControlName="storageBuffer" placeholder="Ingrese buffer" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Volumen alícuota (µL)</label>
+              <input type="number" formControlName="aliquotVolumeUl" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Ubicación en congelador</label>
+              <input type="text" formControlName="freezerLocation" placeholder="Ingrese ubicación" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Plataforma de secuenciación</label>
+              <input type="text" formControlName="sequencingPlatform" placeholder="Ingrese plataforma" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Profundidad de secuenciación</label>
+              <input type="number" formControlName="sequencingDepth" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Protocolo de preparación de librería</label>
+              <input type="text" formControlName="libraryPrepProtocol" placeholder="Ingrese protocolo" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Lecturas totales</label>
+              <input type="number" formControlName="totalReads" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Lecturas mapeadas</label>
+              <input type="number" formControlName="mappedReads" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Calidad de mapeo</label>
+              <input type="number" formControlName="mappingQualityScore" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Variantes detectadas</label>
+              <input type="number" formControlName="variantsDetected" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">SNPs detectados</label>
+              <input type="number" formControlName="snpsDetected" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Indels detectados</label>
+              <input type="number" formControlName="indelsDetected" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">FASTQ R1 URL</label>
+              <input type="text" formControlName="fastqR1Url" placeholder="Ingrese URL" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">FASTQ R2 URL</label>
+              <input type="text" formControlName="fastqR2Url" placeholder="Ingrese URL" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">VCF File URL</label>
+              <input type="text" formControlName="vcfFileUrl" placeholder="Ingrese URL" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">BAM File URL</label>
+              <input type="text" formControlName="bamFileUrl" placeholder="Ingrese URL" class="sample-input" />
+            </div>
+          </div>
+
+          <!-- Saliva Fields -->
+          <div *ngIf="sampleType === 'SALIVA'" [formGroup]="salivaGroup" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Volumen (ml)</label>
+              <input type="number" formControlName="volumeMl" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">pH</label>
+              <input type="number" step="0.1" formControlName="phLevel" placeholder="0.0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Viscosidad</label>
+              <input type="text" formControlName="viscosity" placeholder="Ingrese viscosidad" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">DNA yield (ng)</label>
+              <input type="number" formControlName="dnaYieldNg" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Conteo celular (por ml)</label>
+              <input type="number" formControlName="cellCountPerMl" placeholder="0" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Método de colección</label>
+              <input type="text" formControlName="collectionMethod" placeholder="Ingrese método" class="sample-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-600 mb-2">Temperatura de almacenamiento (°C)</label>
+              <input type="number" formControlName="storageTemperatureCelsius" placeholder="0" class="sample-input" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="mt-12 text-center">
+          <button 
+            type="submit"
+            [disabled]="loading || sampleForm.invalid || !sampleType"
+            class="px-12 py-4 bg-slate-700 hover:bg-slate-800 text-white font-medium rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:transform-none disabled:hover:bg-slate-700"
+          >
+            <span *ngIf="!loading">Registrar muestra</span>
+            <span *ngIf="loading" class="flex items-center justify-center">
+              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Registrando...
+            </span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

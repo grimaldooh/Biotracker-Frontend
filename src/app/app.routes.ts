@@ -73,6 +73,29 @@ export const routes: Routes = [
       import('./modules/lab/register-sample/register-sample.component')
         .then(m => m.RegisterSampleComponent)
   },
+  {
+    path: 'patient/home',
+    loadComponent: () =>
+      import('./modules/patient/home/home.component')
+        .then(m => m.HomeComponent)
+
+  },
+  {
+    path: 'patient/smart-report',
+    loadComponent: () =>
+      import('./modules/patient/smart-report/smart-report.component').then(m => m.SmartReportComponent)
+  },
+  {
+  path: 'patient/samples',
+  loadComponent: () =>
+    import('./modules/patient/samples/samples.component').then(m => m.SamplesComponent)
+  },
+  {
+    path: 'patient/appointments-historial',
+    loadComponent: () =>
+      import('./modules/patient/appointments-historial/appointments-historial.component')
+        .then(m => m.AppointmentsHistorialComponent)
+},
   { path: '', redirectTo: 'patients/register', pathMatch: 'full' },
   { path: '**', redirectTo: 'patients/register' }
 ];

@@ -1,0 +1,30 @@
+<div class="min-h-screen bg-gray-50 flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="w-full max-w-md mx-auto">
+    <div class="text-center mb-10">
+      <h1 class="text-4xl font-extrabold text-gray-900 mb-2">Hola, {{ patientName || 'Paciente' }} 👋</h1>
+      <p class="text-gray-600 text-lg">Bienvenido a tu portal de salud</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <button (click)="goToStudies()" class="action-card bg-white rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col items-center justify-center text-center">
+        <span class="material-icons text-4xl text-blue-600 mb-3">science</span>
+        <span class="text-lg font-semibold text-gray-800">Ver estudios</span>
+      </button>
+
+      <button (click)="goToIaReports()" class="action-card bg-white rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col items-center justify-center text-center">
+        <span class="material-icons text-4xl text-indigo-600 mb-3">psychology</span>
+        <span class="text-lg font-semibold text-gray-800">Ver reportes de IA</span>
+      </button>
+
+      <button (click)="goToCreateAppointment()" class="action-card bg-white rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col items-center justify-center text-center">
+        <span class="material-icons text-4xl text-green-600 mb-3">event_available</span>
+        <span class="text-lg font-semibold text-gray-800">Agendar cita médica</span>
+      </button>
+
+      <button (click)="goToUpcomingAppointments()" class="action-card bg-white rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col items-center justify-center text-center">
+        <span class="material-icons text-4xl text-yellow-600 mb-3">event_note</span>
+        <span class="text-lg font-semibold text-gray-800">Ver próximas citas</span>
+      </button>
+    </div>
+  </div>
+</div>

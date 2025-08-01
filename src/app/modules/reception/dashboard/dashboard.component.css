@@ -1,0 +1,232 @@
+/* Glass morphism container */
+.glass-container {
+  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* Stats cards animations */
+.stats-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stats-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+}
+
+/* Action cards base styles */
+.action-card {
+  @apply flex items-center p-6 rounded-2xl transition-all duration-300 text-left w-full border-2;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.7);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.action-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.1);
+}
+
+.action-card:active {
+  transform: translateY(0);
+}
+
+/* Primary action cards */
+.primary-action {
+  @apply bg-white/90 border-white/40;
+}
+
+.primary-action:hover {
+  @apply bg-white border-blue-200;
+  box-shadow: 0 15px 35px -5px rgba(59, 130, 246, 0.15);
+}
+
+.primary-action .icon-container {
+  transform: scale(1);
+  transition: transform 0.3s ease;
+}
+
+.primary-action:hover .icon-container {
+  transform: scale(1.1);
+}
+
+/* Secondary action cards */
+.secondary-action {
+  @apply bg-slate-50/80 border-slate-200/50;
+}
+
+.secondary-action:hover {
+  @apply bg-white border-slate-300;
+}
+
+/* Tertiary action cards */
+.tertiary-action {
+  @apply border-2;
+}
+
+/* Icon container */
+.icon-container {
+  @apply w-14 h-14 rounded-xl flex items-center justify-center mr-4 flex-shrink-0;
+  transition: all 0.3s ease;
+}
+
+/* Content area */
+.content {
+  @apply flex-1;
+}
+
+.title {
+  @apply text-lg font-semibold text-slate-800 mb-1;
+}
+
+.description {
+  @apply text-sm text-slate-600 leading-relaxed;
+}
+
+/* Arrow indicator */
+.arrow {
+  @apply ml-4 text-slate-400 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300;
+}
+
+/* Hover effects for different action types */
+.primary-action:hover .arrow {
+  @apply text-blue-600;
+}
+
+.secondary-action:hover .arrow {
+  @apply text-slate-600;
+}
+
+/* Loading animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.loading {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Fade in animation for cards */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stats-card,
+.action-card {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Stagger animation delays */
+.stats-card:nth-child(1) { animation-delay: 0.1s; }
+.stats-card:nth-child(2) { animation-delay: 0.2s; }
+.stats-card:nth-child(3) { animation-delay: 0.3s; }
+.stats-card:nth-child(4) { animation-delay: 0.4s; }
+
+.action-card:nth-child(1) { animation-delay: 0.5s; }
+.action-card:nth-child(2) { animation-delay: 0.6s; }
+.action-card:nth-child(3) { animation-delay: 0.7s; }
+.action-card:nth-child(4) { animation-delay: 0.8s; }
+.action-card:nth-child(5) { animation-delay: 0.9s; }
+.action-card:nth-child(6) { animation-delay: 1.0s; }
+
+/* Ripple effect on click */
+.action-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.action-card::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.action-card:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Focus states for accessibility */
+.action-card:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: rgb(59 130 246);
+  ring-offset: 2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .action-card {
+    @apply p-4;
+  }
+  
+  .icon-container {
+    @apply w-12 h-12 mr-3;
+  }
+  
+  .title {
+    @apply text-base;
+  }
+  
+  .description {
+    @apply text-xs;
+  }
+}
+
+/* Dark mode support (if needed) */
+@media (prefers-color-scheme: dark) {
+  .glass-container {
+    background: rgba(30, 41, 59, 0.85);
+  }
+  
+  .action-card {
+    background: rgba(51, 65, 85, 0.7);
+    border-color: rgba(71, 85, 105, 0.3);
+  }
+  
+  .title {
+    @apply text-slate-100;
+  }
+  
+  .description {
+    @apply text-slate-300;
+  }
+}
+
+/* Custom scrollbar if needed */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

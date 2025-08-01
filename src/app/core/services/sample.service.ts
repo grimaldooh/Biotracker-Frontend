@@ -18,4 +18,5 @@ export class SampleService {
   registerSample(sample: any) {
     return this.http.post('http://localhost:8080/api/samples', sample);
   }
+  
 }

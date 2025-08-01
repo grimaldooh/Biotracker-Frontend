@@ -1,0 +1,104 @@
+<div class="min-h-screen bg-slate-50 p-4 sm:p-8">
+  <div *ngIf="loading" class="text-center text-slate-500 py-12">Cargando reporte...</div>
+  <div *ngIf="error" class="text-center text-red-600 py-12">{{ error }}</div>
+
+  <main *ngIf="!loading && !error" class="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200">
+    
+    <header class="p-6 md:p-8 border-b border-slate-200">
+      <div class="flex justify-between items-start">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold text-slate-800">Reporte Inteligente de Salud</h1>
+        </div>
+        <button class="hidden md:flex items-center gap-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg px-3 py-2 transition-colors">
+          <span class="material-icons text-base">print</span>
+          Imprimir
+        </button>
+      </div>
+      <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+        <div>
+          <div class="text-slate-500">Paciente</div>
+          <div class="font-semibold text-slate-700">{{ patientName }}</div>
+        </div>
+        <div>
+          <div class="text-slate-500">Fecha de Nacimiento</div>
+          <div class="font-semibold text-slate-700">{{ birthDate | date:'longDate' }}</div>
+        </div>
+        <div>
+          <div class="text-slate-500">CURP</div>
+          <div class="font-semibold text-slate-700 font-mono">{{ curp }}</div>
+        </div>
+      </div>
+    </header>
+
+    <section class="p-6 md:p-8 bg-indigo-50/50">
+      <div class="grid md:grid-cols-5 gap-8">
+        <div class="md:col-span-2">
+          <h2 class="section-title">Resumen General</h2>
+          <p class="text-slate-600 leading-relaxed">{{ summaryText }}</p>
+          <div *ngIf="detectedConditions.length > 0" class="mt-4">
+            <h3 class="font-semibold text-slate-700 mb-2">Condiciones detectadas:</h3>
+            <ul class="list-disc list-inside text-slate-600">
+              <li *ngFor="let cond of detectedConditions">{{ cond }}</li>
+            </ul>
+          </div>
+        </div>
+        <div class="md:col-span-3">
+          <h2 class="section-title">Recomendaciones Clave</h2>
+          <ul class="space-y-3">
+            <li *ngFor="let rec of recommendations" class="flex items-start gap-3">
+              <span class="material-icons text-green-500 mt-1">check_circle</span>
+              <span class="text-slate-600 leading-relaxed">{{ rec }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="p-6 md:p-8">
+      <h2 class="section-title mb-6">Historial de Visitas Médicas</h2>
+      <div class="relative pl-6 border-l-2 border-slate-200">
+        <div *ngFor="let visit of visits" class="timeline-item">
+          <div class="timeline-dot"></div>
+          <time class="font-semibold text-indigo-600 text-sm">{{ visit.fechaVisita | date:'longDate' }}</time>
+          <h3 class="text-lg font-bold text-slate-800 mt-1">{{ visit.diagnostico }}</h3>
+          <dl class="mt-2 text-sm space-y-2">
+            <div>
+              <dt class="font-semibold text-slate-600">Recomendaciones del Dr.</dt>
+              <dd class="text-slate-500">
+                <ul *ngIf="visit.recomendaciones && visit.recomendaciones.length > 0" class="list-disc list-inside">
+                  <li *ngFor="let r of visit.recomendaciones">{{ r }}</li>
+                </ul>
+                <span *ngIf="!visit.recomendaciones || visit.recomendaciones.length === 0">Sin recomendaciones</span>
+              </dd>
+            </div>
+            <div>
+              <dt class="font-semibold text-slate-600">Notas Adicionales</dt>
+              <dd class="text-slate-500">{{ visit.notas || 'Sin notas' }}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="p-6 md:p-8 border-t border-slate-200">
+      <h2 class="section-title mb-4">Reporte de Estudios Recientes</h2>
+      <div class="space-y-3">
+        <details *ngFor="let study of studies" class="bg-slate-50 rounded-lg border border-slate-200">
+          <summary class="flex items-center justify-between p-4 cursor-pointer font-semibold text-slate-700">
+            <span>Estudio de {{ study.tipoMuestra }} - {{ study.fechaEstudio | date:'mediumDate' }}</span>
+            <span class="material-icons transition-transform duration-300">expand_more</span>
+          </summary>
+          <div class="p-4 border-t border-slate-200">
+            <dl class="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
+              <dt class="font-medium text-slate-500">Analizador:</dt>
+              <dd class="text-slate-700 md:col-span-2">{{ study.modeloAnalizador }}</dd>
+              <dt class="font-medium text-slate-500">Hallazgos:</dt>
+              <dd class="text-slate-700 md:col-span-2">{{ study.hallazgosPrincipales }}</dd>
+            </dl>
+          </div>
+        </details>
+      </div>
+    </section>
+
+  </main>
+</div>

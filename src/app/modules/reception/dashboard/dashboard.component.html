@@ -1,67 +1,220 @@
-<div class="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col items-center py-10">
-  <div class="w-full max-w-3xl bg-white rounded-3xl shadow-xl p-8 border border-blue-100">
-    <h1 class="text-3xl font-extrabold text-blue-900 mb-6 text-center">Panel Recepcionista</h1>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-      <!-- Opción: Crear nuevo paciente -->
-      <button
-        class="flex flex-col items-center justify-center bg-blue-700 hover:bg-blue-800 text-white rounded-xl p-6 shadow transition-all duration-200"
-        (click)="goToRegisterPatient()">
-        <span class="material-icons text-4xl mb-2">person_add</span>
-        <span class="font-semibold text-lg">Registrar nuevo paciente</span>
-      </button>
-      <!-- Opción: Ver pacientes registrados -->
-      <button
-        class="flex flex-col items-center justify-center bg-blue-100 hover:bg-blue-200 text-blue-900 rounded-xl p-6 shadow transition-all duration-200"
-        (click)="goToPatientsList()">
-        <span class="material-icons text-4xl mb-2">groups</span>
-        <span class="font-semibold text-lg">Pacientes registrados</span>
-      </button>
-      <!-- Opción: Ver citas del día -->
-      <button
-        class="flex flex-col items-center justify-center bg-blue-100 hover:bg-blue-200 text-blue-900 rounded-xl p-6 shadow transition-all duration-200"
-        (click)="goToAppointments()">
-        <span class="material-icons text-4xl mb-2">event</span>
-        <span class="font-semibold text-lg">Citas del día</span>
-      </button>
-      <!-- Opción: Buscar paciente -->
-      <button
-        class="flex flex-col items-center justify-center bg-blue-100 hover:bg-blue-200 text-blue-900 rounded-xl p-6 shadow transition-all duration-200"
-        (click)="goToSamples()">
-        <span class="material-icons text-4xl mb-2">search</span>
-        <span class="font-semibold text-lg">Search samples</span>
-      </button>
-      <!-- Opción: Crear cita médica -->
-      <button
-        class="flex flex-col items-center justify-center bg-blue-700 hover:bg-blue-800 text-white rounded-xl p-6 shadow transition-all duration-200"
-        (click)="goToCreateAppointment()">
-        <span class="material-icons text-4xl mb-2">add_circle</span>
-        <span class="font-semibold text-lg">Crear cita médica</span>
-      </button>
-      <!-- Opción: Inventario -->
-      <button
-        class="flex flex-col items-center justify-center bg-green-100 hover:bg-green-200 text-green-900 rounded-xl p-6 shadow transition-all duration-200"
-        (click)="goToInventory()">
-        <span class="material-icons text-4xl mb-2">inventory_2</span>
-        <span class="font-semibold text-lg">Inventario</span>
-      </button>
-      <!-- Opción: Registrar usuario -->
-      <button
-        class="flex flex-col items-center justify-center bg-purple-700 hover:bg-purple-800 text-white rounded-xl p-6 shadow transition-all duration-200"
-        (click)="goToRegisterUser()">
-        <span class="material-icons text-4xl mb-2">person_add_alt</span>
-        <span class="font-semibold text-lg">Registrar usuario</span>
-      </button>
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header Section -->
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-light text-slate-800 mb-3">Panel de Recepción</h1>
+      <p class="text-slate-500 font-light">Sistema de gestión hospitalaria</p>
     </div>
-    <!-- Resumen rápido -->
-    <div class="bg-blue-50 rounded-xl p-6 flex flex-col md:flex-row justify-between items-center">
-      <div>
-        <div class="text-blue-900 font-bold text-xl">Pacientes hoy:</div>
-        <div class="text-blue-700 text-2xl">12</div>
+
+    <!-- Quick Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+      <div class="stats-card bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-slate-500 text-sm font-medium">Pacientes hoy</p>
+            <p class="text-3xl font-bold text-slate-800">{{todayPatients}}</p>
+          </div>
+          <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-2.025"/>
+            </svg>
+          </div>
+        </div>
       </div>
-      <div>
-        <div class="text-blue-900 font-bold text-xl">Citas pendientes:</div>
-        <div class="text-blue-700 text-2xl">5</div>
+
+      <div class="stats-card bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-slate-500 text-sm font-medium">Citas pendientes</p>
+            <p class="text-3xl font-bold text-slate-800">{{pendingAppointments}}</p>
+          </div>
+          <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
+            <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </div>
+        </div>
       </div>
+
+      <div class="stats-card bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-slate-500 text-sm font-medium">Muestras procesadas</p>
+            <p class="text-3xl font-bold text-slate-800">{{processedSamples}}</p>
+          </div>
+          <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-card bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-slate-500 text-sm font-medium">Usuarios activos</p>
+            <p class="text-3xl font-bold text-slate-800">{{activeUsers}}</p>
+          </div>
+          <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Actions Grid -->
+    <div class="glass-container rounded-3xl p-8 shadow-xl border border-white/20 mb-8">
+      <h2 class="text-2xl font-medium text-slate-700 mb-8 text-center">Acciones principales</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Primary Actions -->
+        <button 
+          (click)="goToRegisterPatient()"
+          class="action-card primary-action group"
+        >
+          <div class="icon-container bg-blue-600 text-white">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+          </div>
+          <div class="content">
+            <h3 class="title">Registrar Paciente</h3>
+            <p class="description">Agregar nuevo paciente al sistema</p>
+          </div>
+          <div class="arrow">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </div>
+        </button>
+
+        <button 
+          (click)="goToCreateAppointment()"
+          class="action-card primary-action group"
+        >
+          <div class="icon-container bg-indigo-600 text-white">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <div class="content">
+            <h3 class="title">Crear Cita</h3>
+            <p class="description">Programar nueva cita médica</p>
+          </div>
+          <div class="arrow">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </div>
+        </button>
+
+        <!-- Secondary Actions -->
+        <button 
+          (click)="goToPatientsList()"
+          class="action-card secondary-action group"
+        >
+          <div class="icon-container bg-slate-100 text-slate-600">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/>
+            </svg>
+          </div>
+          <div class="content">
+            <h3 class="title">Lista de Pacientes</h3>
+            <p class="description">Ver todos los pacientes registrados</p>
+          </div>
+          <div class="arrow">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </div>
+        </button>
+
+        <button 
+          (click)="goToAppointments()"
+          class="action-card secondary-action group"
+        >
+          <div class="icon-container bg-slate-100 text-slate-600">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <div class="content">
+            <h3 class="title">Citas del Día</h3>
+            <p class="description">Ver agenda de citas programadas</p>
+          </div>
+          <div class="arrow">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </div>
+        </button>
+
+        <button 
+          (click)="goToSamples()"
+          class="action-card secondary-action group"
+        >
+          <div class="icon-container bg-slate-100 text-slate-600">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+          <div class="content">
+            <h3 class="title">Buscar Muestras</h3>
+            <p class="description">Consultar muestras y resultados</p>
+          </div>
+          <div class="arrow">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Secondary Actions -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <button 
+        (click)="goToInventory()"
+        class="action-card tertiary-action group bg-green-50 border-green-200 hover:bg-green-100"
+      >
+        <div class="icon-container bg-green-100 text-green-700">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+        </div>
+        <div class="content">
+          <h3 class="title text-green-800">Gestión de Inventario</h3>
+          <p class="description text-green-600">Administrar suministros y equipos médicos</p>
+        </div>
+        <div class="arrow text-green-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </div>
+      </button>
+
+      <button 
+        (click)="goToRegisterUser()"
+        class="action-card tertiary-action group bg-purple-50 border-purple-200 hover:bg-purple-100"
+      >
+        <div class="icon-container bg-purple-100 text-purple-700">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+          </svg>
+        </div>
+        <div class="content">
+          <h3 class="title text-purple-800">Registrar Usuario</h3>
+          <p class="description text-purple-600">Crear nuevas cuentas de usuario del sistema</p>
+        </div>
+        <div class="arrow text-purple-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </div>
+      </button>
     </div>
   </div>
 </div>

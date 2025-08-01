@@ -1,0 +1,14 @@
+
+@tailwind utilities;
+
+@layer components {
+  .detail-list {
+    @apply grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-3 text-sm;
+  }
+  .detail-list dt {
+    @apply font-semibold text-slate-500;
+  }
+  .detail-list dd {
+    @apply text-slate-800 sm:col-span-2;
+  }
+}
