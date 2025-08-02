@@ -96,6 +96,11 @@ export const routes: Routes = [
       import('./modules/patient/appointments-historial/appointments-historial.component')
         .then(m => m.AppointmentsHistorialComponent)
 },
+  {
+    path: 'patient/schedule',
+    loadComponent: () =>
+      import('./modules/patient/schedule/schedule.component').then(m => m.ScheduleComponent)
+  },
   { path: '', redirectTo: 'patients/register', pathMatch: 'full' },
   { path: '**', redirectTo: 'patients/register' }
 ];

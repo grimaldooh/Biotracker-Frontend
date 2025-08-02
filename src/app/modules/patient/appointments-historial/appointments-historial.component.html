@@ -57,7 +57,7 @@
                class="group bg-white border border-slate-200 hover:border-blue-300 rounded-2xl p-6 transition-all duration-200 hover:shadow-lg">
             <div class="flex items-start justify-between mb-4">
               <div class="flex-1">
-                <h3 class="font-semibold text-slate-800 text-lg mb-1">{{ visit.type }}</h3>
+                <h3 class="font-semibold text-slate-800 text-lg mb-1">{{ getVisitTypeLabel(visit.type) }}</h3>
                 <p class="text-slate-600 text-sm">Dr. {{ visit.doctorName }}</p>
               </div>
               <div class="bg-green-100 text-green-700 text-xs font-medium px-3 py-1 rounded-full">
@@ -111,7 +111,7 @@
                class="bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-md transition-shadow duration-200">
             <div class="flex items-start justify-between mb-4">
               <div class="flex-1">
-                <h3 class="font-semibold text-slate-800 text-lg mb-1">{{ visit.type }}</h3>
+                <h3 class="font-semibold text-slate-800 text-lg mb-1">{{ getVisitTypeLabel(visit.type) }}</h3>
                 <p class="text-slate-600 text-sm">Dr. {{ visit.doctorName }}</p>
               </div>
               <div class="bg-slate-100 text-slate-600 text-xs font-medium px-3 py-1 rounded-full">

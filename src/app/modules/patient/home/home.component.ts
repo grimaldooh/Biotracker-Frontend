@@ -22,7 +22,7 @@ export class HomeComponent {
   }
 
   goToCreateAppointment() {
-    this.router.navigate(['/appointments/create']);
+    this.router.navigate(['/patient/schedule']);
   }
 
   goToUpcomingAppointments() {

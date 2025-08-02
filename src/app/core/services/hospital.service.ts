@@ -24,11 +24,11 @@ export class HospitalService {
     return this.http.get<MedicalVisitDTO[]>(`http://localhost:8080/api/medical-visits/patient/${patientId}`);
   }
 
-  getMedicsByHospital(hospitalId: string) {
+  getMedicsByHospital(hospitalId: string): Observable<Medic[]> {
     return this.http.get<Medic[]>(`http://localhost:8080/api/users/hospital/${hospitalId}/medics`);
   }
 
-  createMedicalVisit(hospitalId: string, body: any) {
-    return this.http.post(`http://localhost:8080/api/medical-visits/${hospitalId}`, body);
+  createMedicalVisit(hospitalId: string, visitData: any): Observable<any> {
+    return this.http.post(`http://localhost:8080/api/medical-visits/${hospitalId}`, visitData);
   }
 }

@@ -26,6 +26,14 @@ interface AppointmentsState {
   error: string | null;
 }
 
+const VISIT_TYPE_LABELS: Record<string, string> = {
+  CONSULTATION: 'Consulta',
+  FOLLOW_UP: 'Seguimiento',
+  SURGERY: 'Cirugía',
+  EMERGENCY: 'Emergencia',
+  OTHER: 'Otro'
+};
+
 @Component({
   selector: 'app-appointments-historial',
   standalone: true,
@@ -128,5 +136,9 @@ export class AppointmentsHistorialComponent implements OnInit, OnDestroy {
   // TrackBy function para optimizar ngFor
   trackByVisitId(index: number, visit: MedicalVisit): string {
     return visit.id;
+  }
+
+  getVisitTypeLabel(type: string): string {
+    return VISIT_TYPE_LABELS[type] || type;
   }
 }
