@@ -1,0 +1,362 @@
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+  <!-- Header -->
+  <div class="bg-white border-b border-slate-200 px-6 py-6">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center space-x-4">
+          <button (click)="goBack()" 
+                  class="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors">
+            <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+          </button>
+          <div>
+            <h1 class="text-3xl font-light text-slate-800">Historial de Consultas</h1>
+            <p class="text-sm text-slate-500">Gestiona y revisa todas tus consultas médicas</p>
+          </div>
+        </div>
+        <button (click)="exportVisits()" 
+                class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors flex items-center space-x-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          <span>Exportar</span>
+        </button>
+      </div>
+
+      <!-- Estadísticas Rápidas -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-4 text-white">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-blue-100 text-sm">Total</p>
+              <p class="text-2xl font-bold">{{ stats.total }}</p>
+            </div>
+            <div class="w-10 h-10 bg-blue-400 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-4 text-white">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-green-100 text-sm">Completadas</p>
+              <p class="text-2xl font-bold">{{ stats.completed }}</p>
+            </div>
+            <div class="w-10 h-10 bg-green-400 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl p-4 text-white">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-yellow-100 text-sm">Pendientes</p>
+              <p class="text-2xl font-bold">{{ stats.pending }}</p>
+            </div>
+            <div class="w-10 h-10 bg-yellow-400 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.2 14.2L11 13V7h1.5v5.2l4.5 2.7-.8 1.3z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-4 text-white">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-purple-100 text-sm">Hoy</p>
+              <p class="text-2xl font-bold">{{ stats.today }}</p>
+            </div>
+            <div class="w-10 h-10 bg-purple-400 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.89-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.11-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-6 py-8">
+    <!-- Filtros -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 mb-8 shadow-sm">
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <!-- Búsqueda -->
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-slate-700 mb-2">Buscar</label>
+          <div class="relative">
+            <input
+              type="text"
+              [(ngModel)]="searchTerm"
+              (input)="applyFilters()"
+              placeholder="Buscar por paciente, diagnóstico..."
+              class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors">
+            <svg class="absolute left-3 top-2.5 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Estado -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Estado</label>
+          <select [(ngModel)]="selectedStatus" (change)="applyFilters()" 
+                  class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+            <option value="ALL">Todos</option>
+            <option value="COMPLETED">Completadas</option>
+            <option value="PENDING">Pendientes</option>
+          </select>
+        </div>
+
+        <!-- Tipo -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Tipo</label>
+          <select [(ngModel)]="selectedType" (change)="applyFilters()" 
+                  class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+            <option value="ALL">Todos</option>
+            <option value="CONSULTATION">Consulta</option>
+            <option value="FOLLOW_UP">Seguimiento</option>
+            <option value="SURGERY">Cirugía</option>
+            <option value="EMERGENCY">Emergencia</option>
+          </select>
+        </div>
+
+        <!-- Fecha -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Período</label>
+          <select [(ngModel)]="selectedDateRange" (change)="applyFilters()" 
+                  class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+            <option value="ALL">Todas</option>
+            <option value="TODAY">Hoy</option>
+            <option value="WEEK">Esta semana</option>
+            <option value="MONTH">Este mes</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-200">
+        <p class="text-sm text-slate-600">
+          Mostrando {{ filteredVisits.length }} de {{ allVisits.length }} consultas
+        </p>
+        <button (click)="clearFilters()" 
+                class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+          Limpiar filtros
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex justify-center items-center py-16">
+      <div class="flex items-center space-x-3 text-slate-600">
+        <div class="animate-spin rounded-full h-8 w-8 border-2 border-slate-300 border-t-slate-600"></div>
+        <span class="text-lg font-medium">Cargando consultas...</span>
+      </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div *ngIf="!loading">
+      <!-- Sin resultados -->
+      <div *ngIf="filteredVisits.length === 0" class="text-center py-16">
+        <div class="w-16 h-16 mx-auto mb-4 text-slate-300">
+          <svg fill="currentColor" viewBox="0 0 24 24">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-slate-600 mb-2">No se encontraron consultas</h3>
+        <p class="text-slate-500">Intenta ajustar los filtros o buscar con otros términos</p>
+      </div>
+
+      <!-- Lista de Visitas Agrupadas -->
+      <div *ngIf="filteredVisits.length > 0" class="space-y-8">
+        <div *ngFor="let date of getObjectKeys(groupedVisits)" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <!-- Encabezado de fecha -->
+          <div class="bg-gradient-to-r from-slate-50 to-slate-100 px-6 py-4 border-b border-slate-200">
+            <h3 class="text-lg font-semibold text-slate-800 capitalize">{{ date }}</h3>
+            <p class="text-sm text-slate-600">{{ groupedVisits[date].length }} consulta(s)</p>
+          </div>
+
+          <!-- Lista de visitas -->
+          <div class="divide-y divide-slate-100">
+            <div *ngFor="let visit of groupedVisits[date]" 
+                 class="p-6 hover:bg-slate-50 transition-colors cursor-pointer"
+                 (click)="openVisitModal(visit)">
+              <div class="flex items-start justify-between">
+                <div class="flex items-start space-x-4 flex-1">
+                  <!-- Avatar del paciente -->
+                  <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                    {{ visit.patientName.charAt(0).toUpperCase() }}
+                  </div>
+
+                  <!-- Información principal -->
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center space-x-3 mb-2">
+                      <h4 class="text-lg font-semibold text-slate-800">{{ visit.patientName }}</h4>
+                      <span [ngClass]="getVisitTypeColor(visit.type)" 
+                            class="px-2 py-1 rounded-full text-xs font-medium border">
+                        {{ getVisitTypeLabel(visit.type) }}
+                      </span>
+                      <span [ngClass]="getStatusColor(visit.visitCompleted)" 
+                            class="px-2 py-1 rounded-full text-xs font-medium border">
+                        {{ getStatusLabel(visit.visitCompleted) }}
+                      </span>
+                    </div>
+
+                    <p class="text-sm text-slate-600 mb-2">
+                      <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      {{ visit.visitDate | date:'short' }}
+                    </p>
+
+                    <div *ngIf="visit.diagnosis" class="mb-2">
+                      <p class="text-sm font-medium text-slate-700">Diagnóstico:</p>
+                      <p class="text-sm text-slate-600">{{ visit.diagnosis }}</p>
+                    </div>
+
+                    <div *ngIf="visit.notes" class="mb-2">
+                      <p class="text-sm font-medium text-slate-700">Notas:</p>
+                      <p class="text-sm text-slate-600 line-clamp-2">{{ visit.notes }}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Acciones -->
+                <div class="flex items-center space-x-2 ml-4">
+                  <button (click)="$event.stopPropagation(); goToVisitManagement(visit)"
+                          class="px-3 py-2 text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-colors text-sm">
+                    Gestionar
+                  </button>
+                  <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paginación -->
+      <div *ngIf="totalPages > 1" class="flex items-center justify-center space-x-2 mt-8">
+        <button (click)="prevPage()" [disabled]="currentPage === 1" 
+                class="px-3 py-2 text-slate-600 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors">
+          Anterior
+        </button>
+        
+        <div class="flex items-center space-x-1">
+          <button *ngFor="let page of [].constructor(totalPages); let i = index" 
+                  (click)="goToPage(i + 1)"
+                  [class]="currentPage === i + 1 ? 'bg-blue-500 text-white' : 'text-slate-600 hover:bg-slate-100'"
+                  class="w-10 h-10 rounded-lg font-medium transition-colors">
+            {{ i + 1 }}
+          </button>
+        </div>
+        
+        <button (click)="nextPage()" [disabled]="currentPage === totalPages" 
+                class="px-3 py-2 text-slate-600 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors">
+          Siguiente
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Detalle de Visita -->
+  <div *ngIf="showVisitModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-slate-200">
+        <div class="flex items-center justify-between">
+          <h3 class="text-2xl font-semibold text-slate-800">Detalles de la Consulta</h3>
+          <button (click)="closeModal()" 
+                  class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors">
+            <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <div *ngIf="selectedVisit" class="p-6 space-y-6">
+        <!-- Información General -->
+        <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-6">
+          <h4 class="font-semibold text-blue-900 mb-4">Información General</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div class="bg-white rounded-lg p-4 border border-blue-200">
+              <p class="text-blue-700 font-medium mb-1">Paciente</p>
+              <p class="text-blue-900 font-semibold text-lg">{{ selectedVisit.patientName }}</p>
+            </div>
+            <div class="bg-white rounded-lg p-4 border border-blue-200">
+              <p class="text-blue-700 font-medium mb-1">Tipo de Consulta</p>
+              <span [ngClass]="getVisitTypeColor(selectedVisit.type)" 
+                    class="px-3 py-1 rounded-full text-sm font-medium border">
+                {{ getVisitTypeLabel(selectedVisit.type) }}
+              </span>
+            </div>
+            <div class="bg-white rounded-lg p-4 border border-blue-200">
+              <p class="text-blue-700 font-medium mb-1">Fecha y Hora</p>
+              <p class="text-blue-900">{{ selectedVisit.visitDate | date:'medium' }}</p>
+            </div>
+            <div class="bg-white rounded-lg p-4 border border-blue-200">
+              <p class="text-blue-700 font-medium mb-1">Estado</p>
+              <span [ngClass]="getStatusColor(selectedVisit.visitCompleted)" 
+                    class="px-3 py-1 rounded-full text-sm font-medium border">
+                {{ getStatusLabel(selectedVisit.visitCompleted) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Área Médica -->
+        <div *ngIf="selectedVisit.medicalArea" class="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-6">
+          <h4 class="font-semibold text-green-900 mb-2">Área Médica</h4>
+          <div class="bg-white rounded-lg p-4 border border-green-200">
+            <p class="text-green-800">{{ selectedVisit.medicalArea }}</p>
+          </div>
+        </div>
+
+        <!-- Notas -->
+        <div *ngIf="selectedVisit.notes" class="bg-gradient-to-r from-amber-50 to-amber-100 rounded-xl p-6">
+          <h4 class="font-semibold text-amber-900 mb-2">Notas de la Consulta</h4>
+          <div class="bg-white rounded-lg p-4 border border-amber-200">
+            <p class="text-amber-800 text-sm leading-relaxed">{{ selectedVisit.notes }}</p>
+          </div>
+        </div>
+
+        <!-- Diagnóstico -->
+        <div *ngIf="selectedVisit.diagnosis" class="bg-gradient-to-r from-red-50 to-red-100 rounded-xl p-6">
+          <h4 class="font-semibold text-red-900 mb-2">Diagnóstico</h4>
+          <div class="bg-white rounded-lg p-4 border border-red-200">
+            <p class="text-red-800 text-sm leading-relaxed">{{ selectedVisit.diagnosis }}</p>
+          </div>
+        </div>
+
+        <!-- Recomendaciones -->
+        <div *ngIf="selectedVisit.recommendations" class="bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-6">
+          <h4 class="font-semibold text-purple-900 mb-2">Recomendaciones</h4>
+          <div class="bg-white rounded-lg p-4 border border-purple-200">
+            <p class="text-purple-800 text-sm leading-relaxed">{{ selectedVisit.recommendations }}</p>
+          </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="flex items-center justify-end space-x-4 pt-4 border-t border-slate-200">
+          <button (click)="closeModal()" 
+                  class="px-6 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg font-medium transition-colors">
+            Cerrar
+          </button>
+          <button (click)="goToVisitManagement(selectedVisit!)" 
+                  class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors">
+            Gestionar Consulta
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

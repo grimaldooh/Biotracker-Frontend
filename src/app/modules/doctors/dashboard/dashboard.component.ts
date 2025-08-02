@@ -164,7 +164,7 @@ export class DashboardComponent implements OnInit {
   }
 
   goToAppointmentHistory() {
-    this.router.navigate(['/doctor/appointment-history']);
+    this.router.navigate(['/doctors/visit-history']);
   }
 
   goToReports() {
