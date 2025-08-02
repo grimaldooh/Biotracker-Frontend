@@ -23,6 +23,12 @@ export interface MedicalVisit {
   medicalArea: string | null;
 }
 
+export interface VisitAdvanceDto {
+  notes: string;
+  diagnosis: string;
+  recommendations: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -43,5 +49,10 @@ export class DoctorService {
   // Solo citas pendientes del doctor
   getPendingVisits(doctorId: string): Observable<MedicalVisit[]> {
     return this.http.get<MedicalVisit[]>(`${this.apiUrl}/doctor/${doctorId}/pending`);
+  }
+
+  // Enviar avance de cita médica
+  submitVisitAdvance(visitId: string, visitData: VisitAdvanceDto): Observable<any> {
+    return this.http.post(`${this.apiUrl}/submitAdvance/${visitId}`, visitData);
   }
 }

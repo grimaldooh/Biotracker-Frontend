@@ -160,7 +160,7 @@ export class DashboardComponent implements OnInit {
   }
 
   goToAppointments() {
-    this.router.navigate(['/doctor/appointments']);
+    this.router.navigate(['/doctor/schedule-appointments']);
   }
 
   goToAppointmentHistory() {

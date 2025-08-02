@@ -1,0 +1,269 @@
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+  <!-- Header -->
+  <div class="bg-white border-b border-slate-200 px-6 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-4">
+        <button (click)="goBack()" 
+                class="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors">
+          <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <div>
+          <h1 class="text-2xl font-light text-slate-800">Gestión de Cita Médica</h1>
+          <p class="text-sm text-slate-500">Completa la información de la consulta</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-6 py-8">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex justify-center items-center py-16">
+      <div class="flex items-center space-x-3 text-slate-600">
+        <div class="animate-spin rounded-full h-6 w-6 border-2 border-slate-300 border-t-slate-600"></div>
+        <span class="text-sm font-medium">Cargando información de la cita...</span>
+      </div>
+    </div>
+
+    <div *ngIf="!loading" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Formulario Principal -->
+      <div class="lg:col-span-2">
+        <!-- Información de la Cita -->
+        <div *ngIf="currentVisit" class="bg-white rounded-2xl border border-slate-200 p-6 mb-6 shadow-sm">
+          <div class="flex items-start justify-between mb-4">
+            <div class="flex items-start space-x-4">
+              <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                {{ currentVisit.patientName.charAt(0).toUpperCase() }}
+              </div>
+              <div>
+                <h3 class="text-xl font-semibold text-slate-800">{{ currentVisit.patientName }}</h3>
+                <p class="text-slate-600">{{ getVisitTypeLabel(currentVisit.type) }}</p>
+                <p class="text-sm text-slate-500">{{ currentVisit.visitDate | date:'medium' }}</p>
+              </div>
+            </div>
+            <div class="bg-green-100 text-green-700 text-xs font-medium px-3 py-1 rounded-full">
+              Cita Activa
+            </div>
+          </div>
+          <div *ngIf="currentVisit.medicalArea" class="bg-blue-50 rounded-lg p-3">
+            <p class="text-blue-900 font-medium text-xs mb-1">ÁREA MÉDICA</p>
+            <p class="text-blue-800 text-sm">{{ currentVisit.medicalArea }}</p>
+          </div>
+        </div>
+
+        <!-- Formulario de Avance -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+          <h2 class="text-lg font-semibold text-slate-800 mb-6 flex items-center">
+            <svg class="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+            </svg>
+            Registrar Consulta
+          </h2>
+
+          <form [formGroup]="visitForm" (ngSubmit)="onSubmitVisit()" class="space-y-6">
+            <!-- Notas -->
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">
+                Notas de la Consulta *
+              </label>
+              <textarea 
+                formControlName="notes"
+                rows="4"
+                class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors resize-none"
+                [class.border-red-300]="isFieldInvalid('notes')"
+                placeholder="Describe los síntomas, observaciones y desarrollo de la consulta...">
+              </textarea>
+              <div *ngIf="isFieldInvalid('notes')" class="mt-1 text-sm text-red-600">
+                {{ getFieldError('notes') }}
+              </div>
+            </div>
+
+            <!-- Diagnóstico -->
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">
+                Diagnóstico *
+              </label>
+              <textarea 
+                formControlName="diagnosis"
+                rows="3"
+                class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors resize-none"
+                [class.border-red-300]="isFieldInvalid('diagnosis')"
+                placeholder="Diagnóstico médico basado en la consulta...">
+              </textarea>
+              <div *ngIf="isFieldInvalid('diagnosis')" class="mt-1 text-sm text-red-600">
+                {{ getFieldError('diagnosis') }}
+              </div>
+            </div>
+
+            <!-- Recomendaciones -->
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">
+                Recomendaciones *
+              </label>
+              <textarea 
+                formControlName="recommendations"
+                rows="4"
+                class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors resize-none"
+                [class.border-red-300]="isFieldInvalid('recommendations')"
+                placeholder="Tratamiento, medicamentos, seguimiento y recomendaciones generales...">
+              </textarea>
+              <div *ngIf="isFieldInvalid('recommendations')" class="mt-1 text-sm text-red-600">
+                {{ getFieldError('recommendations') }}
+              </div>
+            </div>
+
+            <!-- Botón Submit -->
+            <div class="flex items-center justify-end space-x-4 pt-4 border-t border-slate-200">
+              <button 
+                type="button"
+                (click)="goBack()"
+                class="px-6 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg font-medium transition-colors">
+                Cancelar
+              </button>
+              <button 
+                type="submit"
+                [disabled]="submitting"
+                class="px-8 py-3 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white font-semibold rounded-lg transition-colors flex items-center space-x-2">
+                <div *ngIf="submitting" class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                <span>{{ submitting ? 'Guardando...' : 'Completar Consulta' }}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Panel Lateral -->
+      <div class="space-y-6">
+        <!-- Estudios de Laboratorio -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-slate-800 flex items-center">
+              <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19,8L15,12H18A6,6 0 0,1 12,18C11,18 10.03,17.75 9.2,17.3L7.74,18.76C8.97,19.54 10.43,20 12,20A8,8 0 0,0 20,12H23M1,12H4A8,8 0 0,0 12,4C13,4 13.97,4.25 14.8,4.7L16.26,3.24C15.03,2.46 13.57,2 12,2A8,8 0 0,0 4,12H1L5,16L9,12"/>
+              </svg>
+              Estudios Recientes
+            </h3>
+            <button 
+              (click)="toggleShowAllSamples()"
+              class="text-xs text-blue-600 hover:text-blue-700 font-semibold px-2 py-1 rounded-md hover:bg-blue-50 transition-colors">
+              {{ showAllSamples ? 'Ver menos' : 'Ver todos' }}
+            </button>
+          </div>
+
+          <div *ngIf="patientSamples.length === 0" class="text-center py-8">
+            <div class="w-12 h-12 mx-auto mb-3 text-slate-300">
+              <svg fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19,8L15,12H18A6,6 0 0,1 12,18C11,18 10.03,17.75 9.2,17.3L7.74,18.76C8.97,19.54 10.43,20 12,20A8,8 0 0,0 20,12H23M1,12H4A8,8 0 0,0 12,4C13,4 13.97,4.25 14.8,4.7L16.26,3.24C15.03,2.46 13.57,2 12,2A8,8 0 0,0 4,12H1L5,16L9,12"/>
+              </svg>
+            </div>
+            <p class="text-slate-500 text-sm">No hay estudios disponibles</p>
+          </div>
+
+          <div *ngIf="patientSamples.length > 0" class="space-y-3">
+            <div *ngFor="let sample of patientSamples" 
+                 class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+              <div class="flex items-center justify-between mb-2">
+                <p class="font-medium text-slate-800 text-sm">{{ sample.type }}</p>
+                <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                  {{ sample.status }}
+                </span>
+              </div>
+              <p class="text-xs text-slate-500">{{ sample.collectionDate | date:'mediumDate' }}</p>
+              <p class="text-xs text-slate-600 mt-1">{{ sample.registeredByName }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reporte IA -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+          <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+            <svg class="w-5 h-5 text-purple-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z"/>
+            </svg>
+            Análisis IA
+          </h3>
+          
+          <div *ngIf="!showAIReport">
+            <p class="text-slate-500 text-sm mb-4">
+              Obtén un análisis inteligente del historial médico del paciente
+            </p>
+            <button 
+              (click)="loadAIReport()"
+              class="w-full px-4 py-3 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 rounded-lg font-medium transition-colors">
+              Generar Reporte IA
+            </button>
+          </div>
+
+          <div *ngIf="showAIReport && aiReport" class="space-y-4">
+            <div class="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4">
+              <h4 class="font-semibold text-purple-900 mb-2">Resumen General</h4>
+              <p class="text-purple-800 text-sm">{{ aiReport.reporteMedico.resumen.texto }}</p>
+            </div>
+            
+            <div *ngIf="aiReport.reporteMedico.resumen.enfermedadesDetectadas.length > 0">
+              <h4 class="font-semibold text-slate-700 text-sm mb-2">Condiciones Detectadas</h4>
+              <div class="flex flex-wrap gap-2">
+                <span *ngFor="let condition of aiReport.reporteMedico.resumen.enfermedadesDetectadas" 
+                      class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
+                  {{ condition }}
+                </span>
+              </div>
+            </div>
+
+            <div *ngIf="aiReport.reporteMedico.recomendaciones.length > 0">
+              <h4 class="font-semibold text-slate-700 text-sm mb-2">Recomendaciones IA</h4>
+              <ul class="space-y-2">
+                <li *ngFor="let rec of aiReport.reporteMedico.recomendaciones" 
+                    class="text-xs text-slate-600 flex items-start space-x-2">
+                  <span class="text-green-500 mt-0.5">•</span>
+                  <span>{{ rec }}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Historial de Visitas -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-slate-800 flex items-center">
+              <svg class="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.2 14.2L11 13V7h1.5v5.2l4.5 2.7-.8 1.3z"/>
+              </svg>
+              Historial
+            </h3>
+            <button 
+              (click)="toggleShowAllVisits()"
+              class="text-xs text-blue-600 hover:text-blue-700 font-semibold px-2 py-1 rounded-md hover:bg-blue-50 transition-colors">
+              {{ showAllVisits ? 'Ver menos' : 'Ver todos' }}
+            </button>
+          </div>
+
+          <div *ngIf="patientVisits.length === 0" class="text-center py-8">
+            <div class="w-12 h-12 mx-auto mb-3 text-slate-300">
+              <svg fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.2 14.2L11 13V7h1.5v5.2l4.5 2.7-.8 1.3z"/>
+              </svg>
+            </div>
+            <p class="text-slate-500 text-sm">No hay visitas anteriores</p>
+          </div>
+
+          <div *ngIf="patientVisits.length > 0" class="space-y-3">
+            <div *ngFor="let visit of patientVisits" 
+                 class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+              <div class="flex items-center justify-between mb-2">
+                <p class="font-medium text-slate-800 text-sm">{{ getVisitTypeLabel(visit.type) }}</p>
+                <span class="text-xs bg-slate-200 text-slate-600 px-2 py-1 rounded-full">
+                  {{ visit.visitCompleted ? 'Completada' : 'Pendiente' }}
+                </span>
+              </div>
+              <p class="text-xs text-slate-500">{{ visit.visitDate | date:'mediumDate' }}</p>
+              <p *ngIf="visit.diagnosis" class="text-xs text-slate-700 mt-1 font-medium">{{ visit.diagnosis }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

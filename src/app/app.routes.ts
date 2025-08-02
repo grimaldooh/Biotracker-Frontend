@@ -107,6 +107,16 @@ export const routes: Routes = [
       import('./modules/doctors/dashboard/dashboard.component')
         .then(m => m.DashboardComponent)
   },
+  {
+    path: 'doctor/schedule-appointments',
+    loadComponent: () =>
+      import('./modules/doctors/schedule-appointments/schedule-appointments.component').then(m => m.ScheduleAppointmentsComponent)
+  },
+  {
+    path: 'doctors/visit-management/:id',
+    loadComponent: () =>
+      import('./modules/doctors/visit-management/visit-management.component').then(m => m.VisitManagementComponent)
+  },
   { path: '', redirectTo: 'patients/register', pathMatch: 'full' },
   { path: '**', redirectTo: 'patients/register' }
 ];
