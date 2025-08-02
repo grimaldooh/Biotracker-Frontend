@@ -27,6 +27,7 @@ export interface VisitAdvanceDto {
   notes: string;
   diagnosis: string;
   recommendations: string;
+  type: string;
 }
 
 @Injectable({

@@ -20,6 +20,12 @@ export class VisitManagementComponent implements OnInit {
   patientVisits: MedicalVisit[] = [];
   aiReport: AIReport | null = null;
   
+  // Modal states
+  showVisitModal = false;
+  showSampleModal = false;
+  selectedVisit: MedicalVisit | null = null;
+  selectedSample: Sample | null = null;
+  
   loading = true;
   submitting = false;
   showAllSamples = false;
@@ -27,6 +33,7 @@ export class VisitManagementComponent implements OnInit {
   showAIReport = false;
   
   visitId: string = '';
+  visitData: MedicalVisit | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -51,10 +58,10 @@ export class VisitManagementComponent implements OnInit {
   async loadVisitData() {
     this.loading = true;
     try {
-      // Cargar datos de la cita actual (desde el localStorage o servicio)
-      const visitData = this.getVisitFromStorage();
-      if (visitData) {
-        this.currentVisit = visitData;
+      this.visitData = this.getVisitFromStorage();
+      
+      if (this.visitData) {
+        this.currentVisit = this.visitData;
         await this.loadPatientData();
       }
     } catch (error) {
@@ -76,18 +83,16 @@ export class VisitManagementComponent implements OnInit {
     if (!patientId) return;
 
     try {
-      // Cargar muestras del paciente
       this.sampleService.getSamplesByPatient(patientId).subscribe({
         next: (samples) => {
-          this.patientSamples = samples.slice(0, 3); // Solo primeros 3
+          this.patientSamples = samples.slice(0, 3);
         },
         error: (error) => console.error('Error loading samples:', error)
       });
 
-      // Cargar historial de visitas
       this.patientService.getAllVisits(patientId).subscribe({
         next: (visits) => {
-          this.patientVisits = visits.slice(0, 3); // Solo primeras 3
+          this.patientVisits = visits.slice(0, 3);
         },
         error: (error) => console.error('Error loading visits:', error)
       });
@@ -97,9 +102,25 @@ export class VisitManagementComponent implements OnInit {
   }
 
   private extractPatientId(visit: MedicalVisit): string {
-    // Extraer patientId de la visita - esto dependerá de tu estructura de datos
-    // Por ahora uso un ID fijo, pero deberías obtenerlo de la visita
     return '95f34129-c894-4574-8914-be012053e7c7';
+  }
+
+  // Modal methods
+  openVisitModal(visit: MedicalVisit) {
+    this.selectedVisit = visit;
+    this.showVisitModal = true;
+  }
+
+  openSampleModal(sample: Sample) {
+    this.selectedSample = sample;
+    this.showSampleModal = true;
+  }
+
+  closeModals() {
+    this.showVisitModal = false;
+    this.showSampleModal = false;
+    this.selectedVisit = null;
+    this.selectedSample = null;
   }
 
   onSubmitVisit() {
@@ -110,12 +131,12 @@ export class VisitManagementComponent implements OnInit {
 
     this.submitting = true;
     const formData: VisitAdvanceDto = this.visitForm.value;
-
+    formData.type = this.visitData?.type || 'CONSULTATION';
+    console.log('Submitting visit advance:', formData);
     this.doctorService.submitVisitAdvance(this.visitId, formData).subscribe({
       next: (response) => {
-        // Éxito - mostrar mensaje y redirigir
         alert('Cita actualizada exitosamente');
-        this.router.navigate(['/doctors/schedule-appointments']);
+        this.router.navigate(['/doctors/dashboard']);
       },
       error: (error) => {
         console.error('Error submitting visit:', error);
@@ -183,6 +204,7 @@ export class VisitManagementComponent implements OnInit {
     this.router.navigate(['/doctors/schedule-appointments']);
   }
 
+  // Utility methods
   getVisitTypeLabel(type: string): string {
     const labels: Record<string, string> = {
       'CONSULTATION': 'Consulta',
@@ -192,6 +214,37 @@ export class VisitManagementComponent implements OnInit {
       'OTHER': 'Otro'
     };
     return labels[type] || type;
+  }
+
+  getSampleTypeLabel(type: string): string {
+    const labels: Record<string, string> = {
+      'BLOOD': 'Sangre',
+      'URINE': 'Orina',
+      'SALIVA': 'Saliva',
+      'TISSUE': 'Tejido',
+      'OTHER': 'Otro'
+    };
+    return labels[type] || type;
+  }
+
+  getSampleStatusLabel(status: string): string {
+    const labels: Record<string, string> = {
+      'PENDING': 'Pendiente',
+      'IN_PROGRESS': 'En Proceso',
+      'COMPLETED': 'Completado',
+      'CANCELLED': 'Cancelado'
+    };
+    return labels[status] || status;
+  }
+
+  getSampleStatusColor(status: string): string {
+    const colors: Record<string, string> = {
+      'PENDING': 'bg-yellow-100 text-yellow-700',
+      'IN_PROGRESS': 'bg-blue-100 text-blue-700',
+      'COMPLETED': 'bg-green-100 text-green-700',
+      'CANCELLED': 'bg-red-100 text-red-700'
+    };
+    return colors[status] || 'bg-slate-100 text-slate-700';
   }
 
   isFieldInvalid(fieldName: string): boolean {
