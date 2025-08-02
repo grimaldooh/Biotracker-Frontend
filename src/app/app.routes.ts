@@ -95,11 +95,17 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./modules/patient/appointments-historial/appointments-historial.component')
         .then(m => m.AppointmentsHistorialComponent)
-},
+  },
   {
     path: 'patient/schedule',
     loadComponent: () =>
       import('./modules/patient/schedule/schedule.component').then(m => m.ScheduleComponent)
+  },
+  {
+    path: 'doctors/dashboard',
+    loadComponent: () =>
+      import('./modules/doctors/dashboard/dashboard.component')
+        .then(m => m.DashboardComponent)
   },
   { path: '', redirectTo: 'patients/register', pathMatch: 'full' },
   { path: '**', redirectTo: 'patients/register' }
