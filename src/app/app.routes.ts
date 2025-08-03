@@ -122,6 +122,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./modules/doctors/visit-history/visit-history.component').then(m => m.VisitHistoryComponent)
   },
+  {
+    path: 'doctors/new-appointment',
+    loadComponent: () =>
+      import('./modules/doctors/new-appointment/new-appointment.component').then(m => m.NewAppointmentComponent)
+  },
   { path: '', redirectTo: 'patients/register', pathMatch: 'full' },
   { path: '**', redirectTo: 'patients/register' }
 ];

@@ -35,6 +35,10 @@ export class VisitManagementComponent implements OnInit {
   visitId: string = '';
   visitData: MedicalVisit | null = null;
 
+  // Nuevas propiedades para el modal
+  showPostConsultationModal = false;
+  consultationCompleted = false;
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -131,12 +135,13 @@ export class VisitManagementComponent implements OnInit {
 
     this.submitting = true;
     const formData: VisitAdvanceDto = this.visitForm.value;
-    formData.type = this.visitData?.type || 'CONSULTATION';
-    console.log('Submitting visit advance:', formData);
+    formData.type = this.currentVisit?.type || 'CONSULTATION';
+
     this.doctorService.submitVisitAdvance(this.visitId, formData).subscribe({
       next: (response) => {
-        alert('Cita actualizada exitosamente');
-        this.router.navigate(['/doctors/dashboard']);
+        this.consultationCompleted = true;
+        this.submitting = false;
+        this.showPostConsultationModal = true;
       },
       error: (error) => {
         console.error('Error submitting visit:', error);
@@ -144,6 +149,27 @@ export class VisitManagementComponent implements OnInit {
         this.submitting = false;
       }
     });
+  }
+
+  // Nuevos métodos para el modal
+  closePostConsultationModal() {
+    this.showPostConsultationModal = false;
+    this.router.navigate(['/doctors/dashboard']);
+  }
+
+  scheduleNewAppointment(withSameDoctor: boolean = false) {
+    if (this.currentVisit) {
+      const appointmentData = {
+        patientId: this.extractPatientId(this.currentVisit),
+        patientName: this.currentVisit.patientName,
+        withSameDoctor: withSameDoctor,
+        doctorId: withSameDoctor ? '46f163c3-c5ff-4301-ba5f-6e348e982a8a' : null, // ID del doctor actual
+        specialty: withSameDoctor ? this.currentVisit.medicalArea : null
+      };
+      
+      localStorage.setItem('newAppointmentData', JSON.stringify(appointmentData));
+      this.router.navigate(['/doctors/new-appointment']);
+    }
   }
 
   private markFormGroupTouched() {
