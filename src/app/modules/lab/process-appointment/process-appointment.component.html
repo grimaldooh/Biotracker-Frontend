@@ -1,0 +1,429 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+    <div class="max-w-4xl mx-auto">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <button (click)="goBack()" 
+                  class="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">
+            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+          </button>
+          <div>
+            <h1 class="text-2xl font-semibold text-gray-900">Procesar Cita de Laboratorio</h1>
+            <p class="text-sm text-gray-600" *ngIf="appointmentData">
+              Paciente: {{ appointmentData.patientName }} • Doctor: {{ appointmentData.doctorName }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div class="max-w-6xl mx-auto px-6 py-8">
+    <form [formGroup]="sampleForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      
+      <!-- Información de la Cita -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+          <svg class="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.89-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.11-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+          </svg>
+          Información de la Cita
+        </h2>
+        
+        <div *ngIf="appointmentData" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-blue-50 p-4 rounded-lg">
+          <div>
+            <p class="text-sm text-gray-600"><span class="font-medium">Paciente:</span> {{ appointmentData.patientName }}</p>
+            <p class="text-sm text-gray-600"><span class="font-medium">Doctor:</span> {{ appointmentData.doctorName }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600"><span class="font-medium">Tipo de muestra:</span> {{ getSampleTypeLabel(appointmentData.sampleType) }}</p>
+            <p class="text-sm text-gray-600" *ngIf="appointmentData.notes"><span class="font-medium">Notas del doctor:</span> {{ appointmentData.notes }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información de la Muestra -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+          <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+          </svg>
+          Registro de Muestra
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Muestra *</label>
+            <select formControlName="type" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-gray-100"
+                    [disabled]="true">
+              <option [value]="appointmentData?.sampleType">{{ getSampleTypeLabel(appointmentData?.sampleType) }}</option>
+            </select>
+            <p class="text-xs text-gray-500 mt-1">Tipo predefinido por la cita médica</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Estado de la Muestra</label>
+            <select formControlName="status" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+              <option value="PENDING">Pendiente</option>
+              <option value="IN_PROGRESS">En Progreso</option>
+              <option value="COMPLETED">Completado</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de Recolección *</label>
+            <input type="date" formControlName="collectionDate"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+            <div *ngIf="sampleForm.get('collectionDate')?.invalid && sampleForm.get('collectionDate')?.touched" 
+                 class="text-red-600 text-xs mt-1">
+              La fecha de recolección es requerida
+            </div>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Notas del Laboratorio</label>
+            <textarea formControlName="notes" rows="4"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                      placeholder="Observaciones sobre la recolección, condiciones de la muestra, etc..."></textarea>
+            <p class="text-xs text-gray-500 mt-1">
+              Notas del doctor: "{{ appointmentData?.notes || 'Sin notas adicionales' }}"
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Datos Específicos de Sangre -->
+      <div *ngIf="appointmentData?.sampleType === 'BLOOD'" 
+           class="bg-white rounded-lg shadow-sm border border-gray-200 p-6" 
+           formGroupName="bloodData">
+        <h2 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+          <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+          </svg>
+          Análisis de Sangre (Opcional)
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Glucosa (mg/dL)</label>
+            <input type="number" formControlName="glucoseMgDl" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                   placeholder="70-100 normal">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Colesterol Total (mg/dL)</label>
+            <input type="number" formControlName="cholesterolTotalMgDl" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                   placeholder="< 200 deseable">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Colesterol HDL (mg/dL)</label>
+            <input type="number" formControlName="cholesterolHdlMgDl" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                   placeholder="> 40 deseable">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Colesterol LDL (mg/dL)</label>
+            <input type="number" formControlName="cholesterolLdlMgDl" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                   placeholder="< 100 deseable">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Triglicéridos (mg/dL)</label>
+            <input type="number" formControlName="triglyceridesMgDl" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                   placeholder="< 150 normal">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Creatinina (mg/dL)</label>
+            <input type="number" formControlName="creatinineMgDl" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                   placeholder="0.7-1.3 normal">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Urea (mg/dL)</label>
+            <input type="number" formControlName="ureaMgDl" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                   placeholder="15-40 normal">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Hemoglobina (g/dL)</label>
+            <input type="number" formControlName="hemoglobinGDl" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                   placeholder="12-16 normal">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Hematocrito (%)</label>
+            <input type="number" formControlName="hematocritPercent" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                   placeholder="36-46 normal">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Eritrocitos (mill/µL)</label>
+            <input type="number" formControlName="redBloodCellsMillionUl" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Leucocitos (mil/µL)</label>
+            <input type="number" formControlName="whiteBloodCellsThousandUl" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Plaquetas (mil/µL)</label>
+            <input type="number" formControlName="plateletsThousandUl" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">ALT/SGPT (U/L)</label>
+            <input type="number" formControlName="altSgptUL" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">AST/SGOT (U/L)</label>
+            <input type="number" formControlName="astSgotUL" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Bilirrubina Total (mg/dL)</label>
+            <input type="number" formControlName="bilirubinTotalMgDl" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Fosfatasa Alcalina (U/L)</label>
+            <input type="number" formControlName="alkalinePhosphataseUL" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">BUN (mg/dL)</label>
+            <input type="number" formControlName="bunMgDl" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">GFR (ml/min)</label>
+            <input type="number" formControlName="gfrMlMin" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Proteína Total (g/dL)</label>
+            <input type="number" formControlName="totalProteinGDl" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Albúmina (g/dL)</label>
+            <input type="number" formControlName="albuminGDl" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Sodio (mEq/L)</label>
+            <input type="number" formControlName="sodiumMeqL" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Potasio (mEq/L)</label>
+            <input type="number" formControlName="potassiumMeqL" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Cloruro (mEq/L)</label>
+            <input type="number" formControlName="chlorideMeqL" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Proteína C Reactiva (mg/L)</label>
+            <input type="number" formControlName="cReactiveProteinMgL" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">ESR (mm/hr)</label>
+            <input type="number" formControlName="esrMmHr" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Marcadores Genéticos</label>
+            <input type="number" formControlName="geneticMarkersDetected"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Calidad Genética (%)</label>
+            <input type="number" formControlName="geneticQualityScore"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Valores de Referencia</label>
+            <input type="text" formControlName="labReferenceValues"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Modelo de Analizador</label>
+            <input type="text" formControlName="analyzerModel"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Velocidad Centrifugación (rpm)</label>
+            <input type="number" formControlName="centrifugationSpeedRpm"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Temperatura Almacenamiento (°C)</label>
+            <input type="number" formControlName="storageTemperatureCelsius"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+        </div>
+      </div>
+
+      <!-- Datos Específicos de DNA -->
+      <div *ngIf="appointmentData?.sampleType === 'DNA'" 
+           class="bg-white rounded-lg shadow-sm border border-gray-200 p-6" 
+           formGroupName="dnaData">
+        <h2 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+          <svg class="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M4.83,12L7,9.83L9.17,12L7,14.17L4.83,12M12,4.83L14.17,7L12,9.17L9.83,7L12,4.83M19.17,12L17,9.83L14.83,12L17,14.17L19.17,12M12,19.17L9.83,17L12,14.83L14.17,17L12,19.17Z"/>
+          </svg>
+          Análisis de ADN (Opcional)
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Concentración DNA (ng/µL)</label>
+            <input type="number" formControlName="concentrationNgUl" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Pureza 260/280</label>
+            <input type="number" formControlName="purity260280Ratio" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Pureza 260/230</label>
+            <input type="number" formControlName="purity260230Ratio" step="0.01"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Número de Integridad</label>
+            <input type="number" formControlName="integrityNumber"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Método de Extracción</label>
+            <input type="text" formControlName="extractionMethod"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Volumen (μL)</label>
+            <input type="number" formControlName="volumeUl" step="0.1"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+        </div>
+      </div>
+
+      <!-- Datos Específicos de Saliva -->
+      <div *ngIf="appointmentData?.sampleType === 'SALIVA'" 
+           class="bg-white rounded-lg shadow-sm border border-gray-200 p-6" 
+           formGroupName="salivaData">
+        <h2 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+          <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+          </svg>
+          Análisis de Saliva (Opcional)
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Volumen (mL)</label>
+            <input type="number" formControlName="volumeMl" step="0.1"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                   placeholder="1-5 mL típico">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">pH</label>
+            <input type="number" formControlName="phLevel" step="0.1"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                   placeholder="6.0-7.4 normal">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Color</label>
+            <select formControlName="color"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+              <option value="">Seleccionar</option>
+              <option value="CLEAR">Transparente</option>
+              <option value="YELLOW">Amarillo</option>
+              <option value="CLOUDY">Turbio</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="flex justify-end space-x-4 pt-6">
+        <button type="button" (click)="goBack()" 
+                class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+          Cancelar
+        </button>
+        
+        <button type="submit" [disabled]="loading || sampleForm.invalid"
+                class="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-lg transition-colors flex items-center space-x-2">
+          <div *ngIf="loading" class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+          <span>{{ loading ? 'Registrando...' : 'Registrar Muestra' }}</span>
+        </button>
+      </div>
+    </form>
+
+    <!-- Información adicional -->
+    <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div class="flex items-start">
+        <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+        </svg>
+        <div>
+          <h3 class="text-sm font-medium text-blue-900 mb-1">Información Importante</h3>
+          <p class="text-sm text-blue-800">
+            Los datos de análisis específicos son opcionales en este momento. Puedes registrar la muestra ahora y completar los resultados de laboratorio más tarde desde la sección de edición de muestras.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

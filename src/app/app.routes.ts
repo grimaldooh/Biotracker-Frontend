@@ -127,6 +127,21 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./modules/doctors/new-appointment/new-appointment.component').then(m => m.NewAppointmentComponent)
   },
+  {
+    path: 'lab/pending-appointments',
+    loadComponent: () =>
+      import('./modules/lab/pending-appointments/pending-appointments.component').then(m => m.PendingAppointmentsComponent)
+  },
+  {
+    path: 'lab/process-appointment',
+    loadComponent: () =>
+      import('./modules/lab/process-appointment/process-appointment.component').then(m => m.ProcessAppointmentComponent)
+  },
+  {
+    path: 'lab/edit-sample/:id',
+    loadComponent: () =>
+      import('./modules/lab/edit-sample/edit-sample.component').then(m => m.EditSampleComponent)
+  },
   { path: '', redirectTo: 'patients/register', pathMatch: 'full' },
   { path: '**', redirectTo: 'patients/register' }
 ];

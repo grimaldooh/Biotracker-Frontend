@@ -1,0 +1,518 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+    <div class="max-w-6xl mx-auto">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <button (click)="goBack()" 
+                  class="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">
+            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+          </button>
+          <div>
+            <h1 class="text-2xl font-semibold text-gray-900">Editar Muestra</h1>
+            <p class="text-sm text-gray-600" *ngIf="sample">
+              ID: {{ sample.id }} • Tipo: {{ getSampleTypeLabel(sample.type) }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex justify-center items-center py-16">
+    <div class="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent"></div>
+  </div>
+
+  <!-- Form -->
+  <div *ngIf="!loading && sample" class="max-w-6xl mx-auto px-6 py-8">
+    <form [formGroup]="sampleForm" (ngSubmit)="onSubmit()" class="space-y-8">
+      
+      <!-- Información Básica -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">Información Básica</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Muestra</label>
+            <select formControlName="type" 
+                    [class.border-red-300]="isFieldInvalid('type')"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+              <option value="">Selecciona un tipo</option>
+              <option *ngFor="let type of sampleTypes" [value]="type.value">{{ type.label }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+            <select formControlName="status" 
+                    [class.border-red-300]="isFieldInvalid('status')"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+              <option value="">Selecciona un estado</option>
+              <option *ngFor="let status of sampleStatuses" [value]="status.value">{{ status.label }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de Recolección</label>
+            <input type="date" formControlName="collectionDate"
+                   [class.border-red-300]="isFieldInvalid('collectionDate')"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Notas</label>
+            <textarea formControlName="notes" rows="3"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                      placeholder="Observaciones adicionales sobre la muestra..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Datos Específicos de Sangre -->
+      <div *ngIf="sampleForm.get('type')?.value === 'BLOOD'" 
+           class="bg-white rounded-lg shadow-sm border border-gray-200 p-6" 
+           formGroupName="bloodData">
+        <h2 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+          <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+          </svg>
+          Datos de Análisis de Sangre
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Glucosa (mg/dL)</label>
+            <input type="number" formControlName="glucoseMgDl" step="0.01" placeholder="70-100 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Colesterol Total (mg/dL)</label>
+            <input type="number" formControlName="cholesterolTotalMgDl" step="0.01" placeholder="< 200 deseable"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Colesterol HDL (mg/dL)</label>
+            <input type="number" formControlName="cholesterolHdlMgDl" step="0.01" placeholder="> 40 hombres, > 50 mujeres"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Colesterol LDL (mg/dL)</label>
+            <input type="number" formControlName="cholesterolLdlMgDl" step="0.01" placeholder="< 100 óptimo"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Triglicéridos (mg/dL)</label>
+            <input type="number" formControlName="triglyceridesMgDl" step="0.01" placeholder="< 150 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Creatinina (mg/dL)</label>
+            <input type="number" formControlName="creatinineMgDl" step="0.01" placeholder="0.6-1.2 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Urea (mg/dL)</label>
+            <input type="number" formControlName="ureaMgDl" step="0.01" placeholder="15-40 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Hemoglobina (g/dL)</label>
+            <input type="number" formControlName="hemoglobinGDl" step="0.01" placeholder="12-16 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Hematocrito (%)</label>
+            <input type="number" formControlName="hematocritPercent" step="0.1" placeholder="36-46 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Eritrocitos (mill/µL)</label>
+            <input type="number" formControlName="redBloodCellsMillionUl" step="0.01" placeholder="4.2-5.4 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Leucocitos (mil/µL)</label>
+            <input type="number" formControlName="whiteBloodCellsThousandUl" step="0.01" placeholder="4.5-11.0 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Plaquetas (mil/µL)</label>
+            <input type="number" formControlName="plateletsThousandUl" step="0.01" placeholder="150-400 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">ALT/SGPT (U/L)</label>
+            <input type="number" formControlName="altSgptUL" step="0.01" placeholder="7-35 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">AST/SGOT (U/L)</label>
+            <input type="number" formControlName="astSgotUL" step="0.01" placeholder="8-40 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Bilirrubina Total (mg/dL)</label>
+            <input type="number" formControlName="bilirubinTotalMgDl" step="0.01" placeholder="0.3-1.2 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Fosfatasa Alcalina (U/L)</label>
+            <input type="number" formControlName="alkalinePhosphataseUL" step="0.01" placeholder="44-147 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">BUN (mg/dL)</label>
+            <input type="number" formControlName="bunMgDl" step="0.01" placeholder="7-20 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">GFR (ml/min)</label>
+            <input type="number" formControlName="gfrMlMin" step="0.01" placeholder="> 60 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Proteína Total (g/dL)</label>
+            <input type="number" formControlName="totalProteinGDl" step="0.01" placeholder="6.0-8.3 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Albúmina (g/dL)</label>
+            <input type="number" formControlName="albuminGDl" step="0.01" placeholder="3.5-5.0 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Sodio (mEq/L)</label>
+            <input type="number" formControlName="sodiumMeqL" step="0.01" placeholder="136-145 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Potasio (mEq/L)</label>
+            <input type="number" formControlName="potassiumMeqL" step="0.01" placeholder="3.5-5.0 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Cloruro (mEq/L)</label>
+            <input type="number" formControlName="chlorideMeqL" step="0.01" placeholder="98-107 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Proteína C Reactiva (mg/L)</label>
+            <input type="number" formControlName="cReactiveProteinMgL" step="0.01" placeholder="< 3.0 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">ESR (mm/hr)</label>
+            <input type="number" formControlName="esrMmHr" step="0.01" placeholder="< 20 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Marcadores Genéticos Detectados</label>
+            <input type="number" formControlName="geneticMarkersDetected" placeholder="0"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Calidad Genética (%)</label>
+            <input type="number" formControlName="geneticQualityScore" placeholder="0-100"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Valores de Referencia</label>
+            <input type="text" formControlName="labReferenceValues" placeholder="Valores de referencia del laboratorio"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Modelo de Analizador</label>
+            <input type="text" formControlName="analyzerModel" placeholder="Modelo del equipo"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Velocidad de Centrifugación (rpm)</label>
+            <input type="number" formControlName="centrifugationSpeedRpm" placeholder="0"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Temperatura de Almacenamiento (°C)</label>
+            <input type="number" formControlName="storageTemperatureCelsius" placeholder="-80 a 4"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+        </div>
+      </div>
+
+      <!-- Datos Específicos de DNA -->
+      <div *ngIf="sampleForm.get('type')?.value === 'DNA'" 
+           class="bg-white rounded-lg shadow-sm border border-gray-200 p-6" 
+           formGroupName="dnaData">
+        <h2 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+          <svg class="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M4.83,12L7,9.83L9.17,12L7,14.17L4.83,12M12,4.83L14.17,7L12,9.17L9.83,7L12,4.83M19.17,12L17,9.83L14.83,12L17,14.17L19.17,12M12,19.17L9.83,17L12,14.83L14.17,17L12,19.17Z"/>
+          </svg>
+          Datos de Análisis de ADN
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Concentración DNA (ng/µL)</label>
+            <input type="number" formControlName="concentrationNgUl" step="0.01" placeholder="50-100 típico"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Pureza 260/280</label>
+            <input type="number" formControlName="purity260280Ratio" step="0.01" placeholder="1.8-2.0 puro"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Pureza 260/230</label>
+            <input type="number" formControlName="purity260230Ratio" step="0.01" placeholder="2.0-2.2 puro"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Número de Integridad</label>
+            <input type="number" formControlName="integrityNumber" step="0.1" placeholder="1-10"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Método de Extracción</label>
+            <input type="text" formControlName="extractionMethod" placeholder="Kit/método usado"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de Extracción</label>
+            <input type="datetime-local" formControlName="extractionDate"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Técnico de Extracción</label>
+            <input type="text" formControlName="extractionTechnician" placeholder="Nombre del técnico"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Buffer de Almacenamiento</label>
+            <input type="text" formControlName="storageBuffer" placeholder="Tipo de buffer"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Volumen Alícuota (µL)</label>
+            <input type="number" formControlName="aliquotVolumeUl" step="0.1" placeholder="10-50 típico"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Ubicación en Congelador</label>
+            <input type="text" formControlName="freezerLocation" placeholder="Rack-Caja-Posición"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Plataforma de Secuenciación</label>
+            <input type="text" formControlName="sequencingPlatform" placeholder="Illumina, PacBio, etc."
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Profundidad de Secuenciación</label>
+            <input type="number" formControlName="sequencingDepth" placeholder="30x, 100x, etc."
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Protocolo de Preparación de Librería</label>
+            <input type="text" formControlName="libraryPrepProtocol" placeholder="Protocolo utilizado"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Lecturas Totales</label>
+            <input type="number" formControlName="totalReads" placeholder="Número de reads"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Lecturas Mapeadas</label>
+            <input type="number" formControlName="mappedReads" placeholder="Reads mapeados"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Calidad de Mapeo</label>
+            <input type="number" formControlName="mappingQualityScore" step="0.01" placeholder="Score 0-100"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Variantes Detectadas</label>
+            <input type="number" formControlName="variantsDetected" placeholder="Número de variantes"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">SNPs Detectados</label>
+            <input type="number" formControlName="snpsDetected" placeholder="Número de SNPs"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Indels Detectados</label>
+            <input type="number" formControlName="indelsDetected" placeholder="Número de indels"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">FASTQ R1 URL</label>
+            <input type="text" formControlName="fastqR1Url" placeholder="URL del archivo R1"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">FASTQ R2 URL</label>
+            <input type="text" formControlName="fastqR2Url" placeholder="URL del archivo R2"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">VCF File URL</label>
+            <input type="text" formControlName="vcfFileUrl" placeholder="URL del archivo VCF"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">BAM File URL</label>
+            <input type="text" formControlName="bamFileUrl" placeholder="URL del archivo BAM"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+        </div>
+      </div>
+
+      <!-- Datos Específicos de Saliva -->
+      <div *ngIf="sampleForm.get('type')?.value === 'SALIVA'" 
+           class="bg-white rounded-lg shadow-sm border border-gray-200 p-6" 
+           formGroupName="salivaData">
+        <h2 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
+          <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+          </svg>
+          Datos de Análisis de Saliva
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Volumen (ml)</label>
+            <input type="number" formControlName="volumeMl" step="0.1" placeholder="1-5 mL típico"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">pH</label>
+            <input type="number" formControlName="phLevel" step="0.1" placeholder="6.0-7.4 normal"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Viscosidad</label>
+            <input type="text" formControlName="viscosity" placeholder="Baja, Media, Alta"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">DNA Yield (ng)</label>
+            <input type="number" formControlName="dnaYieldNg" step="0.01" placeholder="Rendimiento de DNA"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Conteo Celular (por ml)</label>
+            <input type="number" formControlName="cellCountPerMl" placeholder="Células por mL"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Método de Colección</label>
+            <input type="text" formControlName="collectionMethod" placeholder="Método utilizado"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Estado de Ayuno</label>
+            <select formControlName="fastingStatus"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+              <option [value]="false">No</option>
+              <option [value]="true">Sí</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Nivel de Contaminación</label>
+            <input type="text" formControlName="contaminationLevel" placeholder="Bajo, Medio, Alto"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Preservativo Usado</label>
+            <input type="text" formControlName="preservativeUsed" placeholder="Tipo de preservativo"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Tiempo hasta Procesamiento (horas)</label>
+            <input type="number" formControlName="timeToProcessingHours" step="0.1" placeholder="Horas hasta procesar"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="flex justify-end space-x-4">
+        <button type="button" (click)="goBack()" 
+                class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+          Cancelar
+        </button>
+        
+        <button type="submit" [disabled]="saving || sampleForm.invalid"
+                class="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-lg transition-colors flex items-center space-x-2">
+          <div *ngIf="saving" class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+          <span>{{ saving ? 'Guardando...' : 'Guardar Cambios' }}</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
