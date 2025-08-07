@@ -20,7 +20,7 @@ interface Medic {
 })
 export class ScheduleComponent implements OnInit {
   hospitalId = '00d79e66-4457-4d27-9228-fe467823ce8e';
-  patientId = '95f34129-c894-4574-8914-be012053e7c7'; // ID del paciente logueado
+  patientId = '60ede05e-702c-442a-aba1-4507bb2fe542'; // ID del paciente logueado
   medics: Medic[] = [];
   specialties: string[] = [];
   filteredMedics: Medic[] = [];

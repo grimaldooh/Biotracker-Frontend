@@ -125,7 +125,7 @@ export class UploadMutationsComponent implements OnInit {
           this.loading = false;
         },
         error: (error) => {
-          console.error('Error loading patients:', error);
+          //console.error('Error loading patients:', error);
           this.loading = false;
           alert('Error al cargar los pacientes');
         }
@@ -172,7 +172,7 @@ export class UploadMutationsComponent implements OnInit {
           this.searchPatientsLocally(searchTerm);
         },
         error: (error) => {
-          console.error('Error in search:', error);
+          //console.error('Error in search:', error);
         }
       });
     }
@@ -311,7 +311,7 @@ export class UploadMutationsComponent implements OnInit {
       
       // 2. Crear la muestra con las mutaciones incluidas
       const sampleData = this.prepareSampleData(mutations);
-      console.log('Datos de la muestra a crear:', sampleData);
+      //console.log('Datos de la muestra a crear:', sampleData);
       const createdSample = await this.http.post<GeneticSampleResponse>('http://localhost:8080/api/genetic-samples', sampleData).toPromise();
       //aqui si se estan creando bien las mutaciones 
       if (createdSample) {
@@ -319,7 +319,7 @@ export class UploadMutationsComponent implements OnInit {
         this.resetForms();
       }
     } catch (error) {
-      console.error('Error creating genetic sample with file:', error);
+      //console.error('Error creating genetic sample with file:', error);
       alert('Error al crear la muestra genética y procesar el archivo');
     } finally {
       this.submitting = false;
@@ -340,11 +340,11 @@ export class UploadMutationsComponent implements OnInit {
     try {
       // 1. Preparar las mutaciones desde el formulario
       const mutations = this.mutationsArray.value as MutationDTO[];
-      console.log('Mutations to be created:', mutations);
+      //console.log('Mutations to be created:', mutations);
       
       // 2. Crear la muestra con las mutaciones incluidas
       const sampleData = this.prepareSampleData(mutations);
-      console.log('Sample data to be created:', sampleData);
+      //console.log('Sample data to be created:', sampleData);
       const createdSample = await this.http.post<GeneticSampleResponse>('http://localhost:8080/api/genetic-samples', sampleData).toPromise();
       
       if (createdSample) {
@@ -352,7 +352,7 @@ export class UploadMutationsComponent implements OnInit {
         this.resetForms();
       }
     } catch (error) {
-      console.error('Error creating genetic sample:', error);
+      //console.error('Error creating genetic sample:', error);
       alert('Error al crear la muestra genética');
     } finally {
       this.submitting = false;
@@ -428,7 +428,7 @@ export class UploadMutationsComponent implements OnInit {
     try {
       await this.http.post(`http://localhost:8080/api/mutations/process?resultFileId=${resultFileId}`, {}).toPromise();
     } catch (error) {
-      console.error('Error processing mutations:', error);
+      //console.error('Error processing mutations:', error);
       throw error;
     } finally {
       this.processing = false;
@@ -547,10 +547,10 @@ CFTR,7,INSERTION,MEDIUM,Cystic fibrosis transmembrane conductance regulator vari
             });
           });
           
-          console.log(`✅ Archivo CSV procesado exitosamente. ${mutations.length} mutaciones encontradas.`);
+          //console.log(`✅ Archivo CSV procesado exitosamente. ${mutations.length} mutaciones encontradas.`);
           resolve(mutations);
         } catch (error) {
-          console.error('Error parsing CSV:', error);
+          //console.error('Error parsing CSV:', error);
           reject(error);
         }
       };

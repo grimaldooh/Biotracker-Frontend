@@ -12,7 +12,7 @@ import { forkJoin } from 'rxjs';
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements OnInit {
-  doctorId = '1a042737-3406-4aa5-a7e6-948b4c136778'; // Obtener del servicio de autenticación
+  doctorId = 'c332337f-ea0f-48b1-a1a6-9dac44364343'; // Obtener del servicio de autenticación
   doctorName = 'Dr. García'; // Obtener del servicio de autenticación
   
   stats: DoctorStats = {

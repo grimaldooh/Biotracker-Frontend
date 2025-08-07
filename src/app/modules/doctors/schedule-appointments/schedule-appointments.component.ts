@@ -16,7 +16,7 @@ interface AppointmentGroup {
   styleUrl: './schedule-appointments.component.css'
 })
 export class ScheduleAppointmentsComponent implements OnInit {
-  doctorId = '1a042737-3406-4aa5-a7e6-948b4c136778'; // Obtener del servicio de autenticación
+  doctorId = 'c332337f-ea0f-48b1-a1a6-9dac44364343'; // Obtener del servicio de autenticación
   pendingVisits: MedicalVisit[] = [];
   groupedAppointments: AppointmentGroup[] = [];
   loading = true;

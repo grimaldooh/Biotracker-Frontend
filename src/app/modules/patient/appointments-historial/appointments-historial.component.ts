@@ -42,7 +42,7 @@ const VISIT_TYPE_LABELS: Record<string, string> = {
   imports: [CommonModule]
 })
 export class AppointmentsHistorialComponent implements OnInit, OnDestroy {
-  private readonly patientId = '95f34129-c894-4574-8914-be012053e7c7';
+  private readonly patientId = '60ede05e-702c-442a-aba1-4507bb2fe542';
   private readonly destroy$ = new Subject<void>();
   private readonly baseUrl = 'http://localhost:8080/api/medical-visits';
 

@@ -14,7 +14,7 @@ export class SamplesComponent implements OnInit {
   samples: any[] = [];
   loading = true;
   selectedSample: any = null;
-  patientId = '95f34129-c894-4574-8914-be012053e7c7'; // Puedes obtenerlo de un servicio de sesión
+  patientId = '60ede05e-702c-442a-aba1-4507bb2fe542'; // Puedes obtenerlo de un servicio de sesión
 
   constructor(private sampleService: SampleService) {}
 

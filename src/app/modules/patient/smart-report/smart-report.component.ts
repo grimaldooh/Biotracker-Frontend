@@ -35,7 +35,7 @@ export class SmartReportComponent implements OnInit {
   detectedConditions: string[] = [];
   recommendations: string[] = [];
 
-  patientId = '95f34129-c894-4574-8914-be012053e7c7'; // Reemplaza por el id real
+  patientId = '60ede05e-702c-442a-aba1-4507bb2fe542'; // Reemplaza por el id real
 
   constructor(private patientService: PatientService) {}
 
