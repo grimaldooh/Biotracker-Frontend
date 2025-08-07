@@ -182,51 +182,127 @@
           </div>
         </div>
 
-        <!-- Reporte IA -->
-        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-          <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
-            <svg class="w-5 h-5 text-purple-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z"/>
+        <!-- Reporte IA - Versión Minimalista -->
+        <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+            <svg class="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2Z"/>
             </svg>
-            Análisis IA
+            Análisis Inteligente
           </h3>
           
-          <div *ngIf="!showAIReport">
-            <p class="text-slate-500 text-sm mb-4">
-              Obtén un análisis inteligente del historial médico del paciente
+          <div *ngIf="!showAIReport" class="text-center py-8">
+            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2Z"/>
+              </svg>
+            </div>
+            <h4 class="text-lg font-semibold text-gray-800 mb-2">Análisis Médico Inteligente</h4>
+            <p class="text-gray-600 text-sm mb-6 max-w-sm mx-auto">
+              Genera un análisis detallado del historial médico del paciente con correlaciones clínicas y recomendaciones basadas en IA
             </p>
             <button 
               (click)="loadAIReport()"
-              class="w-full px-4 py-3 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 rounded-lg font-medium transition-colors">
-              Generar Reporte IA
+              class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center space-x-2 mx-auto">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014.846 21H9.154a3.374 3.374 0 00-2.548-1.113L6.058 19.4z"/>
+              </svg>
+              <span>Generar Análisis</span>
             </button>
           </div>
 
+          <!-- Reporte IA - Vista Previa Minimalista -->
           <div *ngIf="showAIReport && aiReport" class="space-y-4">
-            <div class="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4">
-              <h4 class="font-semibold text-purple-900 mb-2">Resumen General</h4>
-              <p class="text-purple-800 text-sm">{{ aiReport.reporteMedico.resumen.texto }}</p>
-            </div>
             
-            <div *ngIf="aiReport.reporteMedico.resumen.enfermedadesDetectadas.length > 0">
-              <h4 class="font-semibold text-slate-700 text-sm mb-2">Condiciones Detectadas</h4>
+            <!-- Header del Reporte -->
+            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 class="font-semibold text-gray-800 text-sm">{{ aiReport.reporteMedico.paciente.nombre }}</h4>
+                  <p class="text-gray-600 text-xs">Análisis generado el {{ getCurrentDate() | date:'mediumDate' }}</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-full">
+                    {{ aiReport.reporteMedico.trazabilidadEvidencia.nivelConfianzaResumen }}
+                  </span>
+                  <span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">
+                    {{ aiReport.reporteMedico.trazabilidadEvidencia.muestrasAnalizadas.length }} estudios
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Resumen Ejecutivo -->
+            <div class="bg-white border border-gray-200 rounded-lg p-4">
+              <h5 class="font-medium text-gray-800 text-sm mb-2 flex items-center">
+                <svg class="w-4 h-4 text-gray-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                </svg>
+                Resumen Ejecutivo
+              </h5>
+              <p class="text-gray-700 text-sm leading-relaxed line-clamp-3">{{ aiReport.reporteMedico.resumen.texto }}</p>
+            </div>
+
+            <!-- Condiciones Detectadas -->
+            <div *ngIf="aiReport.reporteMedico.resumen.enfermedadesDetectadas.length > 0" class="bg-white border border-gray-200 rounded-lg p-4">
+              <h5 class="font-medium text-gray-800 text-sm mb-3 flex items-center">
+                <svg class="w-4 h-4 text-red-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z"/>
+                </svg>
+                Condiciones Identificadas ({{ aiReport.reporteMedico.resumen.enfermedadesDetectadas.length }})
+              </h5>
               <div class="flex flex-wrap gap-2">
-                <span *ngFor="let condition of aiReport.reporteMedico.resumen.enfermedadesDetectadas" 
-                      class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
+                <span *ngFor="let condition of aiReport.reporteMedico.resumen.enfermedadesDetectadas.slice(0, 3)" 
+                      class="bg-red-50 text-red-700 text-xs font-medium px-3 py-1 rounded-full border border-red-200">
                   {{ condition }}
+                </span>
+                <span *ngIf="aiReport.reporteMedico.resumen.enfermedadesDetectadas.length > 3" 
+                      class="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full">
+                  +{{ aiReport.reporteMedico.resumen.enfermedadesDetectadas.length - 3 }} más
                 </span>
               </div>
             </div>
 
-            <div *ngIf="aiReport.reporteMedico.recomendaciones.length > 0">
-              <h4 class="font-semibold text-slate-700 text-sm mb-2">Recomendaciones IA</h4>
-              <ul class="space-y-2">
-                <li *ngFor="let rec of aiReport.reporteMedico.recomendaciones" 
-                    class="text-xs text-slate-600 flex items-start space-x-2">
-                  <span class="text-green-500 mt-0.5">•</span>
-                  <span>{{ rec }}</span>
-                </li>
-              </ul>
+            <!-- Recomendaciones IA -->
+            <div *ngIf="aiReport.reporteMedico.recomendaciones.length > 0" class="bg-white border border-gray-200 rounded-lg p-4">
+              <h5 class="font-medium text-gray-800 text-sm mb-3 flex items-center">
+                <svg class="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"/>
+                </svg>
+                Recomendaciones Principales ({{ aiReport.reporteMedico.recomendaciones.length }})
+              </h5>
+              <div class="space-y-2">
+                <div *ngFor="let rec of aiReport.reporteMedico.recomendaciones.slice(0, 2); let i = index" 
+                     class="flex items-start space-x-2">
+                  <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-full min-w-max">
+                    {{ i + 1 }}
+                  </span>
+                  <p class="text-gray-700 text-xs leading-relaxed">{{ rec }}</p>
+                </div>
+                <div *ngIf="aiReport.reporteMedico.recomendaciones.length > 2" 
+                     class="text-xs text-gray-500 ml-6">
+                  +{{ aiReport.reporteMedico.recomendaciones.length - 2 }} recomendaciones adicionales
+                </div>
+              </div>
+            </div>
+
+            <!-- Botón Ver Reporte Completo -->
+            <div class="pt-4 border-t border-gray-200">
+              <button (click)="openFullAIReport()" 
+                      class="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center space-x-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                </svg>
+                <span>Ver Reporte Completo</span>
+              </button>
+            </div>
+
+            <!-- Botón Minimizar -->
+            <div class="flex justify-center">
+              <button (click)="showAIReport = false" 
+                      class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors">
+                Minimizar
+              </button>
             </div>
           </div>
         </div>
@@ -587,30 +663,30 @@
             Información General
           </h4>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div class="bg-white rounded-lg p-3 border border-blue-200">
+            <div class="bg-white rounded-lg p-3 border border-blue-100">
               <p class="text-blue-700 font-medium mb-1">Paciente</p>
               <p class="text-blue-900 font-semibold">{{ selectedSample.patientName }}</p>
             </div>
-            <div class="bg-white rounded-lg p-3 border border-blue-200">
+            <div class="bg-white rounded-lg p-3 border border-blue-100">
               <p class="text-blue-700 font-medium mb-1">Tipo de Muestra</p>
               <p class="text-blue-900 font-semibold">{{ getSampleTypeLabel(selectedSample.type) }}</p>
             </div>
-            <div class="bg-white rounded-lg p-3 border border-blue-200">
+            <div class="bg-white rounded-lg p-3 border border-blue-100">
               <p class="text-blue-700 font-medium mb-1">Estado</p>
               <span [ngClass]="getSampleStatusColor(selectedSample.status)" 
                     class="px-3 py-1 rounded-full text-xs font-semibold">
                 {{ getSampleStatusLabel(selectedSample.status) }}
               </span>
             </div>
-            <div class="bg-white rounded-lg p-3 border border-blue-200">
+            <div class="bg-white rounded-lg p-3 border border-blue-100">
               <p class="text-blue-700 font-medium mb-1">Fecha de Recolección</p>
               <p class="text-blue-900">{{ selectedSample.collectionDate | date:'medium' }}</p>
             </div>
-            <div class="bg-white rounded-lg p-3 border border-blue-200">
+            <div class="bg-white rounded-lg p-3 border border-blue-100">
               <p class="text-blue-700 font-medium mb-1">Registrado por</p>
               <p class="text-blue-900">{{ selectedSample.registeredByName }}</p>
             </div>
-            <div *ngIf="selectedSample.notes" class="bg-white rounded-lg p-3 border border-blue-200">
+            <div *ngIf="selectedSample.notes" class="bg-white rounded-lg p-3 border border-blue-100">
               <p class="text-blue-700 font-medium mb-1">Notas</p>
               <p class="text-blue-900 text-xs">{{ selectedSample.notes }}</p>
             </div>

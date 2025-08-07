@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DoctorService, MedicalVisit, VisitAdvanceDto } from '../../../core/services/doctors.service';
 import { PatientService } from '../../../core/services/patient.service';
 import { SampleService } from '../../../core/services/sample.service';
-import { Sample, AIReport, StudyReport } from '../../../core/interfaces/sample.interface';
+import { Sample, StudyReport } from '../../../core/interfaces/sample.interface'; // Removemos AIReport de aquí
 import { HttpClient } from '@angular/common/http';
 
 interface Medication {
@@ -41,6 +41,81 @@ interface MedicationUpdateRequest {
   operations: MedicationOperation[];
 }
 
+interface Patient {
+  nombre: string;
+  fechaNacimiento: string;
+  curp: string;
+}
+
+interface HistorialMedico {
+  fechaVisita: string;
+  diagnostico: string | null;
+  recomendaciones: string[] | null;
+  notas: string;
+}
+
+interface ReporteEstudio {
+  fechaEstudio: string;
+  tipoMuestra: string;
+  idMuestra: string;
+  modeloAnalizador: string;
+  hallazgosPrincipales: string;
+}
+
+interface EvidenciaRespaldo {
+  enfermedad: string;
+  idMuestraRespaldo: string;
+  hallazgoEspecifico: string;
+}
+
+interface PatronIdentificado {
+  patron: string;
+  evidenciaRespaldo: Array<{
+    idMuestra: string;
+    hallazgo: string;
+  }>;
+  fechasRelevantes: string[];
+}
+
+interface HallazgoNoExplicado {
+  hallazgo: string;
+  idMuestra: string | null;
+  recomendacionInvestigacion: string;
+}
+
+interface CorrelacionesClinicas {
+  analisisProgresion: string;
+  patronesIdentificados: PatronIdentificado[];
+  hallazgosNoExplicados: HallazgoNoExplicado[];
+}
+
+interface TrazabilidadEvidencia {
+  muestrasAnalizadas: string[];
+  visitasMedicasReferenciadas: string[];
+  nivelConfianzaResumen: string;
+}
+
+interface Resumen {
+  texto: string;
+  enfermedadesDetectadas: string[];
+  evidenciaRespalda: EvidenciaRespaldo[];
+}
+
+interface ReporteMedico {
+  paciente: Patient;
+  historialMedico: HistorialMedico[];
+  reportesEstudiosRecientes: ReporteEstudio[];
+  resumen: Resumen;
+  recomendaciones: string[];
+  correlacionesClinitas: CorrelacionesClinicas;
+  trazabilidadEvidencia: TrazabilidadEvidencia;
+}
+
+// Esta es la interfaz que necesitas, definida localmente
+interface AIReport {
+  reporteMedico: ReporteMedico;
+}
+
 @Component({
   selector: 'app-visit-management',
   standalone: true,
@@ -54,7 +129,7 @@ export class VisitManagementComponent implements OnInit {
   patientSamples: Sample[] = [];
   patientVisits: MedicalVisit[] = [];
   patientMedications: Medication[] = [];
-  aiReport: AIReport | null = null;
+  aiReport: AIReport | null = null; // Ahora usa la interfaz local
   
   // Modal states
   showVisitModal = false;
@@ -287,6 +362,16 @@ export class VisitManagementComponent implements OnInit {
     });
   }
 
+  openFullAIReport() {
+    if (this.aiReport) {
+      // Guardar el reporte en sessionStorage
+      sessionStorage.setItem('currentAIReport', JSON.stringify(this.aiReport));
+      
+      // Abrir en nueva ventana/pestaña
+      window.open('/doctors/ai-report', '_blank');
+    }
+  }
+
   goBack() {
     this.router.navigate(['/doctors/schedule-appointments']);
   }
@@ -446,6 +531,17 @@ export class VisitManagementComponent implements OnInit {
     return this.medicationsToRemove.includes(medicationId);
   }
 
+  // Método helper para obtener evidencia de una condición específica
+  getEvidenciaForCondition(condition: string): EvidenciaRespaldo[] {
+    if (!this.aiReport?.reporteMedico?.resumen?.evidenciaRespalda) {
+      return [];
+    }
+    
+    return this.aiReport.reporteMedico.resumen.evidenciaRespalda.filter(
+      evidencia => evidencia.enfermedad === condition
+    );
+  }
+
   // Utility methods
   getVisitTypeLabel(type: string): string {
     const labels: Record<string, string> = {
@@ -503,5 +599,9 @@ export class VisitManagementComponent implements OnInit {
       return `Mínimo ${field.errors['minlength'].requiredLength} caracteres`;
     }
     return '';
+  }
+
+  getCurrentDate(): Date {
+    return new Date();
   }
 }

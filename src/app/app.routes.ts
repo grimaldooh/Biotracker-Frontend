@@ -146,6 +146,10 @@ export const routes: Routes = [
     path: 'lab/upload-mutations',
     loadComponent: () => import('./modules/lab//upload-mutations/upload-mutations.component').then(m => m.UploadMutationsComponent)
   },
+  {
+    path: 'doctors/ai-report',
+    loadComponent: () => import('./modules/doctors/ai-report/ai-report.component').then(m => m.AiReportComponent)
+  },
   { path: '', redirectTo: 'patients/register', pathMatch: 'full' },
   { path: '**', redirectTo: 'patients/register' }
 ];
