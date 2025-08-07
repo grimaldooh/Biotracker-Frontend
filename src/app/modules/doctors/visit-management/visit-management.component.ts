@@ -1,11 +1,45 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DoctorService, MedicalVisit, VisitAdvanceDto } from '../../../core/services/doctors.service';
 import { PatientService } from '../../../core/services/patient.service';
 import { SampleService } from '../../../core/services/sample.service';
 import { Sample, AIReport, StudyReport } from '../../../core/interfaces/sample.interface';
+import { HttpClient } from '@angular/common/http';
+
+interface Medication {
+  id: string;
+  name: string;
+  brand: string;
+  activeSubstance: string;
+  indication: string;
+  dosage: string;
+  frequency: string;
+  startDate: string;
+  endDate?: string;
+  prescribedById: string;
+  prescribedBy: string;
+  isActive: boolean;
+}
+
+interface MedicationOperation {
+  operation: 'ADD' | 'REMOVE';
+  medicationId?: string; // Para REMOVE
+  name?: string; // Para ADD
+  brand?: string;
+  activeSubstance?: string;
+  indication?: string;
+  dosage?: string;
+  frequency?: string;
+  startDate?: string;
+  endDate?: string;
+  prescribedById?: string;
+}
+
+interface MedicationUpdateRequest {
+  operations: MedicationOperation[];
+}
 
 @Component({
   selector: 'app-visit-management',
@@ -15,21 +49,27 @@ import { Sample, AIReport, StudyReport } from '../../../core/interfaces/sample.i
 })
 export class VisitManagementComponent implements OnInit {
   visitForm: FormGroup;
+  medicationForm: FormGroup;
   currentVisit: MedicalVisit | null = null;
   patientSamples: Sample[] = [];
   patientVisits: MedicalVisit[] = [];
+  patientMedications: Medication[] = [];
   aiReport: AIReport | null = null;
   
   // Modal states
   showVisitModal = false;
   showSampleModal = false;
+  showMedicationModal = false;
   selectedVisit: MedicalVisit | null = null;
   selectedSample: Sample | null = null;
   
   loading = true;
   submitting = false;
+  medicationLoading = false;
+  medicationSubmitting = false;
   showAllSamples = false;
   showAllVisits = false;
+  showAllMedications = false;
   showAIReport = false;
   
   visitId: string = '';
@@ -39,18 +79,34 @@ export class VisitManagementComponent implements OnInit {
   showPostConsultationModal = false;
   consultationCompleted = false;
 
+  // Medicamentos a agregar y remover
+  medicationsToAdd: MedicationOperation[] = [];
+  medicationsToRemove: string[] = [];
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private doctorService: DoctorService,
     private patientService: PatientService,
-    private sampleService: SampleService
+    private sampleService: SampleService,
+    private http: HttpClient
   ) {
     this.visitForm = this.fb.group({
       notes: ['', [Validators.required, Validators.minLength(10)]],
       diagnosis: ['', [Validators.required, Validators.minLength(5)]],
       recommendations: ['', [Validators.required, Validators.minLength(10)]]
+    });
+
+    this.medicationForm = this.fb.group({
+      name: ['', Validators.required],
+      brand: ['', Validators.required],
+      activeSubstance: ['', Validators.required],
+      indication: ['', Validators.required],
+      dosage: ['', Validators.required],
+      frequency: ['', Validators.required],
+      startDate: [new Date().toISOString().split('T')[0], Validators.required],
+      endDate: ['']
     });
   }
 
@@ -87,6 +143,7 @@ export class VisitManagementComponent implements OnInit {
     if (!patientId) return;
 
     try {
+      // Cargar muestras
       this.sampleService.getSamplesByPatient(patientId).subscribe({
         next: (samples) => {
           this.patientSamples = samples.slice(0, 3);
@@ -94,12 +151,16 @@ export class VisitManagementComponent implements OnInit {
         error: (error) => console.error('Error loading samples:', error)
       });
 
+      // Cargar visitas
       this.patientService.getAllVisits(patientId).subscribe({
         next: (visits) => {
           this.patientVisits = visits.slice(0, 3);
         },
         error: (error) => console.error('Error loading visits:', error)
       });
+
+      // Cargar medicamentos
+      this.loadPatientMedications(patientId);
     } catch (error) {
       console.error('Error loading patient data:', error);
     }
@@ -228,6 +289,161 @@ export class VisitManagementComponent implements OnInit {
 
   goBack() {
     this.router.navigate(['/doctors/schedule-appointments']);
+  }
+
+  // ========== MÉTODOS DE MEDICAMENTOS ==========
+
+  loadPatientMedications(patientId: string) {
+    this.medicationLoading = true;
+    
+    this.http.get<Medication[]>(`http://localhost:8080/api/medications/patient/${patientId}`)
+      .subscribe({
+        next: (medications) => {
+          this.patientMedications = this.showAllMedications ? medications : medications.slice(0, 3);
+          this.medicationLoading = false;
+        },
+        error: (error) => {
+          console.error('Error loading medications:', error);
+          this.medicationLoading = false;
+        }
+      });
+  }
+
+  openMedicationModal() {
+    this.showMedicationModal = true;
+    this.medicationForm.reset({
+      startDate: new Date().toISOString().split('T')[0]
+    });
+  }
+
+  closeMedicationModal() {
+    this.showMedicationModal = false;
+    this.medicationForm.reset();
+  }
+
+  addMedicationToList() {
+    if (this.medicationForm.invalid) {
+      this.markMedicationFormTouched();
+      return;
+    }
+
+    const formValue = this.medicationForm.value;
+    const newMedication: MedicationOperation = {
+      operation: 'ADD',
+      name: formValue.name,
+      brand: formValue.brand,
+      activeSubstance: formValue.activeSubstance,
+      indication: formValue.indication,
+      dosage: formValue.dosage,
+      frequency: formValue.frequency,
+      startDate: formValue.startDate,
+      endDate: formValue.endDate || undefined,
+      prescribedById: 'c332337f-ea0f-48b1-a1a6-9dac44364343' // ID del doctor actual
+    };
+
+    this.medicationsToAdd.push(newMedication);
+    this.closeMedicationModal();
+  }
+
+  removeMedicationFromList(medicationId: string) {
+    if (confirm('¿Está seguro de que desea remover este medicamento?')) {
+      this.medicationsToRemove.push(medicationId);
+      
+      // Remover visualmente de la lista actual
+      this.patientMedications = this.patientMedications.filter(med => med.id !== medicationId);
+    }
+  }
+
+  removePendingMedication(index: number) {
+    this.medicationsToAdd.splice(index, 1);
+  }
+
+  undoRemoveMedication(medicationId: string) {
+    this.medicationsToRemove = this.medicationsToRemove.filter(id => id !== medicationId);
+    
+    // Recargar medicamentos para mostrar el que se "deshizo"
+    if (this.currentVisit) {
+      const patientId = this.extractPatientId(this.currentVisit);
+      this.loadPatientMedications(patientId);
+    }
+  }
+
+  submitMedicationChanges() {
+    if (this.medicationsToAdd.length === 0 && this.medicationsToRemove.length === 0) {
+      alert('No hay cambios en medicamentos para enviar');
+      return;
+    }
+
+    if (!this.currentVisit) return;
+
+    this.medicationSubmitting = true;
+    const patientId = this.extractPatientId(this.currentVisit);
+
+    // Crear las operaciones
+    const operations: MedicationOperation[] = [
+      ...this.medicationsToAdd,
+      ...this.medicationsToRemove.map(id => ({
+        operation: 'REMOVE' as const,
+        medicationId: id
+      }))
+    ];
+
+    const request: MedicationUpdateRequest = { operations };
+
+    this.http.patch(`http://localhost:8080/api/medications/patient/${patientId}`, request)
+      .subscribe({
+        next: (response) => {
+          console.log('Medications updated successfully:', response);
+          alert('Medicamentos actualizados exitosamente');
+          
+          // Limpiar las listas de cambios pendientes
+          this.medicationsToAdd = [];
+          this.medicationsToRemove = [];
+          
+          // Recargar la lista de medicamentos
+          this.loadPatientMedications(patientId);
+          
+          this.medicationSubmitting = false;
+        },
+        error: (error) => {
+          console.error('Error updating medications:', error);
+          alert('Error al actualizar medicamentos');
+          this.medicationSubmitting = false;
+        }
+      });
+  }
+
+  toggleShowAllMedications() {
+    this.showAllMedications = !this.showAllMedications;
+    if (this.showAllMedications && this.currentVisit) {
+      const patientId = this.extractPatientId(this.currentVisit);
+      this.loadPatientMedications(patientId);
+    } else {
+      this.patientMedications = this.patientMedications.slice(0, 3);
+    }
+  }
+
+  private markMedicationFormTouched() {
+    Object.keys(this.medicationForm.controls).forEach(key => {
+      this.medicationForm.get(key)?.markAsTouched();
+    });
+  }
+
+  isMedicationFieldInvalid(fieldName: string): boolean {
+    const field = this.medicationForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched));
+  }
+
+  getMedicationFieldError(fieldName: string): string {
+    const field = this.medicationForm.get(fieldName);
+    if (field?.errors?.['required']) {
+      return `${fieldName} es requerido`;
+    }
+    return '';
+  }
+
+  isMedicationMarkedForRemoval(medicationId: string): boolean {
+    return this.medicationsToRemove.includes(medicationId);
   }
 
   // Utility methods

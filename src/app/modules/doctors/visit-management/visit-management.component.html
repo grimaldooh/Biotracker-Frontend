@@ -231,6 +231,224 @@
           </div>
         </div>
 
+        <!-- Medicamentos del Paciente -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-slate-800 flex items-center">
+              <svg class="w-5 h-5 text-orange-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z"/>
+              </svg>
+              Medicamentos Actuales
+            </h3>
+            <div class="flex items-center space-x-2">
+              <button 
+                (click)="openMedicationModal()"
+                class="text-xs text-orange-600 hover:text-orange-700 font-semibold px-3 py-1 rounded-md hover:bg-orange-50 transition-colors flex items-center space-x-1">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                <span>Agregar</span>
+              </button>
+              <button 
+                (click)="toggleShowAllMedications()"
+                class="text-xs text-blue-600 hover:text-blue-700 font-semibold px-2 py-1 rounded-md hover:bg-blue-50 transition-colors">
+                {{ showAllMedications ? 'Ver menos' : 'Ver todos' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Loading State -->
+          <div *ngIf="medicationLoading" class="flex justify-center items-center py-8">
+            <div class="flex items-center space-x-2 text-slate-500">
+              <div class="animate-spin rounded-full h-4 w-4 border-2 border-slate-300 border-t-slate-600"></div>
+              <span class="text-sm">Cargando medicamentos...</span>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div *ngIf="!medicationLoading && patientMedications.length === 0 && medicationsToAdd.length === 0" class="text-center py-8">
+            <div class="w-12 h-12 mx-auto mb-3 text-slate-300">
+              <svg fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z"/>
+              </svg>
+            </div>
+            <p class="text-slate-500 text-sm mb-3">No hay medicamentos registrados</p>
+            <button 
+              (click)="openMedicationModal()"
+              class="text-orange-600 hover:text-orange-700 text-sm font-medium hover:underline">
+              Agregar primer medicamento
+            </button>
+          </div>
+
+          <!-- Medicamentos Existentes -->
+          <div *ngIf="!medicationLoading && patientMedications.length > 0" class="space-y-3 mb-4">
+            <div *ngFor="let medication of patientMedications" 
+                 class="p-4 rounded-lg border transition-all duration-200"
+                 [ngClass]="isMedicationMarkedForRemoval(medication.id) ? 
+                   'bg-red-50 border-red-200 opacity-75' : 
+                   'bg-slate-50 hover:bg-slate-100 border-slate-200'">
+              
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center space-x-2 mb-2">
+                    <h4 class="font-semibold text-slate-800 text-sm">{{ medication.name }}</h4>
+                    <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                      {{ medication.brand }}
+                    </span>
+                    <span *ngIf="isMedicationMarkedForRemoval(medication.id)" 
+                          class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
+                      Pendiente de remoción
+                    </span>
+                  </div>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-slate-600">
+                    <div>
+                      <span class="font-medium">Sustancia:</span> {{ medication.activeSubstance }}
+                    </div>
+                    <div>
+                      <span class="font-medium">Dosis:</span> {{ medication.dosage }}
+                    </div>
+                    <div>
+                      <span class="font-medium">Frecuencia:</span> {{ medication.frequency }}
+                    </div>
+                    <div>
+                      <span class="font-medium">Desde:</span> {{ medication.startDate | date:'mediumDate' }}
+                    </div>
+                  </div>
+                  
+                  <div *ngIf="medication.indication" class="mt-2">
+                    <p class="text-xs text-slate-700">
+                      <span class="font-medium">Indicación:</span> {{ medication.indication }}
+                    </p>
+                  </div>
+
+                  <div *ngIf="medication.endDate" class="mt-1">
+                    <p class="text-xs text-orange-600">
+                      <span class="font-medium">Hasta:</span> {{ medication.endDate | date:'mediumDate' }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex items-center space-x-2 ml-4">
+                  <button *ngIf="!isMedicationMarkedForRemoval(medication.id)"
+                          (click)="removeMedicationFromList(medication.id)"
+                          class="w-6 h-6 rounded-full bg-red-100 hover:bg-red-200 flex items-center justify-center transition-colors"
+                          title="Remover medicamento">
+                    <svg class="w-3 h-3 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                  </button>
+
+                  <button *ngIf="isMedicationMarkedForRemoval(medication.id)"
+                          (click)="undoRemoveMedication(medication.id)"
+                          class="w-6 h-6 rounded-full bg-green-100 hover:bg-green-200 flex items-center justify-center transition-colors"
+                          title="Deshacer remoción">
+                    <svg class="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Medicamentos Pendientes de Agregar -->
+          <div *ngIf="medicationsToAdd.length > 0" class="space-y-3 mb-4">
+            <div class="border-t border-slate-200 pt-3">
+              <h5 class="text-sm font-medium text-green-700 mb-3 flex items-center">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Nuevos medicamentos por agregar
+              </h5>
+              
+              <div *ngFor="let medication of medicationsToAdd; let i = index" 
+                   class="p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div class="flex items-start justify-between">
+                  <div class="flex-1">
+                    <div class="flex items-center space-x-2 mb-2">
+                      <h4 class="font-semibold text-green-800 text-sm">{{ medication.name }}</h4>
+                      <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                        {{ medication.brand }}
+                      </span>
+                      <span class="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
+                        Nuevo
+                      </span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-green-700">
+                      <div>
+                        <span class="font-medium">Sustancia:</span> {{ medication.activeSubstance }}
+                      </div>
+                      <div>
+                        <span class="font-medium">Dosis:</span> {{ medication.dosage }}
+                      </div>
+                      <div>
+                        <span class="font-medium">Frecuencia:</span> {{ medication.frequency }}
+                      </div>
+                      <div>
+                        <span class="font-medium">Desde:</span> {{ medication.startDate | date:'mediumDate' }}
+                      </div>
+                    </div>
+                    
+                    <div *ngIf="medication.indication" class="mt-2">
+                      <p class="text-xs text-green-800">
+                        <span class="font-medium">Indicación:</span> {{ medication.indication }}
+                      </p>
+                    </div>
+
+                    <div *ngIf="medication.endDate" class="mt-1">
+                      <p class="text-xs text-orange-600">
+                        <span class="font-medium">Hasta:</span> {{ medication.endDate | date:'mediumDate' }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button (click)="removePendingMedication(i)"
+                          class="w-6 h-6 rounded-full bg-red-100 hover:bg-red-200 flex items-center justify-center transition-colors ml-4"
+                          title="Quitar de la lista">
+                    <svg class="w-3 h-3 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botones de Acción -->
+          <div *ngIf="(medicationsToAdd.length > 0 || medicationsToRemove.length > 0) && !medicationSubmitting" 
+               class="border-t border-slate-200 pt-4">
+            <div class="flex items-center justify-between">
+              <div class="text-sm text-slate-600">
+                <span *ngIf="medicationsToAdd.length > 0">
+                  {{ medicationsToAdd.length }} por agregar
+                </span>
+                <span *ngIf="medicationsToAdd.length > 0 && medicationsToRemove.length > 0"> • </span>
+                <span *ngIf="medicationsToRemove.length > 0">
+                  {{ medicationsToRemove.length }} por remover
+                </span>
+              </div>
+              
+              <button (click)="submitMedicationChanges()"
+                      class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium rounded-lg transition-colors flex items-center space-x-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span>Guardar Cambios</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Estado de Envío -->
+          <div *ngIf="medicationSubmitting" class="border-t border-slate-200 pt-4">
+            <div class="flex items-center justify-center space-x-2 text-orange-600">
+              <div class="animate-spin rounded-full h-4 w-4 border-2 border-orange-200 border-t-orange-600"></div>
+              <span class="text-sm font-medium">Actualizando medicamentos...</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Historial de Visitas -->
         <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
           <div class="flex items-center justify-between mb-4">
@@ -637,4 +855,172 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal para Agregar Medicamento -->
+  <div *ngIf="showMedicationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-slate-200">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl font-semibold text-slate-800 flex items-center">
+            <svg class="w-5 h-5 text-orange-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+            </svg>
+            Agregar Nuevo Medicamento
+          </h3>
+          <button (click)="closeMedicationModal()" 
+                  class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors">
+            <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <form [formGroup]="medicationForm" (ngSubmit)="addMedicationToList()" class="p-6 space-y-6">
+        <!-- Información Básica -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              Nombre del Medicamento *
+            </label>
+            <input 
+              type="text"
+              formControlName="name"
+              class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-colors"
+              [class.border-red-300]="isMedicationFieldInvalid('name')"
+              placeholder="Ej: Paracetamol">
+            <div *ngIf="isMedicationFieldInvalid('name')" class="mt-1 text-sm text-red-600">
+              {{ getMedicationFieldError('name') }}
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              Marca *
+            </label>
+            <input 
+              type="text"
+              formControlName="brand"
+              class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-colors"
+              [class.border-red-300]="isMedicationFieldInvalid('brand')"
+              placeholder="Ej: Tylenol">
+            <div *ngIf="isMedicationFieldInvalid('brand')" class="mt-1 text-sm text-red-600">
+              {{ getMedicationFieldError('brand') }}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">
+            Sustancia Activa *
+          </label>
+          <input 
+            type="text"
+            formControlName="activeSubstance"
+            class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-colors"
+            [class.border-red-300]="isMedicationFieldInvalid('activeSubstance')"
+            placeholder="Ej: Acetaminophen">
+          <div *ngIf="isMedicationFieldInvalid('activeSubstance')" class="mt-1 text-sm text-red-600">
+            {{ getMedicationFieldError('activeSubstance') }}
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">
+            Indicación *
+          </label>
+          <textarea 
+            formControlName="indication"
+            rows="3"
+            class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-colors resize-none"
+            [class.border-red-300]="isMedicationFieldInvalid('indication')"
+            placeholder="Ej: Para el control del dolor y la fiebre">
+          </textarea>
+          <div *ngIf="isMedicationFieldInvalid('indication')" class="mt-1 text-sm text-red-600">
+            {{ getMedicationFieldError('indication') }}
+          </div>
+        </div>
+
+        <!-- Dosificación -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              Dosis *
+            </label>
+            <input 
+              type="text"
+              formControlName="dosage"
+              class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-colors"
+              [class.border-red-300]="isMedicationFieldInvalid('dosage')"
+              placeholder="Ej: 500mg">
+            <div *ngIf="isMedicationFieldInvalid('dosage')" class="mt-1 text-sm text-red-600">
+              {{ getMedicationFieldError('dosage') }}
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              Frecuencia *
+            </label>
+            <input 
+              type="text"
+              formControlName="frequency"
+              class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-colors"
+              [class.border-red-300]="isMedicationFieldInvalid('frequency')"
+              placeholder="Ej: Cada 8 horas">
+            <div *ngIf="isMedicationFieldInvalid('frequency')" class="mt-1 text-sm text-red-600">
+              {{ getMedicationFieldError('frequency') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Fechas -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              Fecha de Inicio *
+            </label>
+            <input 
+              type="date"
+              formControlName="startDate"
+              class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-colors"
+              [class.border-red-300]="isMedicationFieldInvalid('startDate')">
+            <div *ngIf="isMedicationFieldInvalid('startDate')" class="mt-1 text-sm text-red-600">
+              {{ getMedicationFieldError('startDate') }}
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              Fecha de Fin (Opcional)
+            </label>
+            <input 
+              type="date"
+              formControlName="endDate"
+              class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-colors">
+            <p class="mt-1 text-xs text-slate-500">Deja en blanco si es un tratamiento continuo</p>
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex items-center justify-end space-x-4 pt-4 border-t border-slate-200">
+          <button 
+            type="button"
+            (click)="closeMedicationModal()"
+            class="px-6 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg font-medium transition-colors">
+            Cancelar
+          </button>
+          <button 
+            type="submit"
+            class="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg transition-colors flex items-center space-x-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            <span>Agregar a la Lista</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 </div>
