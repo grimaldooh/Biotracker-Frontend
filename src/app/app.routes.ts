@@ -142,6 +142,10 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./modules/lab/edit-sample/edit-sample.component').then(m => m.EditSampleComponent)
   },
+  {
+    path: 'lab/upload-mutations',
+    loadComponent: () => import('./modules/lab//upload-mutations/upload-mutations.component').then(m => m.UploadMutationsComponent)
+  },
   { path: '', redirectTo: 'patients/register', pathMatch: 'full' },
   { path: '**', redirectTo: 'patients/register' }
 ];

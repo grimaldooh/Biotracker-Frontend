@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
   styleUrl: './appointments-list.component.css'
 })
 export class AppointmentsListComponent implements OnInit {
-  medicalEntityId = '46f163c3-c5ff-4301-ba5f-6e348e982a8a'; // Usa el id que ya tienes
+  medicalEntityId = '00d79e66-4457-4d27-9228-fe467823ce8e'; // Usa el id que ya tienes
   visits: MedicalVisitDTO[] = [];
   loading = true;
 

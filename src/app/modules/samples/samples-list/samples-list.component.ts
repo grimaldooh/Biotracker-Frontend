@@ -11,7 +11,7 @@ import { SampleDTO } from '../sample.model';
   styleUrl: './samples-list.component.css'
 })
 export class SamplesListComponent implements OnInit {
-  hospitalId = '46f163c3-c5ff-4301-ba5f-6e348e982a8a';
+  hospitalId = '00d79e66-4457-4d27-9228-fe467823ce8e';
   samples: SampleDTO[] = [];
   loading = true;
   selectedSample: SampleDTO | null = null;

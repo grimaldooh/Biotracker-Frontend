@@ -23,7 +23,7 @@ export interface MedicalVisit {
   providedIn: 'root'
 })
 export class PatientService {
-  private apiUrl = 'http://localhost:8080/api/hospitals/register-patient/46f163c3-c5ff-4301-ba5f-6e348e982a8a';
+  private apiUrl = 'http://localhost:8080/api/hospitals/register-patient/00d79e66-4457-4d27-9228-fe467823ce8e';
 
   constructor(private http: HttpClient) {}
 

@@ -153,12 +153,13 @@
         </div>
       </div>
 
-      <!-- Subir Mutaciones (Pendiente) -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 opacity-75 cursor-not-allowed">
+      <!-- Subir Mutaciones (Ahora Activo) -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200 cursor-pointer"
+           (click)="goToUploadMutations()">
         <div class="p-6">
           <div class="flex items-center">
             <div class="flex-shrink-0">
-              <div class="w-10 h-10 bg-gray-400 rounded-lg flex items-center justify-center">
+              <div class="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
                 <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M4.83,12L7,9.83L9.17,12L7,14.17L4.83,12M12,4.83L14.17,7L12,9.17L9.83,7L12,4.83M19.17,12L17,9.83L14.83,12L17,14.17L19.17,12M12,19.17L9.83,17L12,14.83L14.17,17L12,19.17Z"/>
                 </svg>
@@ -166,12 +167,15 @@
             </div>
             <div class="ml-4">
               <h3 class="text-lg font-medium text-gray-900">Subir Mutaciones</h3>
-              <p class="text-sm text-gray-600">Funcionalidad en desarrollo</p>
+              <p class="text-sm text-gray-600">Registra mutaciones genéticas encontradas</p>
             </div>
           </div>
           <div class="mt-4">
-            <div class="flex items-center text-gray-500 text-sm font-medium">
-              <span>Próximamente</span>
+            <div class="flex items-center text-purple-600 text-sm font-medium">
+              <span>Registrar mutaciones</span>
+              <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
             </div>
           </div>
         </div>

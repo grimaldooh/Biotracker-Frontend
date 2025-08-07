@@ -163,7 +163,7 @@ export class VisitManagementComponent implements OnInit {
         patientId: this.extractPatientId(this.currentVisit),
         patientName: this.currentVisit.patientName,
         withSameDoctor: withSameDoctor,
-        doctorId: withSameDoctor ? '46f163c3-c5ff-4301-ba5f-6e348e982a8a' : null, // ID del doctor actual
+        doctorId: withSameDoctor ? '00d79e66-4457-4d27-9228-fe467823ce8e' : null, // ID del doctor actual
         specialty: withSameDoctor ? this.currentVisit.medicalArea : null
       };
       

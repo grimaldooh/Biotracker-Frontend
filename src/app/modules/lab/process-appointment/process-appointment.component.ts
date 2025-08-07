@@ -15,6 +15,7 @@ export class ProcessAppointmentComponent implements OnInit {
   sampleForm!: FormGroup;
   appointmentData: any = null;
   loading = false;
+  medicalEntityId: string = '00d79e66-4457-4d27-9228-fe467823ce8e'; // ID de la entidad médica predefinida
 
   constructor(
     private fb: FormBuilder,
@@ -32,11 +33,11 @@ export class ProcessAppointmentComponent implements OnInit {
     const storedData = localStorage.getItem('labAppointmentData');
     if (storedData) {
       this.appointmentData = JSON.parse(storedData);
-      
+      console.log('Loaded appointment data:', this.appointmentData);
       this.sampleForm.patchValue({
         patientId: this.appointmentData.patientId,
         type: this.appointmentData.sampleType,
-        registeredById: '550e8400-e29b-41d4-a716-446655440000',
+        registeredById: '1a042737-3406-4aa5-a7e6-948b4c136778',
         collectionDate: new Date().toISOString().split('T')[0],
         notes: this.appointmentData.notes || ''
       });
@@ -47,13 +48,13 @@ export class ProcessAppointmentComponent implements OnInit {
 
   private initializeForm() {
     this.sampleForm = this.fb.group({
-      patientId: ['', Validators.required],
-      registeredById: ['', Validators.required],
-      type: ['', Validators.required],
-      status: ['PENDING'],
-      collectionDate: ['', Validators.required],
-      notes: [''],
-      medicalEntityId: ['46f163c3-c5ff-4301-ba5f-6e348e982a8a'],
+      patientId: [null, Validators.required],
+      registeredById: [null, Validators.required],
+      type: [null, Validators.required],
+      status: [null],
+      collectionDate: [null, Validators.required],
+      notes: [null],
+      medicalEntityId: [null],
       
       // Datos completos de sangre
       bloodData: this.fb.group({
@@ -84,8 +85,8 @@ export class ProcessAppointmentComponent implements OnInit {
         esrMmHr: [null],
         geneticMarkersDetected: [null],
         geneticQualityScore: [null],
-        labReferenceValues: [''],
-        analyzerModel: [''],
+        labReferenceValues: [null],
+        analyzerModel: [null],
         centrifugationSpeedRpm: [null],
         storageTemperatureCelsius: [null]
       }),
@@ -96,36 +97,39 @@ export class ProcessAppointmentComponent implements OnInit {
         purity260280Ratio: [null],
         purity260230Ratio: [null],
         integrityNumber: [null],
-        extractionMethod: [''],
-        extractionDate: [''],
-        extractionTechnician: [''],
-        storageBuffer: [''],
+        extractionMethod: [null],
+        extractionDate: [null],
+        extractionTechnician: [null],
+        storageBuffer: [null],
         aliquotVolumeUl: [null],
-        freezerLocation: [''],
-        sequencingPlatform: [''],
+        freezerLocation: [null],
+        sequencingPlatform: [null],
         sequencingDepth: [null],
-        libraryPrepProtocol: [''],
+        libraryPrepProtocol: [null],
         totalReads: [null],
         mappedReads: [null],
         mappingQualityScore: [null],
         variantsDetected: [null],
         snpsDetected: [null],
         indelsDetected: [null],
-        fastqR1Url: [''],
-        fastqR2Url: [''],
-        vcfFileUrl: [''],
-        bamFileUrl: ['']
+        fastqR1Url: [null],
+        fastqR2Url: [null],
+        vcfFileUrl: [null],
+        bamFileUrl: [null]
       }),
       
       // Datos completos de saliva
       salivaData: this.fb.group({
         volumeMl: [null],
         phLevel: [null],
-        viscosity: [''],
+        viscosity: [null],
         dnaYieldNg: [null],
         cellCountPerMl: [null],
-        collectionMethod: [''],
-        storageTemperatureCelsius: [null]
+        collectionMethod: [null],
+        fastingStatus: [null],
+        contaminationLevel: [null],
+        preservativeUsed: [null],
+        timeToProcessingHours: [null]
       })
     });
   }
@@ -138,7 +142,8 @@ export class ProcessAppointmentComponent implements OnInit {
     this.loading = true;
     const formData = this.sampleForm.value;
     formData.doctorReferedId = this.appointmentData.doctorId;
-    formData.medicalEntityId = this.appointmentData.medicalEntityId;
+    formData.medicalEntityId = this.medicalEntityId;
+    console.log('Submitting sample data:', formData);
 
     this.http.post('http://localhost:8080/api/samples', formData)
       .subscribe({
