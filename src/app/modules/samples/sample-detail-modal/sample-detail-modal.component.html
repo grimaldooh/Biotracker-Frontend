@@ -1,0 +1,250 @@
+<div *ngIf="visible" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+      <h3 class="text-xl font-semibold text-gray-800">Detalles del Estudio de Laboratorio</h3>
+      <button (click)="onClose()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center">
+        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div *ngIf="sample" class="p-6 space-y-6">
+        <!-- Información General -->
+        <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-6">
+          <h4 class="font-semibold text-blue-900 mb-4 flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12,2A3,3 0 0,1 15,5V7H19A1,1 0 0,1 20,8V19A1,1 0 0,1 19,20H5A1,1 0 0,1 4,19V8A1,1 0 0,1 5,7H9V5A3,3 0 0,1 12,2M12,4A1,1 0 0,0 11,5V7H13V5A1,1 0 0,0 12,4Z"/>
+            </svg>
+            Información General
+          </h4>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div class="bg-white rounded-lg p-3 border border-blue-100">
+              <p class="text-blue-700 font-medium mb-1">Paciente</p>
+              <p class="text-blue-900 font-semibold">{{ sample.patientName }}</p>
+            </div>
+            <div class="bg-white rounded-lg p-3 border border-blue-100">
+              <p class="text-blue-700 font-medium mb-1">Tipo de Muestra</p>
+              <p class="text-blue-900 font-semibold">{{ getSampleTypeLabel(sample.type) }}</p>
+            </div>
+            <div class="bg-white rounded-lg p-3 border border-blue-100">
+              <p class="text-blue-700 font-medium mb-1">Estado</p>
+              <span [ngClass]="getSampleStatusColor(sample.status)" 
+                    class="px-3 py-1 rounded-full text-xs font-semibold">
+                {{ getSampleStatusLabel(sample.status) }}
+              </span>
+            </div>
+            <div class="bg-white rounded-lg p-3 border border-blue-100">
+              <p class="text-blue-700 font-medium mb-1">Fecha de Recolección</p>
+              <p class="text-blue-900">{{ sample.collectionDate | date:'medium' }}</p>
+            </div>
+            <div class="bg-white rounded-lg p-3 border border-blue-100">
+              <p class="text-blue-700 font-medium mb-1">Registrado por</p>
+              <p class="text-blue-900">{{ sample.registeredByName }}</p>
+            </div>
+            <div *ngIf="sample.notes" class="bg-white rounded-lg p-3 border border-blue-100">
+              <p class="text-blue-700 font-medium mb-1">Notas</p>
+              <p class="text-blue-900 text-xs">{{ sample.notes }}</p>
+          </div>
+        </div>
+
+        <!-- Datos de Sangre -->
+        <div *ngIf="sample.bloodData && sample.type === 'BLOOD'" class="bg-gradient-to-r from-red-50 to-red-100 rounded-xl p-6 mt-8">
+          <h4 class="font-semibold text-red-900 mb-4 flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12,2A2,2 0 0,1 14,4A2,2 0 0,1 12,6A2,2 0 0,1 10,4A2,2 0 0,1 12,2M21,9V7L12,2L3,7V9H21M4,10V20A1,1 0 0,0 5,21H11V17H13V21H19A1,1 0 0,0 20,20V10H4Z"/>
+            </svg>
+            Análisis de Sangre
+          </h4>
+
+          <!-- Química Sanguínea -->
+          <div class="mb-6">
+            <h5 class="font-medium text-red-800 mb-3 text-sm">QUÍMICA SANGUÍNEA</h5>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <div *ngIf="sample.bloodData.glucoseMgDl" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">Glucosa</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.glucoseMgDl }} mg/dL</p>
+              </div>
+              <div *ngIf="sample.bloodData.cholesterolTotalMgDl" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">Colesterol Total</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.cholesterolTotalMgDl }} mg/dL</p>
+              </div>
+              <div *ngIf="sample.bloodData.cholesterolHdlMgDl" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">HDL</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.cholesterolHdlMgDl }} mg/dL</p>
+              </div>
+              <div *ngIf="sample.bloodData.cholesterolLdlMgDl" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">LDL</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.cholesterolLdlMgDl }} mg/dL</p>
+              </div>
+              <div *ngIf="sample.bloodData.triglyceridesMgDl" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">Triglicéridos</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.triglyceridesMgDl }} mg/dL</p>
+              </div>
+              <div *ngIf="sample.bloodData.creatinineMgDl" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">Creatinina</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.creatinineMgDl }} mg/dL</p>
+              </div>
+              <div *ngIf="sample.bloodData.ureaMgDl" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">Urea</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.ureaMgDl }} mg/dL</p>
+              </div>
+              <div *ngIf="sample.bloodData.bunMgDl" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">BUN</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.bunMgDl }} mg/dL</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Biometría Hemática -->
+          <div class="mb-6">
+            <h5 class="font-medium text-red-800 mb-3 text-sm">BIOMETRÍA HEMÁTICA</h5>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <div *ngIf="sample.bloodData.hemoglobinGDl" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">Hemoglobina</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.hemoglobinGDl }} g/dL</p>
+              </div>
+              <div *ngIf="sample.bloodData.hematocritPercent" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">Hematocrito</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.hematocritPercent }}%</p>
+              </div>
+              <div *ngIf="sample.bloodData.redBloodCellsMillionUl" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">Eritrocitos</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.redBloodCellsMillionUl }} M/μL</p>
+              </div>
+              <div *ngIf="sample.bloodData.whiteBloodCellsThousandUl" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">Leucocitos</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.whiteBloodCellsThousandUl }} K/μL</p>
+              </div>
+              <div *ngIf="sample.bloodData.plateletsThousandUl" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">Plaquetas</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.plateletsThousandUl }} K/μL</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Función Hepática -->
+          <div class="mb-6">
+            <h5 class="font-medium text-red-800 mb-3 text-sm">FUNCIÓN HEPÁTICA</h5>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <div *ngIf="sample.bloodData.altSgptUL" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">ALT (SGPT)</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.altSgptUL }} U/L</p>
+              </div>
+              <div *ngIf="sample.bloodData.astSgotUL" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">AST (SGOT)</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.astSgotUL }} U/L</p>
+              </div>
+              <div *ngIf="sample.bloodData.bilirubinTotalMgDl" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">Bilirrubina Total</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.bilirubinTotalMgDl }} mg/dL</p>
+              </div>
+              <div *ngIf="sample.bloodData.alkalinePhosphataseUL" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">Fosfatasa Alcalina</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.alkalinePhosphataseUL }} U/L</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Electrolitos y Proteínas -->
+          <div class="mb-6">
+            <h5 class="font-medium text-red-800 mb-3 text-sm">ELECTROLITOS Y PROTEÍNAS</h5>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <div *ngIf="sample.bloodData.sodiumMeqL" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">Sodio</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.sodiumMeqL }} mEq/L</p>
+              </div>
+              <div *ngIf="sample.bloodData.potassiumMeqL" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">Potasio</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.potassiumMeqL }} mEq/L</p>
+              </div>
+              <div *ngIf="sample.bloodData.chlorideMeqL" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">Cloruro</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.chlorideMeqL }} mEq/L</p>
+              </div>
+              <div *ngIf="sample.bloodData.totalProteinGDl" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">Proteína Total</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.totalProteinGDl }} g/dL</p>
+              </div>
+              <div *ngIf="sample.bloodData.albuminGDl" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">Albúmina</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.albuminGDl }} g/dL</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Marcadores Inflamatorios -->
+          <div class="mb-6">
+            <h5 class="font-medium text-red-800 mb-3 text-sm">MARCADORES INFLAMATORIOS</h5>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div *ngIf="sample.bloodData.cReactiveProteinMgL" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">Proteína C Reactiva</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.cReactiveProteinMgL }} mg/L</p>
+              </div>
+              <div *ngIf="sample.bloodData.esrMmHr" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">VSG</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.esrMmHr }} mm/hr</p>
+              </div>
+              <div *ngIf="sample.bloodData.gfrMlMin" class="bg-white rounded-lg p-3 border border-red-200">
+                <p class="text-red-700 font-medium text-xs mb-1">TFG</p>
+                <p class="text-red-900 font-bold">{{ sample.bloodData.gfrMlMin }} mL/min</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información del Laboratorio -->
+          <div class="bg-white rounded-lg p-4 border border-red-200">
+            <h5 class="font-medium text-red-800 mb-3 text-sm">INFORMACIÓN DEL LABORATORIO</h5>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div *ngIf="sample.bloodData.analyzerModel">
+                <p class="text-red-700 font-medium">Analizador</p>
+                <p class="text-red-900">{{ sample.bloodData.analyzerModel }}</p>
+              </div>
+              <div *ngIf="sample.bloodData.geneticQualityScore">
+                <p class="text-red-700 font-medium">Puntuación de Calidad</p>
+                <p class="text-red-900">{{ sample.bloodData.geneticQualityScore }}%</p>
+              </div>
+              <div *ngIf="sample.bloodData.centrifugationSpeedRpm">
+                <p class="text-red-700 font-medium">Velocidad Centrifugación</p>
+                <p class="text-red-900">{{ sample.bloodData.centrifugationSpeedRpm }} RPM</p>
+              </div>
+              <div *ngIf="sample.bloodData.storageTemperatureCelsius">
+                <p class="text-red-700 font-medium">Temperatura de Almacenamiento</p>
+                <p class="text-red-900">{{ sample.bloodData.storageTemperatureCelsius }}°C</p>
+              </div>
+            </div>
+            <div *ngIf="sample.bloodData.labReferenceValues" class="mt-4 p-3 bg-red-50 rounded-lg border border-red-200">
+              <p class="text-red-700 font-medium text-xs mb-1">OBSERVACIONES DEL LABORATORIO</p>
+              <p class="text-red-800 text-sm">{{ sample.bloodData.labReferenceValues }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Datos de DNA -->
+        <div *ngIf="sample.dnaData && sample.type === 'DNA'" class="bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-6">
+          <h4 class="font-semibold text-purple-900 mb-4 flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M4.83,12L7,9.83L9.17,12L7,14.17L4.83,12M12,4.83L14.17,7L12,9.17L9.83,7L12,4.83M19.17,12L17,9.83L14.83,12L17,14.17L19.17,12M12,19.17L9.83,17L12,14.83L14.17,17L12,19.17Z"/>
+            </svg>
+            Análisis de ADN
+          </h4>
+          <!-- Aquí agregar los campos específicos del DNA si es necesario -->
+          <p class="text-purple-800">Datos de ADN disponibles para análisis genético.</p>
+        </div>
+
+        <!-- Datos de Saliva -->
+        <div *ngIf="sample.salivaData && sample.type === 'SALIVA'" class="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-6">
+          <h4 class="font-semibold text-green-900 mb-4 flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12,2C13.1,2 14,2.9 14,4C14,5.1 13.1,6 12,6C10.9,6 10,5.1 10,4C10,2.9 10.9,2 12,2M21,9V7L12,2L3,7V9H21M4,10V20A1,1 0 0,0 5,21H19A1,1 0 0,0 20,20V10H4Z"/>
+            </svg>
+            Análisis de Saliva
+          </h4>
+          <!-- Aquí agregar los campos específicos de saliva si es necesario -->
+          <p class="text-green-800">Datos de saliva disponibles para análisis.</p>
+      </div>
+    </div>
+  </div>
+    </div>
+</div>

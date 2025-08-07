@@ -8,6 +8,10 @@ import { SampleService } from '../../../core/services/sample.service';
 import { Sample, StudyReport } from '../../../core/interfaces/sample.interface'; // Removemos AIReport de aquí
 import { HttpClient } from '@angular/common/http';
 
+//Modales
+
+import { SampleDetailModalComponent } from '../../samples/sample-detail-modal/sample-detail-modal.component';
+
 interface Medication {
   id: string;
   name: string;
@@ -119,7 +123,7 @@ interface AIReport {
 @Component({
   selector: 'app-visit-management',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, SampleDetailModalComponent],
   templateUrl: './visit-management.component.html',
 })
 export class VisitManagementComponent implements OnInit {

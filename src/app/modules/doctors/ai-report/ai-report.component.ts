@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
+import { SampleDetailModalComponent } from '../../samples/sample-detail-modal/sample-detail-modal.component';
+import { Sample } from '../../../core/interfaces/sample.interface';
+import { SampleService } from '../../../core/services/sample.service';
 
 interface Patient {
   nombre: string;
@@ -81,18 +84,22 @@ interface AIReport {
 @Component({
   selector: 'app-ai-report',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SampleDetailModalComponent],
   templateUrl: './ai-report.component.html',
 })
 export class AiReportComponent implements OnInit {
   aiReport: AIReport | null = null;
   loading = true;
-  public now: Date = new Date();
+  now = new Date();
+
+  showSampleModal = false;
+  selectedSample: Sample | null = null;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private location: Location
+    private location: Location,
+    private sampleService: SampleService
   ) {}
 
   ngOnInit() {
@@ -133,11 +140,18 @@ export class AiReportComponent implements OnInit {
   }
 
   openSampleDetail(sampleId: string) {
-    // Aquí implementarías la lógica para abrir el detalle de la muestra
-    // Por ahora, guardamos el ID en sessionStorage y navegamos
-    sessionStorage.setItem('selectedSampleId', sampleId);
-    // Podrías abrir un modal o navegar a otra página
-    console.log('Opening sample detail for:', sampleId);
+    this.sampleService.getSampleById(sampleId).subscribe({
+      next: s => {
+        this.selectedSample = s;
+        this.showSampleModal = true;
+      },
+      error: e => console.error('Error loading sample', e)
+    });
+  }
+
+  closeModals() {
+    this.showSampleModal = false;
+    this.selectedSample = null;
   }
 
   printReport() {

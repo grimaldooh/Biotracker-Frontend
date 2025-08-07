@@ -18,5 +18,9 @@ export class SampleService {
   registerSample(sample: any) {
     return this.http.post('http://localhost:8080/api/samples', sample);
   }
+
+   getSampleById(id: string): Observable<SampleDTO> {
+    return this.http.get<SampleDTO>(`http://localhost:8080/api/samples/${id}`);
+  }
   
 }
