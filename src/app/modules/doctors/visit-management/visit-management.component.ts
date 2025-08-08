@@ -735,30 +735,40 @@ export class VisitManagementComponent implements OnInit {
     this.compatibilityLoading = false;
   }
 
-  // Método helper para obtener color de severidad
+  // Método para abrir reporte completo (modal o nueva ventana)
+  openFullCompatibilityReport() {
+    if (this.compatibilityReport) {
+      // Guardar el reporte en sessionStorage para abrirlo en una nueva ventana
+      sessionStorage.setItem('currentCompatibilityReport', JSON.stringify(this.compatibilityReport));
+      // Por ahora, mostramos el alert de que la funcionalidad estará disponible
+      alert('Funcionalidad de reporte completo disponible próximamente');
+      // Alternativa: window.open('/doctors/compatibility-report', '_blank');
+    }
+  }
+
+    // Método helper para obtener color de severidad
   getSeverityColor(severity: string): string {
-    switch (severity.toLowerCase()) {
-      case 'high':
-      case 'severe':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'moderate':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'low':
-      case 'mild':
-        return 'bg-green-100 text-green-800 border-green-200';
+    switch (severity?.toUpperCase()) {
+      case 'HIGH':
+        return 'border-red-500 bg-red-50';
+      case 'MEDIUM':
+        return 'border-yellow-500 bg-yellow-50';
+      case 'LOW':
+        return 'border-green-500 bg-green-50';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'border-gray-500 bg-gray-50';
     }
   }
 
   // Método helper para obtener color de prioridad
   getPriorityColor(priority: string): string {
-    switch (priority.toLowerCase()) {
-      case 'high':
+    switch (priority?.toUpperCase()) {
+      case 'HIGH':
+      case 'URGENT':
         return 'bg-red-100 text-red-800';
-      case 'medium':
+      case 'MEDIUM':
         return 'bg-yellow-100 text-yellow-800';
-      case 'low':
+      case 'LOW':
         return 'bg-green-100 text-green-800';
       default:
         return 'bg-gray-100 text-gray-800';

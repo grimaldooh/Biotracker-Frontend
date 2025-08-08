@@ -580,6 +580,153 @@
               <p class="text-xs text-gray-500 mt-2">Analizando {{ getActiveMedications().length }} medicamentos</p>
             </div>
           </div>
+
+          <!-- Reporte de Compatibilidad -->
+          <div *ngIf="compatibilityReport && !compatibilityLoading" class="mt-6 space-y-4">
+            
+            <!-- Resumen del Análisis -->
+            <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="font-semibold text-blue-900 text-sm flex items-center">
+                  <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M9,11H15V12H9V11M9,13H15V14H9V13M9,15H13V16H9V15M4,19V5C4,3.89 4.9,3 6,3H18A2,2 0 0,1 20,5V19L18,17H6C4.89,17 4,16.1 4,15"/>
+                  </svg>
+                  Resumen del Análisis
+                </h4>
+                <button (click)="closeCompatibilityAnalysis()" 
+                        class="w-6 h-6 rounded-full bg-blue-200 hover:bg-blue-300 flex items-center justify-center transition-colors">
+                  <svg class="w-3 h-3 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+              
+              <div class="grid grid-cols-2 gap-3 mb-3">
+                <div class="bg-white rounded-md p-3 border border-blue-200">
+                  <p class="text-blue-700 font-medium text-xs">Medicamentos</p>
+                  <p class="text-blue-900 text-lg font-bold">{{ compatibilityReport.medication_compatibility_report.analysis_summary.total_medications_analyzed }}</p>
+                </div>
+                
+                <div class="bg-white rounded-md p-3 border border-blue-200">
+                  <p class="text-blue-700 font-medium text-xs">Puntuación</p>
+                  <p class="text-blue-900 text-lg font-bold">{{ compatibilityReport.medication_compatibility_report.safety_score.overall_score }}/100</p>
+                </div>
+              </div>
+
+              <div class="bg-white rounded-md p-3 border border-blue-200">
+                <p class="text-blue-700 font-medium text-xs mb-1">Evaluación General</p>
+                <p class="text-blue-900 font-semibold text-sm">{{ compatibilityReport.medication_compatibility_report.analysis_summary.overall_safety_assessment }}</p>
+                <p *ngIf="compatibilityReport.medication_compatibility_report.analysis_summary.key_concerns" 
+                   class="text-blue-800 text-xs mt-2">{{ compatibilityReport.medication_compatibility_report.analysis_summary.key_concerns }}</p>
+              </div>
+            </div>
+
+            <!-- Interacciones (si las hay) -->
+            <div *ngIf="compatibilityReport.medication_compatibility_report.drug_interactions.length > 0" 
+                 class="bg-gradient-to-r from-red-50 to-red-100 rounded-lg p-4 border border-red-200">
+              <h4 class="font-semibold text-red-900 text-sm mb-3 flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z"/>
+                </svg>
+                Interacciones Detectadas ({{ compatibilityReport.medication_compatibility_report.drug_interactions.length }})
+              </h4>
+              
+              <div class="space-y-2">
+                <div *ngFor="let interaction of compatibilityReport.medication_compatibility_report.drug_interactions.slice(0, 2)" 
+                     class="bg-white rounded-md p-3 border border-red-200">
+                  
+                  <div class="flex items-center space-x-2 mb-2">
+                    <span class="px-2 py-1 rounded-full text-xs font-medium"
+                          [ngClass]="getSeverityColor(interaction.severity_level)">
+                      {{ interaction.severity_level }}
+                    </span>
+                    <span class="text-red-900 font-medium text-xs">{{ interaction.interaction_type }}</span>
+                  </div>
+                  
+                  <p class="text-red-800 text-xs mb-1">
+                    <span class="font-medium">Medicamentos:</span> {{ interaction.medications_involved.join(', ') }}
+                  </p>
+                  <p class="text-red-700 text-xs">{{ interaction.clinical_significance }}</p>
+                </div>
+                
+                <div *ngIf="compatibilityReport.medication_compatibility_report.drug_interactions.length > 2" 
+                     class="text-center">
+                  <p class="text-red-700 text-xs">+{{ compatibilityReport.medication_compatibility_report.drug_interactions.length - 2 }} interacciones más</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Acciones Inmediatas (si las hay) -->
+            <div *ngIf="compatibilityReport.medication_compatibility_report.immediate_actions.length > 0" 
+                 class="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg p-4 border border-orange-200">
+              <h4 class="font-semibold text-orange-900 text-sm mb-3 flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z"/>
+                </svg>
+                Acciones Requeridas ({{ compatibilityReport.medication_compatibility_report.immediate_actions.length }})
+              </h4>
+              
+              <div class="space-y-2">
+                <div *ngFor="let action of compatibilityReport.medication_compatibility_report.immediate_actions.slice(0, 2)" 
+                     class="bg-white rounded-md p-3 border border-orange-200">
+                  
+                  <div class="flex items-start space-x-2">
+                    <span class="px-2 py-1 rounded-full text-xs font-medium mt-0.5"
+                          [ngClass]="getPriorityColor(action.priority)">
+                      {{ action.priority }}
+                    </span>
+                    <div class="flex-1">
+                      <p class="text-orange-900 font-medium text-xs mb-1">{{ action.action }}</p>
+                      <p class="text-orange-700 text-xs">{{ action.timeframe }}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div *ngIf="compatibilityReport.medication_compatibility_report.immediate_actions.length > 2" 
+                     class="text-center">
+                  <p class="text-orange-700 text-xs">+{{ compatibilityReport.medication_compatibility_report.immediate_actions.length - 2 }} acciones más</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recomendaciones Principales -->
+            <div *ngIf="compatibilityReport.medication_compatibility_report.recommendations_summary" 
+                 class="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+              <h4 class="font-semibold text-green-900 text-sm mb-3 flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"/>
+                </svg>
+                Recomendaciones Principales
+              </h4>
+              
+              <div class="space-y-2 text-xs">
+                <div *ngIf="compatibilityReport.medication_compatibility_report.recommendations_summary.continue_medications.length > 0">
+                  <p class="font-medium text-green-900 mb-1">Continuar:</p>
+                  <p class="text-green-800">{{ compatibilityReport.medication_compatibility_report.recommendations_summary.continue_medications.slice(0, 2).join(', ') }}</p>
+                  <span *ngIf="compatibilityReport.medication_compatibility_report.recommendations_summary.continue_medications.length > 2" 
+                        class="text-green-700">+{{ compatibilityReport.medication_compatibility_report.recommendations_summary.continue_medications.length - 2 }} más</span>
+                </div>
+                
+                <div *ngIf="compatibilityReport.medication_compatibility_report.recommendations_summary.modify_medications.length > 0">
+                  <p class="font-medium text-green-900 mb-1">Modificar:</p>
+                  <p class="text-green-800">{{ compatibilityReport.medication_compatibility_report.recommendations_summary.modify_medications.slice(0, 2).join(', ') }}</p>
+                  <span *ngIf="compatibilityReport.medication_compatibility_report.recommendations_summary.modify_medications.length > 2" 
+                        class="text-green-700">+{{ compatibilityReport.medication_compatibility_report.recommendations_summary.modify_medications.length - 2 }} más</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botón para ver reporte completo -->
+            <div class="text-center pt-2">
+              <button (click)="openFullCompatibilityReport()" 
+                      class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center space-x-2 mx-auto">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                </svg>
+                <span>Ver Reporte Completo</span>
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- ...existing code para Historial de Visitas... -->
@@ -875,317 +1022,6 @@
           </button>
         </div>
       </form>
-    </div>
-  </div>
-
-  <!-- Modal de Análisis de Compatibilidad Completo -->
-  <div *ngIf="showCompatibilityAnalysis && compatibilityReport && !compatibilityLoading" 
-       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl max-w-7xl w-full max-h-[95vh] overflow-y-auto">
-      <!-- Header -->
-      <div class="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white rounded-t-2xl">
-        <div>
-          <h3 class="text-2xl font-semibold text-gray-800">Reporte de Compatibilidad de Medicamentos</h3>
-          <p class="text-sm text-gray-600">Análisis completo de interacciones y recomendaciones</p>
-        </div>
-        <button (click)="closeCompatibilityAnalysis()" 
-                class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">
-          <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-
-      <div class="p-6">
-        <!-- Resumen del Análisis -->
-        <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-6 mb-6">
-          <h4 class="text-xl font-semibold text-blue-900 mb-4 flex items-center">
-            <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M9,11H15V12H9V11M9,13H15V14H9V13M9,15H13V16H9V15M4,19V5C4,3.89 4.9,3 6,3H18A2,2 0 0,1 20,5V19L18,17H6C4.89,17 4,16.1 4,15"/>
-            </svg>
-            Resumen del Análisis
-          </h4>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-            <div class="bg-white rounded-lg p-4 border border-blue-200">
-              <p class="text-blue-700 font-medium text-sm">Medicamentos Analizados</p>
-              <p class="text-blue-900 text-2xl font-bold">{{ compatibilityReport.medication_compatibility_report.analysis_summary.total_medications_analyzed }}</p>
-            </div>
-            
-            <div class="bg-white rounded-lg p-4 border border-blue-200">
-              <p class="text-blue-700 font-medium text-sm">Evaluación General</p>
-              <p class="text-blue-900 font-semibold text-sm">{{ compatibilityReport.medication_compatibility_report.analysis_summary.overall_safety_assessment }}</p>
-            </div>
-            
-            <div class="bg-white rounded-lg p-4 border border-blue-200">
-              <p class="text-blue-700 font-medium text-sm">Fecha de Análisis</p>
-              <p class="text-blue-900 font-semibold text-sm">{{ compatibilityReport.medication_compatibility_report.analysis_summary.analysis_date | date:'mediumDate' }}</p>
-            </div>
-            
-            <div class="bg-white rounded-lg p-4 border border-blue-200">
-              <p class="text-blue-700 font-medium text-sm">Puntuación General</p>
-              <p class="text-blue-900 text-2xl font-bold">{{ compatibilityReport.medication_compatibility_report.safety_score.overall_score }}/100</p>
-            </div>
-          </div>
-
-          <div *ngIf="compatibilityReport.medication_compatibility_report.analysis_summary.key_concerns" 
-               class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <h5 class="font-semibold text-yellow-900 mb-2">Preocupaciones Principales:</h5>
-            <p class="text-yellow-800 text-sm">{{ compatibilityReport.medication_compatibility_report.analysis_summary.key_concerns }}</p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- Columna Izquierda -->
-          <div class="space-y-6">
-            
-            <!-- Interacciones de Medicamentos -->
-            <div *ngIf="compatibilityReport.medication_compatibility_report.drug_interactions.length > 0" 
-                 class="bg-white rounded-xl border border-gray-200 p-6">
-              <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z"/>
-                </svg>
-                Interacciones Detectadas
-              </h4>
-              
-              <div class="space-y-4">
-                <div *ngFor="let interaction of compatibilityReport.medication_compatibility_report.drug_interactions" 
-                     class="border rounded-lg p-4"
-                     [ngClass]="getSeverityColor(interaction.severity_level)">
-                  
-                  <div class="flex items-start justify-between mb-3">
-                    <div class="flex-1">
-                      <div class="flex items-center space-x-2 mb-2">
-                        <span class="font-semibold text-sm">{{ interaction.interaction_type }}</span>
-                        <span class="px-2 py-1 rounded-full text-xs font-medium"
-                              [ngClass]="getSeverityColor(interaction.severity_level)">
-                          {{ interaction.severity_level }}
-                        </span>
-                      </div>
-                      
-                      <div class="space-y-2 text-sm">
-                        <div>
-                          <span class="font-medium">Medicamentos involucrados:</span>
-                          <span class="ml-1">{{ interaction.medications_involved.join(', ') }}</span>
-                        </div>
-                        
-                        <div>
-                          <span class="font-medium">Mecanismo:</span>
-                          <span class="ml-1">{{ interaction.mechanism }}</span>
-                        </div>
-                        
-                        <div>
-                          <span class="font-medium">Significancia clínica:</span>
-                          <span class="ml-1">{{ interaction.clinical_significance }}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div class="bg-white bg-opacity-60 rounded-md p-3 border">
-                    <p class="font-medium text-sm mb-1">Recomendaciones:</p>
-                    <p class="text-sm">{{ interaction.recommendations }}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Acciones Inmediatas -->
-            <div *ngIf="compatibilityReport.medication_compatibility_report.immediate_actions.length > 0" 
-                 class="bg-white rounded-xl border border-gray-200 p-6">
-              <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <svg class="w-5 h-5 text-orange-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z"/>
-                </svg>
-                Acciones Inmediatas Requeridas
-              </h4>
-              
-              <div class="space-y-3">
-                <div *ngFor="let action of compatibilityReport.medication_compatibility_report.immediate_actions" 
-                     class="border border-gray-200 rounded-lg p-4">
-                  
-                  <div class="flex items-start space-x-3">
-                    <span class="px-2 py-1 rounded-full text-xs font-medium"
-                          [ngClass]="getPriorityColor(action.priority)">
-                      {{ action.priority }}
-                    </span>
-                    <div class="flex-1">
-                      <h5 class="font-semibold text-gray-900 text-sm mb-2">{{ action.action }}</h5>
-                      <div class="text-sm text-gray-700 space-y-1">
-                        <div>
-                          <span class="font-medium">Plazo:</span> {{ action.timeframe }}
-                        </div>
-                        <div>
-                          <span class="font-medium">Razón:</span> {{ action.rationale }}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Columna Derecha -->
-          <div class="space-y-6">
-            
-            <!-- Puntuaciones de Seguridad -->
-            <div class="bg-white rounded-xl border border-gray-200 p-6">
-              <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z"/>
-                </svg>
-                Puntuaciones de Seguridad
-              </h4>
-              
-              <div class="grid grid-cols-1 gap-4">
-                <div class="bg-gray-50 rounded-lg p-4">
-                  <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm font-medium text-gray-700">Puntuación General</span>
-                    <span class="text-lg font-bold text-gray-900">{{ compatibilityReport.medication_compatibility_report.safety_score.overall_score }}/100</span>
-                  </div>
-                  <div class="w-full bg-gray-200 rounded-full h-2">
-                    <div class="bg-blue-600 h-2 rounded-full" 
-                         [style.width.%]="compatibilityReport.medication_compatibility_report.safety_score.overall_score"></div>
-                  </div>
-                </div>
-                
-                <div class="bg-gray-50 rounded-lg p-4">
-                  <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm font-medium text-gray-700">Riesgo de Interacciones</span>
-                    <span class="text-lg font-bold text-gray-900">{{ compatibilityReport.medication_compatibility_report.safety_score.interaction_risk_score }}/100</span>
-                  </div>
-                  <div class="w-full bg-gray-200 rounded-full h-2">
-                    <div class="bg-red-500 h-2 rounded-full" 
-                         [style.width.%]="compatibilityReport.medication_compatibility_report.safety_score.interaction_risk_score"></div>
-                  </div>
-                </div>
-                
-                <div class="bg-gray-50 rounded-lg p-4">
-                  <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm font-medium text-gray-700">Apropiabilidad</span>
-                    <span class="text-lg font-bold text-gray-900">{{ compatibilityReport.medication_compatibility_report.safety_score.appropriateness_score }}/100</span>
-                  </div>
-                  <div class="w-full bg-gray-200 rounded-full h-2">
-                    <div class="bg-green-500 h-2 rounded-full" 
-                         [style.width.%]="compatibilityReport.medication_compatibility_report.safety_score.appropriateness_score"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Recomendaciones de Monitoreo -->
-            <div *ngIf="compatibilityReport.medication_compatibility_report.monitoring_recommendations.length > 0" 
-                 class="bg-white rounded-xl border border-gray-200 p-6">
-              <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <svg class="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
-                Recomendaciones de Monitoreo
-              </h4>
-              
-              <div class="space-y-3">
-                <div *ngFor="let monitoring of compatibilityReport.medication_compatibility_report.monitoring_recommendations" 
-                     class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  
-                  <h5 class="font-semibold text-blue-900 text-sm mb-2">{{ monitoring.parameter }}</h5>
-                  
-                  <div class="text-sm text-blue-800 space-y-1">
-                    <div>
-                      <span class="font-medium">Frecuencia:</span> {{ monitoring.frequency }}
-                    </div>
-                    <div>
-                      <span class="font-medium">Valores objetivo:</span> {{ monitoring.target_values }}
-                    </div>
-                    <div>
-                      <span class="font-medium">Razón:</span> {{ monitoring.rationale }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Resumen de Recomendaciones -->
-            <div class="bg-white rounded-xl border border-gray-200 p-6">
-              <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <svg class="w-5 h-5 text-purple-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"/>
-                </svg>
-                Resumen de Recomendaciones
-              </h4>
-              
-              <div class="space-y-4 text-sm">
-                <div *ngIf="compatibilityReport.medication_compatibility_report.recommendations_summary.continue_medications.length > 0">
-                  <h5 class="font-medium text-green-900 mb-2">Continuar:</h5>
-                  <ul class="list-disc list-inside text-green-800 space-y-1">
-                    <li *ngFor="let med of compatibilityReport.medication_compatibility_report.recommendations_summary.continue_medications">{{ med }}</li>
-                  </ul>
-                </div>
-                
-                <div *ngIf="compatibilityReport.medication_compatibility_report.recommendations_summary.modify_medications.length > 0">
-                  <h5 class="font-medium text-yellow-900 mb-2">Modificar:</h5>
-                  <ul class="list-disc list-inside text-yellow-800 space-y-1">
-                    <li *ngFor="let med of compatibilityReport.medication_compatibility_report.recommendations_summary.modify_medications">{{ med }}</li>
-                  </ul>
-                </div>
-                
-                <div *ngIf="compatibilityReport.medication_compatibility_report.recommendations_summary.add_medications.length > 0">
-                  <h5 class="font-medium text-blue-900 mb-2">Considerar agregar:</h5>
-                  <ul class="list-disc list-inside text-blue-800 space-y-1">
-                    <li *ngFor="let med of compatibilityReport.medication_compatibility_report.recommendations_summary.add_medications">{{ med }}</li>
-                  </ul>
-                </div>
-                
-                <div *ngIf="compatibilityReport.medication_compatibility_report.recommendations_summary.specialist_referral_needed">
-                  <h5 class="font-medium text-purple-900 mb-2">Referencia a especialista:</h5>
-                  <p class="text-purple-800">{{ compatibilityReport.medication_compatibility_report.recommendations_summary.specialist_referral_needed }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Análisis del Contexto Clínico -->
-        <div class="mt-6 bg-gray-50 rounded-xl p-6">
-          <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <svg class="w-5 h-5 text-gray-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-            </svg>
-            Análisis del Contexto Clínico
-          </h4>
-          
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div class="bg-white rounded-lg p-4 border border-gray-200">
-              <h5 class="font-medium text-gray-900 mb-2">Apropiabilidad de Medicamentos</h5>
-              <p class="text-gray-700">{{ compatibilityReport.medication_compatibility_report.clinical_context_analysis.medication_appropriateness }}</p>
-            </div>
-            
-            <div class="bg-white rounded-lg p-4 border border-gray-200">
-              <h5 class="font-medium text-gray-900 mb-2">Brechas Terapéuticas</h5>
-              <p class="text-gray-700">{{ compatibilityReport.medication_compatibility_report.clinical_context_analysis.therapeutic_gaps }}</p>
-            </div>
-            
-            <div class="bg-white rounded-lg p-4 border border-gray-200">
-              <h5 class="font-medium text-gray-900 mb-2">Evaluación de Polifarmacia</h5>
-              <p class="text-gray-700">{{ compatibilityReport.medication_compatibility_report.clinical_context_analysis.polypharmacy_assessment }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Disclaimer -->
-        <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-          <div class="flex items-start space-x-3">
-            <svg class="w-5 h-5 text-yellow-600 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z"/>
-            </svg>
-            <div>
-              <h5 class="font-medium text-yellow-900 text-sm mb-1">Descargo de responsabilidad</h5>
-              <p class="text-yellow-800 text-sm">{{ compatibilityReport.medication_compatibility_report.disclaimer }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 
