@@ -120,6 +120,79 @@ interface AIReport {
   reporteMedico: ReporteMedico;
 }
 
+interface MedicationCompatibilityRequest {
+  patientId: string;
+  medications: Medication[];
+}
+
+interface DrugInteraction {
+  interaction_type: string;
+  medications_involved: string[];
+  mechanism: string;
+  clinical_significance: string;
+  severity_level: string;
+  recommendations: string;
+}
+
+interface MonitoringRecommendation {
+  parameter: string;
+  frequency: string;
+  rationale: string;
+  target_values: string;
+}
+
+interface ImmediateAction {
+  priority: string;
+  action: string;
+  timeframe: string;
+  rationale: string;
+}
+
+interface SafetyScore {
+  overall_score: string;
+  interaction_risk_score: string;
+  appropriateness_score: string;
+  monitoring_compliance_score: string;
+}
+
+interface RecommendationsSummary {
+  continue_medications: string[];
+  modify_medications: string[];
+  discontinue_medications: string[];
+  add_medications: string[];
+  specialist_referral_needed: string;
+}
+
+interface AnalysisSummary {
+  total_medications_analyzed: number;
+  analysis_date: string;
+  overall_safety_assessment: string;
+  key_concerns: string;
+}
+
+interface ClinicalContextAnalysis {
+  medication_appropriateness: string;
+  therapeutic_gaps: string;
+  polypharmacy_assessment: string;
+}
+
+interface MedicationCompatibilityReport {
+  analysis_summary: AnalysisSummary;
+  drug_interactions: DrugInteraction[];
+  contraindications: any[];
+  dosage_concerns: any[];
+  clinical_context_analysis: ClinicalContextAnalysis;
+  monitoring_recommendations: MonitoringRecommendation[];
+  immediate_actions: ImmediateAction[];
+  safety_score: SafetyScore;
+  recommendations_summary: RecommendationsSummary;
+  disclaimer: string;
+}
+
+interface CompatibilityResponse {
+  medication_compatibility_report: MedicationCompatibilityReport;
+}
+
 @Component({
   selector: 'app-visit-management',
   standalone: true,
@@ -161,6 +234,14 @@ export class VisitManagementComponent implements OnInit {
   // Medicamentos a agregar y remover
   medicationsToAdd: MedicationOperation[] = [];
   medicationsToRemove: string[] = [];
+
+  // Nuevas propiedades para análisis de compatibilidad
+  showCompatibilityAnalysis = false;
+  compatibilityLoading = false;
+  compatibilityReport: CompatibilityResponse | null = null;
+
+  // Nueva propiedad para almacenar TODOS los medicamentos
+  allPatientMedications: Medication[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -215,6 +296,7 @@ export class VisitManagementComponent implements OnInit {
     return storedVisit ? JSON.parse(storedVisit) : null;
   }
 
+  // CORREGIR: Cargar TODOS los medicamentos desde el inicio
   private async loadPatientData() {
     if (!this.currentVisit) return;
     
@@ -238,11 +320,49 @@ export class VisitManagementComponent implements OnInit {
         error: (error) => console.error('Error loading visits:', error)
       });
 
-      // Cargar medicamentos
-      this.loadPatientMedications(patientId);
+      // CORREGIR: Cargar TODOS los medicamentos desde el inicio
+      this.loadAllPatientMedications(patientId);
     } catch (error) {
       console.error('Error loading patient data:', error);
     }
+  }
+
+  // NUEVO MÉTODO: Cargar TODOS los medicamentos
+  loadAllPatientMedications(patientId: string) {
+    this.medicationLoading = true;
+    
+    this.http.get<Medication[]>(`http://localhost:8080/api/medications/patient/${patientId}`)
+      .subscribe({
+        next: (medications) => {
+          // Guardar TODOS los medicamentos
+          this.allPatientMedications = medications;
+          // Mostrar solo los primeros 3 en la UI
+          this.patientMedications = this.showAllMedications ? medications : medications.slice(0, 3);
+          this.medicationLoading = false;
+        },
+        error: (error) => {
+          console.error('Error loading medications:', error);
+          this.medicationLoading = false;
+        }
+      });
+  }
+
+  // CORREGIR: Usar allPatientMedications en lugar de patientMedications
+  loadPatientMedications(patientId: string) {
+    this.medicationLoading = true;
+    
+    this.http.get<Medication[]>(`http://localhost:8080/api/medications/patient/${patientId}`)
+      .subscribe({
+        next: (medications) => {
+          this.allPatientMedications = medications;
+          this.patientMedications = this.showAllMedications ? medications : medications.slice(0, 3);
+          this.medicationLoading = false;
+        },
+        error: (error) => {
+          console.error('Error loading medications:', error);
+          this.medicationLoading = false;
+        }
+      });
   }
 
   private extractPatientId(visit: MedicalVisit): string {
@@ -382,21 +502,22 @@ export class VisitManagementComponent implements OnInit {
 
   // ========== MÉTODOS DE MEDICAMENTOS ==========
 
-  loadPatientMedications(patientId: string) {
-    this.medicationLoading = true;
+  // loadPatientMedications(patientId: string) {
+  //   this.medicationLoading = true;
     
-    this.http.get<Medication[]>(`http://localhost:8080/api/medications/patient/${patientId}`)
-      .subscribe({
-        next: (medications) => {
-          this.patientMedications = this.showAllMedications ? medications : medications.slice(0, 3);
-          this.medicationLoading = false;
-        },
-        error: (error) => {
-          console.error('Error loading medications:', error);
-          this.medicationLoading = false;
-        }
-      });
-  }
+  //   this.http.get<Medication[]>(`http://localhost:8080/api/medications/patient/${patientId}`)
+  //     .subscribe({
+  //       next: (medications) => {
+  //         this.allPatientMedications = medications;
+  //         this.patientMedications = this.showAllMedications ? medications : medications.slice(0, 3);
+  //         this.medicationLoading = false;
+  //       },
+  //       error: (error) => {
+  //         console.error('Error loading medications:', error);
+  //         this.medicationLoading = false;
+  //       }
+  //     });
+  // }
 
   openMedicationModal() {
     this.showMedicationModal = true;
@@ -438,7 +559,8 @@ export class VisitManagementComponent implements OnInit {
     if (confirm('¿Está seguro de que desea remover este medicamento?')) {
       this.medicationsToRemove.push(medicationId);
       
-      // Remover visualmente de la lista actual
+      // Actualizar AMBAS listas
+      this.allPatientMedications = this.allPatientMedications.filter(med => med.id !== medicationId);
       this.patientMedications = this.patientMedications.filter(med => med.id !== medicationId);
     }
   }
@@ -450,10 +572,10 @@ export class VisitManagementComponent implements OnInit {
   undoRemoveMedication(medicationId: string) {
     this.medicationsToRemove = this.medicationsToRemove.filter(id => id !== medicationId);
     
-    // Recargar medicamentos para mostrar el que se "deshizo"
+    // Recargar TODOS los medicamentos
     if (this.currentVisit) {
       const patientId = this.extractPatientId(this.currentVisit);
-      this.loadPatientMedications(patientId);
+      this.loadAllPatientMedications(patientId);
     }
   }
 
@@ -468,7 +590,6 @@ export class VisitManagementComponent implements OnInit {
     this.medicationSubmitting = true;
     const patientId = this.extractPatientId(this.currentVisit);
 
-    // Crear las operaciones
     const operations: MedicationOperation[] = [
       ...this.medicationsToAdd,
       ...this.medicationsToRemove.map(id => ({
@@ -485,12 +606,11 @@ export class VisitManagementComponent implements OnInit {
           console.log('Medications updated successfully:', response);
           alert('Medicamentos actualizados exitosamente');
           
-          // Limpiar las listas de cambios pendientes
           this.medicationsToAdd = [];
           this.medicationsToRemove = [];
           
-          // Recargar la lista de medicamentos
-          this.loadPatientMedications(patientId);
+          // Recargar TODOS los medicamentos
+          this.loadAllPatientMedications(patientId);
           
           this.medicationSubmitting = false;
         },
@@ -502,39 +622,6 @@ export class VisitManagementComponent implements OnInit {
       });
   }
 
-  toggleShowAllMedications() {
-    this.showAllMedications = !this.showAllMedications;
-    if (this.showAllMedications && this.currentVisit) {
-      const patientId = this.extractPatientId(this.currentVisit);
-      this.loadPatientMedications(patientId);
-    } else {
-      this.patientMedications = this.patientMedications.slice(0, 3);
-    }
-  }
-
-  private markMedicationFormTouched() {
-    Object.keys(this.medicationForm.controls).forEach(key => {
-      this.medicationForm.get(key)?.markAsTouched();
-    });
-  }
-
-  isMedicationFieldInvalid(fieldName: string): boolean {
-    const field = this.medicationForm.get(fieldName);
-    return !!(field && field.invalid && (field.dirty || field.touched));
-  }
-
-  getMedicationFieldError(fieldName: string): string {
-    const field = this.medicationForm.get(fieldName);
-    if (field?.errors?.['required']) {
-      return `${fieldName} es requerido`;
-    }
-    return '';
-  }
-
-  isMedicationMarkedForRemoval(medicationId: string): boolean {
-    return this.medicationsToRemove.includes(medicationId);
-  }
-
   // Método helper para obtener evidencia de una condición específica
   getEvidenciaForCondition(condition: string): EvidenciaRespaldo[] {
     if (!this.aiReport?.reporteMedico?.resumen?.evidenciaRespalda) {
@@ -544,6 +631,138 @@ export class VisitManagementComponent implements OnInit {
     return this.aiReport.reporteMedico.resumen.evidenciaRespalda.filter(
       evidencia => evidencia.enfermedad === condition
     );
+  }
+
+  // Método para verificar si un medicamento está marcado para ser removido
+  isMedicationMarkedForRemoval(medicationId: string): boolean {
+    return this.medicationsToRemove.includes(medicationId);
+  }
+
+  // CORREGIR: Método para obtener todos los medicamentos activos
+  getActiveMedications(): Medication[] {
+    // Usar allPatientMedications en lugar de patientMedications
+    const existingMedications = this.allPatientMedications.filter(
+      med => !this.isMedicationMarkedForRemoval(med.id)
+    );
+
+    // Convertir medicamentos pendientes de agregar a formato Medication
+    const newMedications: Medication[] = this.medicationsToAdd.map((med, index) => ({
+      id: `temp-${index}`,
+      name: med.name!,
+      brand: med.brand!,
+      activeSubstance: med.activeSubstance!,
+      indication: med.indication!,
+      dosage: med.dosage!,
+      frequency: med.frequency!,
+      startDate: med.startDate!,
+      endDate: med.endDate,
+      prescribedById: med.prescribedById!,
+      prescribedBy: 'Dr. Actual',
+      isActive: true
+    }));
+
+    return [...existingMedications, ...newMedications];
+  }
+
+  // CORREGIR: Método para ejecutar análisis de compatibilidad SIN polling
+  async runCompatibilityAnalysis() {
+    if (!this.currentVisit) {
+      alert('No se puede ejecutar el análisis sin información de la visita');
+      return;
+    }
+
+    const activeMedications = this.getActiveMedications();
+    
+    if (activeMedications.length < 2) {
+      alert('Se necesitan al menos 2 medicamentos para realizar el análisis de compatibilidad');
+      return;
+    }
+
+    this.compatibilityLoading = true;
+    this.showCompatibilityAnalysis = true;
+
+    const patientId = this.extractPatientId(this.currentVisit);
+    
+    const request: MedicationCompatibilityRequest = {
+      patientId: patientId,
+      medications: activeMedications
+    };
+
+    try {
+      console.log('Enviando solicitud de análisis de compatibilidad...');
+      
+      // El backend devuelve el JSON como string directamente
+      const response = await this.http.post(
+        'http://localhost:8080/api/medications/compatibility-analysis',
+        request,
+        { 
+          responseType: 'text', // Importante: recibir como texto
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      ).toPromise();
+
+      if (response) {
+        console.log('Respuesta recibida del backend');
+        
+        try {
+          // Parsear el JSON del string
+          this.compatibilityReport = JSON.parse(response);
+          this.compatibilityLoading = false;
+          console.log('Reporte de compatibilidad cargado:', this.compatibilityReport);
+        } catch (parseError) {
+          console.error('Error parseando JSON:', parseError);
+          console.log('Respuesta raw:', response);
+          throw new Error('Error parseando la respuesta del servidor');
+        }
+      } else {
+        throw new Error('No se recibió respuesta del servidor');
+      }
+
+    } catch (error) {
+      console.error('Error en análisis de compatibilidad:', error);
+      alert('Error al generar el análisis de compatibilidad. Por favor, intenta nuevamente.');
+      this.compatibilityLoading = false;
+      this.showCompatibilityAnalysis = false;
+    }
+  }
+
+  // Método para cerrar el análisis de compatibilidad
+  closeCompatibilityAnalysis() {
+    this.showCompatibilityAnalysis = false;
+    this.compatibilityReport = null;
+    this.compatibilityLoading = false;
+  }
+
+  // Método helper para obtener color de severidad
+  getSeverityColor(severity: string): string {
+    switch (severity.toLowerCase()) {
+      case 'high':
+      case 'severe':
+        return 'bg-red-100 text-red-800 border-red-200';
+      case 'moderate':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'low':
+      case 'mild':
+        return 'bg-green-100 text-green-800 border-green-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  }
+
+  // Método helper para obtener color de prioridad
+  getPriorityColor(priority: string): string {
+    switch (priority.toLowerCase()) {
+      case 'high':
+        return 'bg-red-100 text-red-800';
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'low':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
   }
 
   // Utility methods
@@ -607,5 +826,59 @@ export class VisitManagementComponent implements OnInit {
 
   getCurrentDate(): Date {
     return new Date();
+  }
+
+  private markMedicationFormTouched() {
+    Object.keys(this.medicationForm.controls).forEach(key => {
+      this.medicationForm.get(key)?.markAsTouched();
+    });
+  }
+
+  // AGREGAR: Métodos faltantes para validación de medicamentos
+  isMedicationFieldInvalid(fieldName: string): boolean {
+    const field = this.medicationForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched));
+  }
+
+  getMedicationFieldError(fieldName: string): string {
+    const field = this.medicationForm.get(fieldName);
+    if (field?.errors?.['required']) {
+      const fieldLabels: Record<string, string> = {
+        'name': 'El nombre del medicamento',
+        'brand': 'La marca',
+        'activeSubstance': 'La sustancia activa',
+        'indication': 'La indicación',
+        'dosage': 'La dosis',
+        'frequency': 'La frecuencia',
+        'startDate': 'La fecha de inicio'
+      };
+      return `${fieldLabels[fieldName] || fieldName} es requerido`;
+    }
+    if (field?.errors?.['minlength']) {
+      return `Mínimo ${field.errors['minlength'].requiredLength} caracteres`;
+    }
+    return '';
+  }
+
+  // CORREGIR: Método para mostrar/ocultar medicamentos en la UI
+  toggleShowAllMedications() {
+    this.showAllMedications = !this.showAllMedications;
+    // Solo cambiar la vista, no recargar datos
+    this.patientMedications = this.showAllMedications ? 
+      this.allPatientMedications : 
+      this.allPatientMedications.slice(0, 3);
+  }
+
+  // AGREGAR: Método faltante para abrir modal de sample
+  openSampleDetail(sampleId: string) {
+    this.sampleService.getSampleById(sampleId).subscribe({
+      next: sample => {
+        this.selectedSample = sample;
+        this.showSampleModal = true;
+      },
+      error: err => {
+        console.error('Error fetching sample', err);
+      }
+    });
   }
 }
