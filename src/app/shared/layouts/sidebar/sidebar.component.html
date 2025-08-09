@@ -1,0 +1,85 @@
+<div class="w-64 bg-white h-full border-r border-slate-200 flex flex-col">
+  <!-- Header del Sidebar -->
+  <div class="p-6 border-b border-slate-200">
+    <h2 class="text-lg font-semibold text-slate-800">{{ sidebarConfig.title }}</h2>
+  </div>
+
+  <!-- Menu Items -->
+  <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+    <div *ngFor="let item of sidebarConfig.menuItems" class="space-y-1">
+      
+      <!-- Menu Item Principal -->
+      <div class="relative">
+        <button 
+          *ngIf="!item.children"
+          (click)="navigate(item.route)"
+          class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors group"
+          [class.bg-blue-50]="item.isActive"
+          [class.text-blue-700]="item.isActive">
+          
+          <svg class="w-5 h-5 mr-3 text-slate-500 group-hover:text-slate-700" 
+               [class.text-blue-600]="item.isActive"
+               fill="currentColor" 
+               viewBox="0 0 24 24">
+            <path [attr.d]="item.icon"/>
+          </svg>
+          {{ item.label }}
+        </button>
+
+        <!-- Menu Item con Submenu -->
+        <button 
+          *ngIf="item.children"
+          (click)="toggleSubmenu(item)"
+          class="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors group">
+          
+          <div class="flex items-center">
+            <svg class="w-5 h-5 mr-3 text-slate-500 group-hover:text-slate-700" 
+                 fill="currentColor" 
+                 viewBox="0 0 24 24">
+              <path [attr.d]="item.icon"/>
+            </svg>
+            {{ item.label }}
+          </div>
+          
+          <svg class="w-4 h-4 text-slate-400 transition-transform"
+               [class.rotate-90]="item.isExpanded"
+               fill="none" 
+               stroke="currentColor" 
+               viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Submenu Items -->
+      <div *ngIf="item.children && item.isExpanded" 
+           class="ml-8 space-y-1 border-l border-slate-200 pl-4">
+        <button 
+          *ngFor="let child of item.children"
+          (click)="navigate(child.route)"
+          class="w-full flex items-center px-3 py-2 text-sm rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+          [class.bg-blue-50]="child.isActive"
+          [class.text-blue-700]="child.isActive">
+          
+          <svg class="w-4 h-4 mr-3 text-slate-400" 
+               [class.text-blue-600]="child.isActive"
+               fill="currentColor" 
+               viewBox="0 0 24 24">
+            <path [attr.d]="child.icon"/>
+          </svg>
+          {{ child.label }}
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Footer del Sidebar -->
+  <div class="p-4 border-t border-slate-200">
+    <button class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg text-red-600 hover:bg-red-50 transition-colors">
+      <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+      </svg>
+      Cerrar Sesión
+    </button>
+  </div>
+</div>

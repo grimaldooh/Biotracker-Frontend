@@ -1,99 +1,242 @@
-<div class="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
-  <div class="w-full max-w-lg bg-white rounded-3xl shadow-xl p-10 border border-blue-100">
-    <div class="flex flex-col items-center mb-8">
-      <img src="/assets/patient.svg" alt="Paciente" class="w-16 h-16 mb-2 opacity-80" />
-      <h2 class="text-3xl font-extrabold text-blue-900 mb-1 tracking-tight">Nuevo Paciente</h2>
-      <p class="text-blue-500 text-sm">Registra la información básica del paciente</p>
+<div class="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-2xl mx-auto">
+    
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+        </svg>
+      </div>
+      <h1 class="text-2xl font-semibold text-slate-800 mb-2">Registrar Nuevo Paciente</h1>
+      <p class="text-slate-600">Complete la información básica del paciente para crear su perfil</p>
     </div>
-    <form [formGroup]="patientForm" (ngSubmit)="submit()" class="space-y-5">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <!-- Nombre -->
+
+    <!-- Formulario -->
+    <div class="bg-white rounded-lg border border-slate-200 p-8">
+      <form [formGroup]="patientForm" (ngSubmit)="submit()" class="space-y-6">
+        
+        <!-- Información Personal -->
         <div>
-          <label class="block text-blue-900 font-semibold mb-2" for="firstName">Nombre</label>
-          <input id="firstName" matInput formControlName="firstName" required
-            class="w-full px-4 py-2 rounded-xl border border-blue-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all bg-blue-50 text-blue-900 placeholder-blue-300"
-            placeholder="Nombre" autocomplete="given-name">
-          <div *ngIf="patientForm.get('firstName')?.invalid && patientForm.get('firstName')?.touched" class="text-red-500 text-xs mt-1">Campo requerido</div>
-        </div>
-        <!-- Apellido -->
-        <div>
-          <label class="block text-blue-900 font-semibold mb-2" for="lastName">Apellido</label>
-          <input id="lastName" matInput formControlName="lastName" required
-            class="w-full px-4 py-2 rounded-xl border border-blue-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all bg-blue-50 text-blue-900 placeholder-blue-300"
-            placeholder="Apellido" autocomplete="family-name">
-          <div *ngIf="patientForm.get('lastName')?.invalid && patientForm.get('lastName')?.touched" class="text-red-500 text-xs mt-1">Campo requerido</div>
-        </div>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <!-- Fecha de nacimiento -->
-        <div>
-          <label class="block text-blue-900 font-semibold mb-2" for="birthDate">Fecha de nacimiento</label>
-          <input id="birthDate" matInput type="date" formControlName="birthDate" required
-            class="w-full px-4 py-2 rounded-xl border border-blue-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all bg-blue-50 text-blue-900 placeholder-blue-300">
-          <div *ngIf="patientForm.get('birthDate')?.invalid && patientForm.get('birthDate')?.touched" class="text-red-500 text-xs mt-1">Campo requerido</div>
-        </div>
-        <!-- Género -->
-        <div>
-          <label class="block text-blue-900 font-semibold mb-2" for="gender">Género</label>
-          <mat-select id="gender" formControlName="gender" required
-            class="w-full rounded-xl border border-blue-200 bg-blue-50 text-blue-900">
-            <mat-option value="MALE">Masculino</mat-option>
-            <mat-option value="FEMALE">Femenino</mat-option>
-            <mat-option value="OTHER">Otro</mat-option>
-          </mat-select>
-          <div *ngIf="patientForm.get('gender')?.invalid && patientForm.get('gender')?.touched" class="text-red-500 text-xs mt-1">Campo requerido</div>
-        </div>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <!-- Email -->
-        <div>
-          <label class="block text-blue-900 font-semibold mb-2" for="email">Email</label>
-          <input id="email" matInput type="email" formControlName="email" required
-            class="w-full px-4 py-2 rounded-xl border border-blue-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all bg-blue-50 text-blue-900 placeholder-blue-300"
-            placeholder="ejemplo@correo.com" autocomplete="email">
-          <div *ngIf="patientForm.get('email')?.invalid && patientForm.get('email')?.touched" class="text-red-500 text-xs mt-1">
-            <span *ngIf="patientForm.get('email')?.hasError('required')">Campo requerido</span>
-            <span *ngIf="patientForm.get('email')?.hasError('email')">Email inválido</span>
+          <h3 class="text-lg font-medium text-slate-800 mb-4 pb-2 border-b border-slate-200">
+            Información Personal
+          </h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Nombre -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2" for="firstName">
+                Nombre *
+              </label>
+              <input 
+                id="firstName" 
+                formControlName="firstName" 
+                required
+                class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors text-slate-800 placeholder-slate-400"
+                [class.border-red-300]="patientForm.get('firstName')?.invalid && patientForm.get('firstName')?.touched"
+                placeholder="Ingrese el nombre"
+                autocomplete="given-name">
+              <div *ngIf="patientForm.get('firstName')?.invalid && patientForm.get('firstName')?.touched" 
+                   class="mt-1 text-sm text-red-600">
+                Este campo es obligatorio
+              </div>
+            </div>
+
+            <!-- Apellido -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2" for="lastName">
+                Apellido *
+              </label>
+              <input 
+                id="lastName" 
+                formControlName="lastName" 
+                required
+                class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors text-slate-800 placeholder-slate-400"
+                [class.border-red-300]="patientForm.get('lastName')?.invalid && patientForm.get('lastName')?.touched"
+                placeholder="Ingrese el apellido"
+                autocomplete="family-name">
+              <div *ngIf="patientForm.get('lastName')?.invalid && patientForm.get('lastName')?.touched" 
+                   class="mt-1 text-sm text-red-600">
+                Este campo es obligatorio
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <!-- Fecha de nacimiento -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2" for="birthDate">
+                Fecha de Nacimiento *
+              </label>
+              <input 
+                id="birthDate" 
+                type="date" 
+                formControlName="birthDate" 
+                required
+                class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors text-slate-800"
+                [class.border-red-300]="patientForm.get('birthDate')?.invalid && patientForm.get('birthDate')?.touched">
+              <div *ngIf="patientForm.get('birthDate')?.invalid && patientForm.get('birthDate')?.touched" 
+                   class="mt-1 text-sm text-red-600">
+                Este campo es obligatorio
+              </div>
+            </div>
+
+            <!-- Género -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2" for="gender">
+                Género *
+              </label>
+              <select 
+                id="gender" 
+                formControlName="gender" 
+                required
+                class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors text-slate-800 bg-white"
+                [class.border-red-300]="patientForm.get('gender')?.invalid && patientForm.get('gender')?.touched">
+                <option value="" disabled selected>Seleccione el género</option>
+                <option value="MALE">Masculino</option>
+                <option value="FEMALE">Femenino</option>
+                <option value="OTHER">Otro</option>
+              </select>
+              <div *ngIf="patientForm.get('gender')?.invalid && patientForm.get('gender')?.touched" 
+                   class="mt-1 text-sm text-red-600">
+                Este campo es obligatorio
+              </div>
+            </div>
           </div>
         </div>
-        <!-- Teléfono -->
+
+        <!-- Información de Contacto -->
         <div>
-          <label class="block text-blue-900 font-semibold mb-2" for="phoneNumber">Teléfono</label>
-          <input id="phoneNumber" matInput formControlName="phoneNumber" required
-            class="w-full px-4 py-2 rounded-xl border border-blue-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all bg-blue-50 text-blue-900 placeholder-blue-300"
-            placeholder="Teléfono" autocomplete="tel">
-          <div *ngIf="patientForm.get('phoneNumber')?.invalid && patientForm.get('phoneNumber')?.touched" class="text-red-500 text-xs mt-1">Campo requerido</div>
+          <h3 class="text-lg font-medium text-slate-800 mb-4 pb-2 border-b border-slate-200">
+            Información de Contacto
+          </h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Email -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2" for="email">
+                Correo Electrónico *
+              </label>
+              <input 
+                id="email" 
+                type="email" 
+                formControlName="email" 
+                required
+                class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors text-slate-800 placeholder-slate-400"
+                [class.border-red-300]="patientForm.get('email')?.invalid && patientForm.get('email')?.touched"
+                placeholder="ejemplo@correo.com"
+                autocomplete="email">
+              <div *ngIf="patientForm.get('email')?.invalid && patientForm.get('email')?.touched" 
+                   class="mt-1 text-sm text-red-600">
+                <span *ngIf="patientForm.get('email')?.hasError('required')">Este campo es obligatorio</span>
+                <span *ngIf="patientForm.get('email')?.hasError('email')">Ingrese un correo válido</span>
+              </div>
+            </div>
+
+            <!-- Teléfono -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2" for="phoneNumber">
+                Número de Teléfono *
+              </label>
+              <input 
+                id="phoneNumber" 
+                formControlName="phoneNumber" 
+                required
+                class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors text-slate-800 placeholder-slate-400"
+                [class.border-red-300]="patientForm.get('phoneNumber')?.invalid && patientForm.get('phoneNumber')?.touched"
+                placeholder="Ej: +52 55 1234 5678"
+                autocomplete="tel">
+              <div *ngIf="patientForm.get('phoneNumber')?.invalid && patientForm.get('phoneNumber')?.touched" 
+                   class="mt-1 text-sm text-red-600">
+                Este campo es obligatorio
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <!-- Password -->
-      <div>
-        <label class="block text-blue-900 font-semibold mb-2" for="password">Contraseña</label>
-        <input id="password" matInput type="password" formControlName="password" required
-          class="w-full px-4 py-2 rounded-xl border border-blue-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all bg-blue-50 text-blue-900 placeholder-blue-300"
-          placeholder="Contraseña" autocomplete="new-password">
-        <div *ngIf="patientForm.get('password')?.invalid && patientForm.get('password')?.touched" class="text-red-500 text-xs mt-1">Campo requerido</div>
-      </div>
-      <!-- CURP -->
-      <div>
-        <label class="block text-blue-900 font-semibold mb-2" for="curp">CURP</label>
-        <input id="curp" matInput formControlName="curp"
-          class="w-full px-4 py-2 rounded-xl border border-blue-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all bg-blue-50 text-blue-900 placeholder-blue-300"
-          placeholder="CURP" autocomplete="off">
-      </div>
-      <!-- Botón -->
-      <button mat-raised-button color="primary"
-        class="w-full py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-semibold text-lg shadow transition-all duration-200 mt-2"
-        [disabled]="loading || patientForm.invalid">
-        <span *ngIf="!loading">Registrar Paciente</span>
-        <span *ngIf="loading">
-          <svg class="animate-spin h-5 w-5 inline-block mr-2" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4" fill="none"></circle>
-            <path class="opacity-75" fill="white"
-              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-          </svg>
-          Registrando...
-        </span>
-      </button>
-    </form>
+
+        <!-- Información de Acceso -->
+        <div>
+          <h3 class="text-lg font-medium text-slate-800 mb-4 pb-2 border-b border-slate-200">
+            Información de Acceso
+          </h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Contraseña -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2" for="password">
+                Contraseña *
+              </label>
+              <input 
+                id="password" 
+                type="password" 
+                formControlName="password" 
+                required
+                class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors text-slate-800 placeholder-slate-400"
+                [class.border-red-300]="patientForm.get('password')?.invalid && patientForm.get('password')?.touched"
+                placeholder="Ingrese una contraseña segura"
+                autocomplete="new-password">
+              <div *ngIf="patientForm.get('password')?.invalid && patientForm.get('password')?.touched" 
+                   class="mt-1 text-sm text-red-600">
+                Este campo es obligatorio
+              </div>
+            </div>
+
+            <!-- CURP -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2" for="curp">
+                CURP
+              </label>
+              <input 
+                id="curp" 
+                formControlName="curp"
+                class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors text-slate-800 placeholder-slate-400"
+                placeholder="Ej: ABCD123456HEFGHI00"
+                autocomplete="off"
+                maxlength="18">
+              <p class="mt-1 text-xs text-slate-500">Campo opcional - Clave Única de Registro de Población</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-slate-200">
+          <button 
+            type="button"
+            class="flex-1 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium">
+            Cancelar
+          </button>
+          
+          <button 
+            type="submit"
+            class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center"
+            [disabled]="loading || patientForm.invalid">
+            
+            <span *ngIf="!loading" class="flex items-center">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+              </svg>
+              Registrar Paciente
+            </span>
+            
+            <span *ngIf="loading" class="flex items-center">
+              <svg class="animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Registrando...
+            </span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Footer informativo -->
+    <div class="mt-6 text-center">
+      <p class="text-sm text-slate-500">
+        Los campos marcados con * son obligatorios. La información será tratada de forma confidencial.
+      </p>
+    </div>
+
   </div>
 </div>
