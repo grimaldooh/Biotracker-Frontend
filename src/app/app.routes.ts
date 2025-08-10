@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { BaseLayoutComponent } from './shared/layouts/base-layout/base-layout.component';
+import { CreateLabAppointmentComponent } from './modules/reception/create-lab-appointment/create-lab-appointment.component';
+import { LabAppointmentsListComponent } from './modules/reception/lab-appointments-list/lab-appointments-list.component';
 
 export const routes: Routes = [
   {
@@ -154,6 +156,18 @@ export const routes: Routes = [
       {
         path: 'doctors/ai-report',
         loadComponent: () => import('./modules/doctors/ai-report/ai-report.component').then(m => m.AiReportComponent)
+      },
+      {
+        path: 'reception/create-lab-appointment',
+        loadComponent: () =>
+          import('./modules/reception/create-lab-appointment/create-lab-appointment.component')
+            .then(m => m.CreateLabAppointmentComponent)
+      },
+      {
+        path: 'reception/lab-appointments-list',
+        loadComponent: () =>
+          import('./modules/reception/lab-appointments-list/lab-appointments-list.component')
+            .then(m => m.LabAppointmentsListComponent)
       },
     ]
   },

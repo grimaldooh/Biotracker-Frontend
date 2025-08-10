@@ -1,0 +1,249 @@
+<div class="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-6xl mx-auto">
+    
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-semibold text-slate-800">Citas de Laboratorio</h1>
+          <p class="text-slate-600 text-sm mt-1">Consulta y gestión de citas de laboratorio por paciente</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Búsqueda de paciente -->
+    <div class="bg-white rounded-lg border border-slate-200 p-6 mb-6">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-2">
+          Buscar Paciente para Ver sus Citas
+        </label>
+        <div class="relative">
+          <input
+            type="text"
+            [(ngModel)]="searchPatientTerm"
+            (keydown.enter)="searchPatients()"
+            placeholder="Buscar paciente por nombre, email o CURP..."
+            class="w-full pl-10 pr-10 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors text-slate-800 placeholder-slate-400"
+          />
+          <svg class="absolute left-3 top-3.5 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          
+          <div *ngIf="loadingPatients" class="absolute right-3 top-3">
+            <div class="animate-spin w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+          </div>
+          
+          <!-- Resultados de búsqueda -->
+          <div *ngIf="filteredPatients.length > 0" class="absolute left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-slate-200 z-10 max-h-60 overflow-y-auto">
+            <div
+              *ngFor="let patient of filteredPatients"
+              (click)="selectPatient(patient)"
+              class="px-4 py-3 cursor-pointer hover:bg-slate-50 border-b border-slate-100 last:border-b-0 transition-colors"
+            >
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-medium text-slate-800">{{ patient.firstName }} {{ patient.lastName }}</p>
+                  <p class="text-sm text-slate-600">{{ patient.email }}</p>
+                </div>
+                <div class="text-right">
+                  <p class="text-xs text-slate-500">Nacimiento:</p>
+                  <p class="text-sm text-slate-700">{{ patient.birthDate | date:'dd/MM/yyyy' }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Paciente seleccionado -->
+        <div *ngIf="selectedPatient" class="mt-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+                </svg>
+              </div>
+              <div>
+                <p class="font-medium text-blue-800">{{ selectedPatient.firstName }} {{ selectedPatient.lastName }}</p>
+                <p class="text-sm text-blue-600">{{ selectedPatient.email }}</p>
+              </div>
+            </div>
+            <button 
+              (click)="clearSelectedPatient()"
+              class="w-8 h-8 rounded-full bg-blue-200 hover:bg-blue-300 flex items-center justify-center transition-colors">
+              <svg class="w-4 h-4 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estadísticas rápidas -->
+    <div *ngIf="selectedPatient" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <div class="bg-white rounded-lg border border-slate-200 p-4">
+        <div class="flex items-center">
+          <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+            <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-slate-600 text-sm">Total Citas</p>
+            <p class="text-slate-800 text-xl font-bold">{{ appointments.length }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg border border-slate-200 p-4">
+        <div class="flex items-center">
+          <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center mr-3">
+            <svg class="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-slate-600 text-sm">Solicitados</p>
+            <p class="text-slate-800 text-xl font-bold">
+              {{ getTotalSolicitadoAppointments() }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg border border-slate-200 p-4">
+        <div class="flex items-center">
+          <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+            <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-slate-600 text-sm">Completadas</p>
+            <p class="text-slate-800 text-xl font-bold">{{ getTotalCompletedAppointments() }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div *ngIf="loading" class="bg-white rounded-lg border border-slate-200 p-12">
+      <div class="flex items-center justify-center">
+        <div class="flex items-center space-x-3">
+          <div class="animate-spin w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+          <span class="text-slate-600">Cargando citas de laboratorio...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state - sin paciente seleccionado -->
+    <div *ngIf="!selectedPatient && !loading" class="bg-white rounded-lg border border-slate-200 p-12">
+      <div class="text-center">
+        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
+        <h3 class="text-slate-800 font-medium mb-2">Seleccione un paciente</h3>
+        <p class="text-slate-600 text-sm">Busque y seleccione un paciente para ver sus citas de laboratorio.</p>
+      </div>
+    </div>
+
+    <!-- Empty state - sin citas -->
+    <div *ngIf="selectedPatient && !loading && appointments.length === 0" class="bg-white rounded-lg border border-slate-200 p-12">
+      <div class="text-center">
+        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3"/>
+          </svg>
+        </div>
+        <h3 class="text-slate-800 font-medium mb-2">Sin citas de laboratorio</h3>
+        <p class="text-slate-600 text-sm">Este paciente no tiene citas de laboratorio registradas.</p>
+      </div>
+    </div>
+
+    <!-- Lista de citas -->
+    <div *ngIf="selectedPatient && !loading && appointments.length > 0" class="bg-white rounded-lg border border-slate-200">
+      
+      <!-- Table header -->
+      <div class="hidden md:grid md:grid-cols-12 gap-4 px-6 py-4 border-b border-slate-200 bg-slate-50 text-sm font-medium text-slate-700">
+        <div class="col-span-3">Tipo de Muestra</div>
+        <div class="col-span-2">Estado</div>
+        <div class="col-span-2">Fecha Creación</div>
+        <div class="col-span-4">Notas</div>
+        <div class="col-span-1">ID</div>
+      </div>
+
+      <!-- Appointments list -->
+      <div class="divide-y divide-slate-200">
+        <div
+          *ngFor="let appointment of filteredAppointments; let i = index"
+          class="px-6 py-4 hover:bg-slate-50 transition-colors"
+        >
+          
+          <!-- Mobile layout -->
+          <div class="block md:hidden">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex-1">
+                <div class="flex items-center space-x-2 mb-2">
+                  <span class="text-lg">{{ getSampleTypeIcon(appointment.sampleType) }}</span>
+                  <h4 class="font-medium text-slate-800">{{ getSampleTypeLabel(appointment.sampleType) }}</h4>
+                </div>
+                <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full"
+                      [ngClass]="getStatusColor(appointment.status)">
+                  {{ getStatusLabel(appointment.status) }}
+                </span>
+                <p class="text-slate-600 text-sm mt-2">{{ appointment.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+                <p *ngIf="appointment.notes" class="text-slate-600 text-sm mt-1">{{ appointment.notes }}</p>
+                <p class="text-slate-500 text-xs mt-1">ID: {{ appointment.id }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Desktop layout -->
+          <div class="hidden md:grid md:grid-cols-12 gap-4 items-center">
+            
+            <!-- Tipo de muestra -->
+            <div class="col-span-3">
+              <div class="flex items-center space-x-3">
+                <span class="text-2xl">{{ getSampleTypeIcon(appointment.sampleType) }}</span>
+                <div>
+                  <p class="font-medium text-slate-800">{{ getSampleTypeLabel(appointment.sampleType) }}</p>
+                  <p class="text-slate-500 text-sm">Análisis de laboratorio</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Estado -->
+            <div class="col-span-2">
+              <span class="inline-flex px-3 py-1 text-sm font-medium rounded-full"
+                    [ngClass]="getStatusColor(appointment.status)">
+                {{ getStatusLabel(appointment.status) }}
+              </span>
+            </div>
+
+            <!-- Fecha -->
+            <div class="col-span-2">
+              <p class="text-slate-800 text-sm">{{ appointment.createdAt | date:'dd/MM/yyyy' }}</p>
+              <p class="text-slate-500 text-xs">{{ appointment.createdAt | date:'HH:mm' }}</p>
+            </div>
+
+            <!-- Notas -->
+            <div class="col-span-4">
+              <p class="text-slate-800 text-sm" [title]="appointment.notes">
+                {{ appointment.notes || 'Sin notas adicionales' }}
+              </p>
+            </div>
+
+            <!-- ID -->
+            <div class="col-span-1">
+              <p class="text-slate-500 text-xs font-mono">{{ appointment.id.substring(0, 8) }}...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

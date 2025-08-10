@@ -30,7 +30,7 @@ interface Patient {
 })
 export class NewAppointmentComponent implements OnInit {
   hospitalId = '00d79e66-4457-4d27-9228-fe467823ce8e';
-  currentDoctorId = '1a042737-3406-4aa5-a7e6-948b4c136778';
+  currentDoctorId = 'c332337f-ea0f-48b1-a1a6-9dac44364343';
   
   // Formularios
   appointmentForm!: FormGroup;

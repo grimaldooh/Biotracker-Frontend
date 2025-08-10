@@ -80,6 +80,14 @@ export class DashboardRecepcionComponent implements OnInit {
     this.navigateWithAnimation('/users/register');
   }
 
+  goToCreateLabAppointment() {
+    this.router.navigate(['/reception/create-lab-appointment']);
+  }
+
+  goToLabAppointmentsList() {
+    this.router.navigate(['/reception/lab-appointments-list']);
+  }
+
   /**
    * Navigate with smooth transition animation
    * @param route - The route to navigate to

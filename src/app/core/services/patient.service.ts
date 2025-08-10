@@ -58,4 +58,10 @@ export class PatientService {
   getAllVisits(patientId: string): Observable<MedicalVisit[]> {
     return this.http.get<MedicalVisit[]>(`http://localhost:8080/api/medical-visits/patient/${patientId}`);
   }
+
+  searchPatientsByHospital(query: string, hospitalId: string) {
+    return this.http.get<Patient[]>(`http://localhost:8080/api/hospitals/${hospitalId}/patients/search`, {
+      params: { query }
+    });
+  }
 }

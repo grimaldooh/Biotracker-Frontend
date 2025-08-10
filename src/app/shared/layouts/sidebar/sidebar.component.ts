@@ -96,7 +96,22 @@ export class SidebarComponent implements OnInit {
               icon: 'M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2',
               route: '/appointments',
               isActive: false
+            },
+            {
+              id: 'create-lab-appointment',
+              label: 'Crear Cita de Laboratorio',
+              icon: 'M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2',
+              route: '/reception/create-lab-appointment',
+              isActive: false
+            },
+            {
+              id: 'lab-appointments-list',
+              label: 'Citas de Laboratorio',
+              icon: 'M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2',
+              route: '/reception/lab-appointments-list',
+              isActive: false
             }
+
           ]
         },
         {

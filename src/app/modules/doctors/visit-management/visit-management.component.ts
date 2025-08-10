@@ -399,6 +399,7 @@ export class VisitManagementComponent implements OnInit {
 
     this.doctorService.submitVisitAdvance(this.visitId, formData).subscribe({
       next: (response) => {
+        console.log('Visit submitted successfully:', response);
         this.consultationCompleted = true;
         this.submitting = false;
         this.showPostConsultationModal = true;

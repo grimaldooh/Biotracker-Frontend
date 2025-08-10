@@ -1,0 +1,194 @@
+<div class="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-2xl mx-auto">
+    
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M12,3A1,1 0 0,1 13,4A1,1 0 0,1 12,5A1,1 0 0,1 11,4A1,1 0 0,1 12,3"/>
+        </svg>
+      </div>
+      <h1 class="text-2xl font-semibold text-slate-800 mb-2">Crear Cita de Laboratorio</h1>
+      <p class="text-slate-600">Programe una nueva cita para análisis de laboratorio</p>
+    </div>
+
+    <!-- Formulario -->
+    <div class="bg-white rounded-lg border border-slate-200 p-8">
+      <form [formGroup]="appointmentForm" (ngSubmit)="submit()" class="space-y-6">
+        
+        <!-- Información del Paciente -->
+        <div>
+          <h3 class="text-lg font-medium text-slate-800 mb-4 pb-2 border-b border-slate-200">
+            Información del Paciente
+          </h3>
+          
+          <!-- Buscar paciente -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2" for="patientSearch">
+              Buscar Paciente *
+            </label>
+            <div class="relative">
+              <input
+                id="patientSearch"
+                type="text"
+                [(ngModel)]="searchPatientTerm"
+                [ngModelOptions]="{standalone: true}"
+                (keydown.enter)="searchPatients()"
+                placeholder="Buscar paciente por nombre, email o CURP..."
+                class="w-full pl-10 pr-10 py-3 rounded-lg border border-slate-200 focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none transition-colors text-slate-800 placeholder-slate-400"
+              />
+              <svg class="absolute left-3 top-3.5 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+              
+              <div *ngIf="loadingPatients" class="absolute right-3 top-3">
+                <div class="animate-spin w-6 h-6 border-2 border-green-600 border-t-transparent rounded-full"></div>
+              </div>
+              
+              <!-- Resultados de búsqueda -->
+              <div *ngIf="filteredPatients.length > 0" class="absolute left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-slate-200 z-10 max-h-60 overflow-y-auto">
+                <div
+                  *ngFor="let patient of filteredPatients"
+                  (click)="selectPatient(patient)"
+                  class="px-4 py-3 cursor-pointer hover:bg-slate-50 border-b border-slate-100 last:border-b-0 transition-colors"
+                >
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <p class="font-medium text-slate-800">{{ patient.firstName }} {{ patient.lastName }}</p>
+                      <p class="text-sm text-slate-600">{{ patient.email }}</p>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-xs text-slate-500">Nacimiento:</p>
+                      <p class="text-sm text-slate-700">{{ patient.birthDate | date:'dd/MM/yyyy' }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Paciente seleccionado -->
+            <div *ngIf="selectedPatient" class="mt-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="font-medium text-green-800">{{ selectedPatient.firstName }} {{ selectedPatient.lastName }}</p>
+                    <p class="text-sm text-green-600">{{ selectedPatient.email }}</p>
+                  </div>
+                </div>
+                <button 
+                  type="button"
+                  (click)="clearSelectedPatient()"
+                  class="w-8 h-8 rounded-full bg-green-200 hover:bg-green-300 flex items-center justify-center transition-colors">
+                  <svg class="w-4 h-4 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detalles del Análisis -->
+        <div>
+          <h3 class="text-lg font-medium text-slate-800 mb-4 pb-2 border-b border-slate-200">
+            Detalles del Análisis
+          </h3>
+          
+          <!-- Tipo de muestra -->
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-slate-700 mb-3">
+              Tipo de Muestra *
+            </label>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <div
+                *ngFor="let type of sampleTypes"
+                class="relative"
+              >
+                <input
+                  type="radio"
+                  [id]="type.value"
+                  [value]="type.value"
+                  formControlName="sampleType"
+                  class="sr-only"
+                />
+                <label
+                  [for]="type.value"
+                  class="flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer transition-all hover:bg-slate-50"
+                  [class.border-green-500]="appointmentForm.get('sampleType')?.value === type.value"
+                  [class.bg-green-50]="appointmentForm.get('sampleType')?.value === type.value"
+                  [class.border-slate-200]="appointmentForm.get('sampleType')?.value !== type.value"
+                >
+                  <span class="text-2xl">{{ type.icon }}</span>
+                  <span class="font-medium text-slate-800">{{ type.label }}</span>
+                </label>
+              </div>
+            </div>
+            <div *ngIf="appointmentForm.get('sampleType')?.invalid && appointmentForm.get('sampleType')?.touched" 
+                 class="mt-2 text-sm text-red-600">
+              Debe seleccionar un tipo de muestra
+            </div>
+          </div>
+
+          <!-- Notas -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2" for="notes">
+              Notas Adicionales
+            </label>
+            <textarea 
+              id="notes"
+              formControlName="notes"
+              rows="4"
+              placeholder="Agregue información adicional sobre el análisis requerido..."
+              class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none transition-colors text-slate-800 placeholder-slate-400 resize-none"
+            ></textarea>
+            <p class="mt-1 text-xs text-slate-500">Campo opcional - Incluya cualquier instrucción especial</p>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-slate-200">
+          <button 
+            type="button"
+            class="flex-1 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium">
+            Cancelar
+          </button>
+          
+          <button 
+            type="submit"
+            class="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-slate-400 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center"
+            [disabled]="loading || appointmentForm.invalid || !selectedPatient">
+            
+            <span *ngIf="!loading" class="flex items-center">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              Crear Cita de Laboratorio
+            </span>
+            
+            <span *ngIf="loading" class="flex items-center">
+              <svg class="animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Creando Cita...
+            </span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Footer informativo -->
+    <div class="mt-6 text-center">
+      <p class="text-sm text-slate-500">
+        Los campos marcados con * son obligatorios. Asegúrese de seleccionar un paciente válido.
+      </p>
+    </div>
+
+  </div>
+</div>
