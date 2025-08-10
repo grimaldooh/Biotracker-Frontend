@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { FormBuilder, ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { InventoryService } from '../../core/services/inventory.service';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './inventory.component.html',
   styleUrl: './inventory.component.css'
 })
@@ -144,6 +144,49 @@ export class InventoryComponent implements OnInit {
     if (confirm(`¿Seguro que deseas ${delta > 0 ? 'aumentar' : 'disminuir'} la cantidad de "${item.name}" a ${newQuantity}?`)) {
       const updated = { ...item, quantity: newQuantity };
       this.inventoryService.updateItemQuantity(item.id!, updated).subscribe(() => this.loadItems());
+    }
+  }
+
+  // Métodos para estadísticas
+  getTotalMedicines(): number {
+    return this.filteredMedicines?.length || 0;
+  }
+
+  getTotalItems(): number {
+    return this.filteredItems?.length || 0;
+  }
+
+  getLowStockCount(): number {
+    const lowStockMedicines = this.filteredMedicines?.filter(m => m.quantity < 10).length || 0;
+    const lowStockItems = this.filteredItems?.filter(i => i.quantity < 5).length || 0;
+    return lowStockMedicines + lowStockItems;
+  }
+
+  getExpiringCount(): number {
+    const today = new Date();
+    const thirtyDaysFromNow = new Date(today.getTime() + (30 * 24 * 60 * 60 * 1000));
+    
+    return this.filteredMedicines?.filter(medicine => {
+      if (!medicine.expirationDate) return false;
+      const expDate = new Date(medicine.expirationDate);
+      return expDate <= thirtyDaysFromNow;
+    }).length || 0;
+  }
+
+  // Método para clases de expiración
+  getExpirationClass(expirationDate: string): string {
+    if (!expirationDate) return 'text-slate-500';
+    
+    const today = new Date();
+    const expDate = new Date(expirationDate);
+    const thirtyDaysFromNow = new Date(today.getTime() + (30 * 24 * 60 * 60 * 1000));
+    
+    if (expDate < today) {
+      return 'text-red-600'; // Expirado
+    } else if (expDate <= thirtyDaysFromNow) {
+      return 'text-amber-600'; // Por expirar
+    } else {
+      return 'text-slate-500'; // Normal
     }
   }
 }

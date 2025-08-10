@@ -8,4 +8,5 @@ export interface Patient {
   password : string;
   phoneNumber: string;
   curp: string;
+  createdAt: string;
 }

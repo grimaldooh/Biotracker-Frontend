@@ -38,6 +38,8 @@ export class CreateAppointmentComponent implements OnInit {
   loadingMedics = true;
   loadingPatients = false;
   appointmentForm: FormGroup;
+  loading: boolean = false;
+  selectedPatient: Patient | null = null;
   visitTypes = [
     { value: 'CONSULTATION', label: 'Consulta' },
     { value: 'FOLLOW_UP', label: 'Seguimiento' },
@@ -101,10 +103,15 @@ export class CreateAppointmentComponent implements OnInit {
   }
 
   selectPatient(patient: Patient) {
+    this.selectedPatient = patient;
     this.appointmentForm.patchValue({ patientId: patient.id });
     this.filteredPatients = [];
     this.searchPatientTerm = `${patient.firstName} ${patient.lastName}`;
   }
+
+  clearSelectedPatient(): void {
+  this.selectedPatient = null;
+}
 
   submit() {
     if (this.appointmentForm.invalid) return;

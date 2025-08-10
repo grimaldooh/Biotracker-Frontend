@@ -1,19 +1,236 @@
-<div class="min-h-screen bg-gradient-to-br from-purple-50 to-purple-100 flex flex-col items-center py-10">
-  <div class="w-full max-w-lg bg-white rounded-3xl shadow-xl p-10 border border-purple-100">
-    <h2 class="text-2xl font-bold text-purple-900 mb-6 text-center">Registro de Usuario</h2>
-    <form [formGroup]="userForm" (ngSubmit)="submit()" class="space-y-4">
-      <input formControlName="name" placeholder="Nombre completo" class="w-full px-4 py-2 rounded-xl border border-purple-200 mb-2" />
-      <input formControlName="phoneNumber" placeholder="Teléfono" class="w-full px-4 py-2 rounded-xl border border-purple-200 mb-2" />
-      <input formControlName="email" type="email" placeholder="Email" class="w-full px-4 py-2 rounded-xl border border-purple-200 mb-2" />
-      <input formControlName="password" type="password" placeholder="Contraseña" class="w-full px-4 py-2 rounded-xl border border-purple-200 mb-2" />
-      <select formControlName="role" class="w-full px-4 py-2 rounded-xl border border-purple-200 mb-2">
-        <option value="" disabled selected>Selecciona el rol</option>
-        <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
-      </select>
-      <input formControlName="specialty" placeholder="Especialidad (solo para médicos)" class="w-full px-4 py-2 rounded-xl border border-purple-200 mb-2" />
-      <button type="submit" class="w-full py-3 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-semibold text-lg shadow transition-all duration-200" [disabled]="userForm.invalid">
-        Registrar usuario
-      </button>
-    </form>
+<div class="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md mx-auto">
+    
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+        </svg>
+      </div>
+      <h1 class="text-2xl font-semibold text-slate-800 mb-2">Registro de Usuario</h1>
+      <p class="text-slate-600">Complete la información para crear una nueva cuenta</p>
+    </div>
+
+    <!-- Formulario -->
+    <div class="bg-white rounded-lg border border-slate-200 p-8">
+      <form [formGroup]="userForm" (ngSubmit)="submit()" class="space-y-6">
+        
+        <!-- Información Personal -->
+        <div>
+          <h3 class="text-lg font-medium text-slate-800 mb-4 pb-2 border-b border-slate-200">
+            Información Personal
+          </h3>
+          
+          <!-- Nombre completo -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-slate-700 mb-2" for="name">
+              Nombre Completo *
+            </label>
+            <input 
+              id="name"
+              formControlName="name" 
+              placeholder="Ingrese el nombre completo"
+              class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors text-slate-800 placeholder-slate-400"
+              [class.border-red-300]="userForm.get('name')?.invalid && userForm.get('name')?.touched"
+            />
+            <div *ngIf="userForm.get('name')?.invalid && userForm.get('name')?.touched" 
+                 class="mt-1 text-sm text-red-600">
+              Este campo es obligatorio
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-slate-700 mb-2" for="email">
+              Correo Electrónico *
+            </label>
+            <input 
+              id="email"
+              formControlName="email" 
+              type="email" 
+              placeholder="ejemplo@hospital.com"
+              class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors text-slate-800 placeholder-slate-400"
+              [class.border-red-300]="userForm.get('email')?.invalid && userForm.get('email')?.touched"
+            />
+            <div *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched" 
+                 class="mt-1 text-sm text-red-600">
+              <span *ngIf="userForm.get('email')?.errors?.['required']">Este campo es obligatorio</span>
+              <span *ngIf="userForm.get('email')?.errors?.['email']">Ingrese un email válido</span>
+            </div>
+          </div>
+
+          <!-- Teléfono -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-slate-700 mb-2" for="phoneNumber">
+              Número de Teléfono *
+            </label>
+            <input 
+              id="phoneNumber"
+              formControlName="phoneNumber" 
+              placeholder="(55) 1234-5678"
+              class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors text-slate-800 placeholder-slate-400"
+              [class.border-red-300]="userForm.get('phoneNumber')?.invalid && userForm.get('phoneNumber')?.touched"
+            />
+            <div *ngIf="userForm.get('phoneNumber')?.invalid && userForm.get('phoneNumber')?.touched" 
+                 class="mt-1 text-sm text-red-600">
+              Este campo es obligatorio
+            </div>
+          </div>
+        </div>
+
+        <!-- Información de Acceso -->
+        <div>
+          <h3 class="text-lg font-medium text-slate-800 mb-4 pb-2 border-b border-slate-200">
+            Información de Acceso
+          </h3>
+          
+          <!-- Contraseña -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-slate-700 mb-2" for="password">
+              Contraseña *
+            </label>
+            <div class="relative">
+              <input 
+                id="password"
+                formControlName="password" 
+                [type]="showPassword ? 'text' : 'password'"
+                placeholder="Mínimo 8 caracteres"
+                class="w-full px-4 py-3 pr-12 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors text-slate-800 placeholder-slate-400"
+                [class.border-red-300]="userForm.get('password')?.invalid && userForm.get('password')?.touched"
+              />
+              <button 
+                type="button"
+                (click)="togglePasswordVisibility()"
+                class="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600 transition-colors">
+                <svg *ngIf="!showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+                <svg *ngIf="showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"/>
+                </svg>
+              </button>
+            </div>
+            <div *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched" 
+                 class="mt-1 text-sm text-red-600">
+              <span *ngIf="userForm.get('password')?.errors?.['required']">Este campo es obligatorio</span>
+              <span *ngIf="userForm.get('password')?.errors?.['minlength']">La contraseña debe tener al menos 8 caracteres</span>
+            </div>
+            <p class="mt-1 text-xs text-slate-500">
+              Recomendamos usar al menos 8 caracteres con mayúsculas, minúsculas y números
+            </p>
+          </div>
+        </div>
+
+        <!-- Información Profesional -->
+        <div>
+          <h3 class="text-lg font-medium text-slate-800 mb-4 pb-2 border-b border-slate-200">
+            Información Profesional
+          </h3>
+          
+          <!-- Rol -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-slate-700 mb-2" for="role">
+              Rol en el Sistema *
+            </label>
+            <select 
+              id="role"
+              formControlName="role"
+              (change)="onRoleChange()"
+              class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors text-slate-800 bg-white"
+              [class.border-red-300]="userForm.get('role')?.invalid && userForm.get('role')?.touched">
+              <option value="" disabled selected>Seleccione un rol</option>
+              <option *ngFor="let role of roles" [value]="role.value">{{ role.label }}</option>
+            </select>
+            <div *ngIf="userForm.get('role')?.invalid && userForm.get('role')?.touched" 
+                 class="mt-1 text-sm text-red-600">
+              Este campo es obligatorio
+            </div>
+          </div>
+
+          <!-- Especialidad (solo para médicos) -->
+          <div *ngIf="showSpecialtyField" class="mb-4">
+            <label class="block text-sm font-medium text-slate-700 mb-2" for="specialty">
+              Especialidad Médica *
+            </label>
+            <select 
+              id="specialty"
+              formControlName="specialty"
+              class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors text-slate-800 bg-white"
+              [class.border-red-300]="userForm.get('specialty')?.invalid && userForm.get('specialty')?.touched">
+              <option value="" disabled selected>Seleccione una especialidad</option>
+              <option *ngFor="let specialty of specialties" [value]="specialty">{{ specialty }}</option>
+            </select>
+            <div *ngIf="userForm.get('specialty')?.invalid && userForm.get('specialty')?.touched" 
+                 class="mt-1 text-sm text-red-600">
+              Este campo es obligatorio para médicos
+            </div>
+          </div>
+        </div>
+
+        <!-- Términos y condiciones -->
+        <div class="flex items-start space-x-3">
+          <input 
+            id="acceptTerms"
+            type="checkbox" 
+            formControlName="acceptTerms"
+            class="mt-1 w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500 focus:ring-2"
+          />
+          <label for="acceptTerms" class="text-sm text-slate-700">
+            Acepto los 
+            <a href="#" class="text-blue-600 hover:text-blue-800 underline">términos y condiciones</a> 
+            y la 
+            <a href="#" class="text-blue-600 hover:text-blue-800 underline">política de privacidad</a> 
+            del sistema hospitalario
+          </label>
+        </div>
+        <div *ngIf="userForm.get('acceptTerms')?.invalid && userForm.get('acceptTerms')?.touched" 
+             class="text-sm text-red-600">
+          Debe aceptar los términos y condiciones para continuar
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-slate-200">
+          <button 
+            type="button"
+            class="flex-1 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium">
+            Cancelar
+          </button>
+          
+          <button 
+            type="submit"
+            class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center"
+            [disabled]="loading || userForm.invalid">
+            
+            <span *ngIf="!loading" class="flex items-center">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+              </svg>
+              Registrar Usuario
+            </span>
+            
+            <span *ngIf="loading" class="flex items-center">
+              <svg class="animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Registrando...
+            </span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Footer informativo -->
+    <div class="mt-6 text-center">
+      <p class="text-sm text-slate-500">
+        Los campos marcados con * son obligatorios. 
+        <br>
+        Asegúrese de que la información sea correcta antes de enviar el formulario.
+      </p>
+    </div>
+
   </div>
 </div>
