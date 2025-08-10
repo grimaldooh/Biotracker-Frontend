@@ -17,10 +17,21 @@ export class SidebarComponent implements OnInit {
     menuItems: []
   };
 
+  isMobileMenuOpen = false;
+
+
   constructor(private router: Router) {}
 
   ngOnInit() {
     this.loadSidebarConfig();
+  }
+
+  openMobileMenu(): void {
+    this.isMobileMenuOpen = true;
+  }
+
+  closeMobileMenu(): void {
+    this.isMobileMenuOpen = false;
   }
 
   private loadSidebarConfig() {
@@ -224,10 +235,26 @@ export class SidebarComponent implements OnInit {
         },
         {
           id: 'appointments',
-          label: 'Mis Citas',
+          label: 'Citas',
           icon: 'M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1',
-          route: '/patient/schedule',
-          isActive: false
+          route: '',
+          isActive: false,
+          children: [
+            {
+              id: 'schedule-appointment',
+              label: 'Agendar Cita',
+              route: '/patient/schedule',
+              icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
+              isActive: false
+            },
+            {
+              id: 'my-appointments',
+              label: 'Mis Citas',
+              route: '/patient/my-appointments',
+              icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
+              isActive: false
+            }
+          ]
         },
         {
           id: 'samples',
@@ -256,6 +283,8 @@ export class SidebarComponent implements OnInit {
 
   navigate(route: string) {
     this.router.navigate([route]);
+    this.closeMobileMenu();
+
   }
 
   toggleSubmenu(menuItem: MenuItem) {

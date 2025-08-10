@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SampleService } from '../../../core/services/sample.service';
 import { StatusColorPipe } from '../../../core/pipes/status-color.pipe'; // Ajusta la ruta
+import { PatientReport, ReportsService } from '../../../core/services/reports.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-patient-samples',
@@ -15,10 +17,22 @@ export class SamplesComponent implements OnInit {
   loading = true;
   selectedSample: any = null;
   patientId = '60ede05e-702c-442a-aba1-4507bb2fe542'; // Puedes obtenerlo de un servicio de sesión
+  reports : PatientReport[] = [];
 
-  constructor(private sampleService: SampleService) {}
 
-  ngOnInit() {
+  constructor(
+    private sampleService: SampleService,
+    private reportsService: ReportsService,
+    private router: Router
+  ) {}
+  
+  ngOnInit(): void {
+    this.loadSamples();
+    this.loadReports();
+  }
+
+  loadSamples() {
+    this.loading = true;
     this.sampleService.getSamplesByPatient(this.patientId).subscribe({
       next: (data) => {
         this.samples = data;
@@ -26,6 +40,17 @@ export class SamplesComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
+      }
+    });
+  }
+
+   loadReports(): void {
+    this.reportsService.getPatientReports(this.patientId).subscribe({
+      next: (reports) => {
+        this.reports = reports;
+      },
+      error: () => {
+        console.error('Error loading reports');
       }
     });
   }
@@ -52,4 +77,116 @@ export class SamplesComponent implements OnInit {
         return 'bg-slate-50 text-slate-700 border border-slate-200';
     }
   }
+
+  getReportForSample(sampleId: string): PatientReport | undefined {
+    return this.reports.find(report => report.sampleId === sampleId);
+  }
+
+  hasPatientFriendlyReport(sampleId: string): boolean {
+    const report = this.getReportForSample(sampleId);
+    return !!(report?.s3UrlPatient);
+  }
+
+  hasMedicalReport(sampleId: string): boolean {
+    const report = this.getReportForSample(sampleId);
+    return !!(report?.s3Url);
+  }
+
+  viewPatientReport(sampleId: string): void {
+    const report = this.getReportForSample(sampleId);
+    if (report?.s3UrlPatient) {
+      this.router.navigate(['/patient/report'], {
+        queryParams: {
+          sampleId: sampleId,
+          s3Url: report.s3UrlPatient,
+          isPatientFriendly: 'true'
+        }
+      });
+    }
+  }
+
+  viewMedicalReport(sampleId: string): void {
+    const report = this.getReportForSample(sampleId);
+    if (report?.s3Url) {
+      this.router.navigate(['/patient/report'], {
+        queryParams: {
+          sampleId: sampleId,
+          s3Url: report.s3Url,
+          isPatientFriendly: 'false'
+        }
+      });
+    }
+  }
+
+// Métodos para parsear los enums y mejorar la UI
+
+getSampleTypeLabel(type: string): string {
+  const labels: { [key: string]: string } = {
+    'BLOOD': 'Análisis de Sangre',
+    'DNA': 'Análisis de ADN',
+    'TISSUE': 'Análisis de Tejido',
+    'SALIVA': 'Análisis de Saliva',
+    'URINE': 'Análisis de Orina',
+    'MUTATIONS': 'Análisis de Mutaciones'
+  };
+  return labels[type] || type;
+}
+
+getStatusLabel(status: string): string {
+  const labels: { [key: string]: string } = {
+    'PENDING': 'Pendiente',
+    'IN_ANALYSIS': 'En Análisis',
+    'COMPLETED': 'Completado'
+  };
+  return labels[status] || status;
+}
+
+getStatusStyle(status: string): string {
+  const styles: { [key: string]: string } = {
+    'PENDING': 'bg-amber-100 text-amber-800 border-amber-200',
+    'IN_ANALYSIS': 'bg-blue-100 text-blue-800 border-blue-200',
+    'COMPLETED': 'bg-emerald-100 text-emerald-800 border-emerald-200'
+  };
+  return styles[status] || 'bg-slate-100 text-slate-800 border-slate-200';
+}
+
+getSampleTypeIcon(type: string): { icon: string, bgColor: string, textColor: string } {
+  const icons: { [key: string]: { icon: string, bgColor: string, textColor: string } } = {
+    'BLOOD': {
+      icon: 'M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8Z',
+      bgColor: 'bg-red-100',
+      textColor: 'text-red-600'
+    },
+    'DNA': {
+      icon: 'M4,2H20A2,2 0 0,1 22,4V20A2,2 0 0,1 20,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2M4,4V20H20V4H4M6,6H18V8H6V6M6,10H18V12H6V10M6,14H18V16H6V14M6,18H18V20H6V18Z',
+      bgColor: 'bg-purple-100',
+      textColor: 'text-purple-600'
+    },
+    'TISSUE': {
+      icon: 'M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M12,3A1,1 0 0,1 13,4A1,1 0 0,1 12,5A1,1 0 0,1 11,4A1,1 0 0,1 12,3',
+      bgColor: 'bg-orange-100',
+      textColor: 'text-orange-600'
+    },
+    'SALIVA': {
+      icon: 'M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6Z',
+      bgColor: 'bg-cyan-100',
+      textColor: 'text-cyan-600'
+    },
+    'URINE': {
+      icon: 'M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3',
+      bgColor: 'bg-yellow-100',
+      textColor: 'text-yellow-600'
+    },
+    'MUTATIONS': {
+      icon: 'M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z',
+      bgColor: 'bg-emerald-100',
+      textColor: 'text-emerald-600'
+    }
+  };
+  return icons[type] || {
+    icon: 'M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3',
+    bgColor: 'bg-slate-100',
+    textColor: 'text-slate-600'
+  };
+}
 }

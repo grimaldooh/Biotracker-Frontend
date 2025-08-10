@@ -1,58 +1,250 @@
-<div class="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col items-center py-8 px-4">
-  <div class="w-full max-w-lg mx-auto bg-white rounded-3xl shadow-xl p-8 border border-blue-100">
-    <h2 class="text-2xl font-bold text-blue-900 mb-6 text-center">Agendar nueva cita</h2>
+<div class="min-h-screen bg-slate-50 py-4 md:py-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-2xl mx-auto">
     
-    <form [formGroup]="appointmentForm" (ngSubmit)="submit()" class="space-y-4">
-      <!-- Especialidad -->
-      <div>
-        <label class="block text-sm font-medium text-blue-700 mb-2">Especialidad</label>
-        <select formControlName="specialty" (change)="onSpecialtyChange()" 
-                class="w-full px-4 py-2 rounded-xl border border-blue-200 bg-white text-blue-900 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all">
-          <option value="">Selecciona una especialidad</option>
-          <option *ngFor="let specialty of specialties" [value]="specialty">{{ specialty }}</option>
-        </select>
+    <!-- Header -->
+    <div class="text-center mb-6 md:mb-8">
+      <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1"/>
+        </svg>
       </div>
+      <h1 class="text-2xl md:text-3xl font-semibold text-slate-800 mb-2">Agendar Nueva Cita</h1>
+      <p class="text-slate-600">Seleccione el tipo de cita y complete la información requerida</p>
+    </div>
 
-      <!-- Doctor -->
-      <div>
-        <label class="block text-sm font-medium text-blue-700 mb-2">Doctor</label>
-        <select formControlName="medicId" 
-                class="w-full px-4 py-2 rounded-xl border border-blue-200 bg-white text-blue-900 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all">
-          <option value="">Selecciona un doctor</option>
-          <option *ngFor="let medic of filteredMedics" [value]="medic.id">{{ medic.name }}</option>
-        </select>
+    <!-- Formulario -->
+    <div class="bg-white rounded-lg border border-slate-200 p-6 md:p-8">
+      <form [formGroup]="appointmentForm" (ngSubmit)="submit()" class="space-y-6">
+        
+        <!-- Selector de tipo de cita -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-3">
+            Tipo de Cita *
+          </label>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div class="relative">
+              <input
+                type="radio"
+                id="medical"
+                value="medical"
+                formControlName="appointmentType"
+                (change)="onAppointmentTypeChange()"
+                class="sr-only"
+              />
+              <label
+                for="medical"
+                class="flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer transition-all hover:bg-slate-50"
+                [class.border-blue-500]="appointmentForm.get('appointmentType')?.value === 'medical'"
+                [class.bg-blue-50]="appointmentForm.get('appointmentType')?.value === 'medical'"
+                [class.border-slate-200]="appointmentForm.get('appointmentType')?.value !== 'medical'"
+              >
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-medium text-slate-800">Cita Médica</p>
+                  <p class="text-sm text-slate-600">Consulta con especialista</p>
+                </div>
+              </label>
+            </div>
+
+            <div class="relative">
+              <input
+                type="radio"
+                id="laboratory"
+                value="laboratory"
+                formControlName="appointmentType"
+                (change)="onAppointmentTypeChange()"
+                class="sr-only"
+              />
+              <label
+                for="laboratory"
+                class="flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer transition-all hover:bg-slate-50"
+                [class.border-green-500]="appointmentForm.get('appointmentType')?.value === 'laboratory'"
+                [class.bg-green-50]="appointmentForm.get('appointmentType')?.value === 'laboratory'"
+                [class.border-slate-200]="appointmentForm.get('appointmentType')?.value !== 'laboratory'"
+              >
+                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3"/>
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-medium text-slate-800">Cita de Laboratorio</p>
+                  <p class="text-sm text-slate-600">Análisis y muestras</p>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campos para Cita Médica -->
+        <div *ngIf="appointmentForm.get('appointmentType')?.value === 'medical'" class="space-y-6">
+          <div class="border-l-4 border-blue-500 pl-4">
+            <h3 class="text-lg font-medium text-slate-800 mb-4">Información de la Consulta Médica</h3>
+            
+            <!-- Especialidad -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-slate-700 mb-2">Especialidad *</label>
+              <select 
+                formControlName="specialty" 
+                (change)="onSpecialtyChange()"
+                class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors text-slate-800 bg-white">
+                <option value="">Seleccione una especialidad</option>
+                <option *ngFor="let specialty of specialties" [value]="specialty">{{ specialty }}</option>
+              </select>
+            </div>
+
+            <!-- Doctor -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-slate-700 mb-2">Doctor *</label>
+              <select 
+                formControlName="medicId"
+                class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors text-slate-800 bg-white">
+                <option value="">Seleccione un doctor</option>
+                <option *ngFor="let medic of filteredMedics" [value]="medic.id">{{ medic.name }}</option>
+              </select>
+            </div>
+
+            <!-- Tipo de visita -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-slate-700 mb-2">Tipo de Visita *</label>
+              <select 
+                formControlName="visitType"
+                class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors text-slate-800 bg-white">
+                <option value="">Seleccione el tipo</option>
+                <option *ngFor="let type of visitTypes" [value]="type.value">{{ type.label }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campos para Cita de Laboratorio -->
+        <div *ngIf="appointmentForm.get('appointmentType')?.value === 'laboratory'" class="space-y-6">
+          <div class="border-l-4 border-green-500 pl-4">
+            <h3 class="text-lg font-medium text-slate-800 mb-4">Información del Análisis de Laboratorio</h3>
+            
+            <!-- Tipo de muestra -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-slate-700 mb-3">Tipo de Muestra *</label>
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div *ngFor="let sampleType of sampleTypes" class="relative">
+                  <input
+                    type="radio"
+                    [id]="sampleType.value"
+                    [value]="sampleType.value"
+                    formControlName="sampleType"
+                    class="sr-only"
+                  />
+                  <label
+                    [for]="sampleType.value"
+                    class="flex flex-col items-center p-3 rounded-lg border-2 cursor-pointer transition-all hover:bg-slate-50 text-center"
+                    [class.border-green-500]="appointmentForm.get('sampleType')?.value === sampleType.value"
+                    [class.bg-green-50]="appointmentForm.get('sampleType')?.value === sampleType.value"
+                    [class.border-slate-200]="appointmentForm.get('sampleType')?.value !== sampleType.value"
+                  >
+                    <span class="text-2xl mb-1">{{ sampleType.icon }}</span>
+                    <span class="text-xs font-medium text-slate-800">{{ sampleType.label }}</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campos comunes -->
+        <div *ngIf="appointmentForm.get('appointmentType')?.value" class="space-y-4">
+          <!-- Fecha y hora -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">Fecha y Hora *</label>
+            <input 
+              type="datetime-local" 
+              formControlName="visitDate"
+              class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors text-slate-800">
+          </div>
+
+          <!-- Notas -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">Notas (opcional)</label>
+            <textarea 
+              formControlName="notes" 
+              rows="4"
+              placeholder="Agregue información adicional sobre la cita..."
+              class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-colors text-slate-800 placeholder-slate-400 resize-none">
+            </textarea>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-slate-200">
+          <button 
+            type="button"
+            class="flex-1 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium">
+            Cancelar
+          </button>
+          
+          <button 
+            type="submit"
+            class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center"
+            [disabled]="loading || appointmentForm.invalid">
+            
+            <span *ngIf="!loading" class="flex items-center">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              {{ getSubmitButtonText() }}
+            </span>
+            
+            <span *ngIf="loading" class="flex items-center">
+              <svg class="animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Agendando...
+            </span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Footer informativo -->
+    <div class="mt-6 text-center">
+      <p class="text-sm text-slate-500">
+        Los campos marcados con * son obligatorios. Asegúrese de que la información sea correcta.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal de éxito -->
+<div *ngIf="showSuccessModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-lg max-w-md w-full p-6 transform transition-all duration-300 scale-100">
+    <div class="text-center">
+      <!-- Icono de éxito -->
+      <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
       </div>
-
-      <!-- Tipo de visita -->
-      <div>
-        <label class="block text-sm font-medium text-blue-700 mb-2">Tipo de visita</label>
-        <select formControlName="visitType" 
-                class="w-full px-4 py-2 rounded-xl border border-blue-200 bg-white text-blue-900 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all">
-          <option value="">Selecciona el tipo</option>
-          <option *ngFor="let type of visitTypes" [value]="type.value">{{ type.label }}</option>
-        </select>
-      </div>
-
-      <!-- Fecha y hora -->
-      <div>
-        <label class="block text-sm font-medium text-blue-700 mb-2">Fecha y hora</label>
-        <input type="datetime-local" formControlName="visitDate" 
-               class="w-full px-4 py-2 rounded-xl border border-blue-200 bg-white text-blue-900 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all">
-      </div>
-
-      <!-- Notas -->
-      <div>
-        <label class="block text-sm font-medium text-blue-700 mb-2">Notas (opcional)</label>
-        <textarea formControlName="notes" rows="3" 
-                  class="w-full px-4 py-2 rounded-xl border border-blue-200 bg-white text-blue-900 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
-                  placeholder="Motivo de la consulta o información adicional..."></textarea>
-      </div>
-
+      
+      <!-- Título -->
+      <h3 class="text-xl font-semibold text-slate-800 mb-2">¡Cita Agendada!</h3>
+      
+      <!-- Mensaje -->
+      <p class="text-slate-600 mb-6">
+        Su {{ successMessage }} ha sido agendada exitosamente.
+      </p>
+      
       <!-- Botón -->
-      <button type="submit" [disabled]="appointmentForm.invalid" 
-              class="w-full py-3 rounded-xl bg-blue-600 text-white font-semibold text-lg shadow hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all">
-        Agendar cita
+      <button 
+        (click)="closeSuccessModal()"
+        class="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
+        Entendido
       </button>
-    </form>
+    </div>
   </div>
 </div>

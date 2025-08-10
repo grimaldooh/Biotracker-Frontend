@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
-import { FormsModule } from '@angular/forms';
-import { PatientService } from '../../../core/services/patient.service';
 import { HospitalService } from '../../../core/services/hospital.service';
+import { LabAppointmentService, LabAppointmentCreationDTO } from '../../../core/services/lab-appointment.service';
 
 interface Medic {
   id: string;
@@ -14,48 +13,64 @@ interface Medic {
 @Component({
   selector: 'app-schedule',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './schedule.component.html',
-  styleUrl: './schedule.component.css'
+  styleUrls: ['./schedule.component.css']
 })
 export class ScheduleComponent implements OnInit {
-  hospitalId = '00d79e66-4457-4d27-9228-fe467823ce8e';
-  patientId = '60ede05e-702c-442a-aba1-4507bb2fe542'; // ID del paciente logueado
-  medics: Medic[] = [];
-  specialties: string[] = [];
-  filteredMedics: Medic[] = [];
-  loadingMedics = true;
   appointmentForm: FormGroup;
-  
+  medics: Medic[] = [];
+  filteredMedics: Medic[] = [];
+  specialties: string[] = [];
+  loading = false;
+  loadingMedics = false;
+  showSuccessModal = false;
+  successMessage = '';
+
+  // IDs hardcodeados
+  patientId = '60ede05e-702c-442a-aba1-4507bb2fe542';
+  hospitalId = '00d79e66-4457-4d27-9228-fe467823ce8e';
+
   visitTypes = [
     { value: 'CONSULTATION', label: 'Consulta' },
     { value: 'FOLLOW_UP', label: 'Seguimiento' },
-    { value: 'SURGERY', label: 'Cirugía' },
     { value: 'EMERGENCY', label: 'Emergencia' },
-    { value: 'OTHER', label: 'Otro' }
+    { value: 'ROUTINE_CHECK', label: 'Chequeo de rutina' }
+  ];
+
+  sampleTypes = [
+    { value: 'BLOOD', label: 'Sangre', icon: '🩸' },
+    { value: 'DNA', label: 'ADN', icon: '🧬' },
+    { value: 'TISSUE', label: 'Tejido', icon: '🔬' },
+    { value: 'SALIVA', label: 'Saliva', icon: '💧' },
+    { value: 'URINE', label: 'Orina', icon: '🧪' },
+    { value: 'MUTATIONS', label: 'Mutaciones', icon: '⚡' }
   ];
 
   constructor(
     private fb: FormBuilder,
-    private patientService: PatientService,
-    private hospitalService: HospitalService
+    private hospitalService: HospitalService,
+    private labAppointmentService: LabAppointmentService
   ) {
     this.appointmentForm = this.fb.group({
-      specialty: ['', Validators.required],
-      medicId: ['', Validators.required],
-      visitType: ['', Validators.required],
+      appointmentType: ['', Validators.required],
+      // Campos para cita médica
+      specialty: [''],
+      medicId: [''],
+      visitType: [''],
+      // Campos para cita de laboratorio
+      sampleType: [''],
+      // Campos comunes
       visitDate: ['', Validators.required],
       notes: ['']
     });
   }
 
-  ngOnInit() {
-    // Se traen los médicos existentes para obtener las especialidades
+  ngOnInit(): void {
+    this.loadingMedics = true;
     this.hospitalService.getMedicsByHospital(this.hospitalId).subscribe({
       next: (data) => {
-        console.log('Médicos cargados:', data);
         this.medics = data;
-        // Se obtienen las especialidades únicas de los médicos
         this.specialties = Array.from(new Set(data.map(m => m.specialty).filter((s): s is string => typeof s === 'string')));
         this.loadingMedics = false;
       },
@@ -65,32 +80,121 @@ export class ScheduleComponent implements OnInit {
     });
   }
 
-  onSpecialtyChange() {
-    const specialty = this.appointmentForm.value.specialty;
-    this.filteredMedics = this.medics.filter(m => m.specialty === specialty);
+  onAppointmentTypeChange(): void {
+    const appointmentType = this.appointmentForm.get('appointmentType')?.value;
+    // Limpiar campos cuando cambie el tipo
+    this.appointmentForm.patchValue({
+      specialty: '',
+      medicId: '',
+      visitType: '',
+      sampleType: ''
+    });
+
+    // Configurar validaciones según el tipo
+    if (appointmentType === 'medical') {
+      this.appointmentForm.get('specialty')?.setValidators([Validators.required]);
+      this.appointmentForm.get('medicId')?.setValidators([Validators.required]);
+      this.appointmentForm.get('visitType')?.setValidators([Validators.required]);
+      this.appointmentForm.get('sampleType')?.clearValidators();
+    } else if (appointmentType === 'laboratory') {
+      this.appointmentForm.get('sampleType')?.setValidators([Validators.required]);
+      this.appointmentForm.get('specialty')?.clearValidators();
+      this.appointmentForm.get('medicId')?.clearValidators();
+      this.appointmentForm.get('visitType')?.clearValidators();
+    }
+
+    // Actualizar validaciones
+    this.appointmentForm.get('specialty')?.updateValueAndValidity();
+    this.appointmentForm.get('medicId')?.updateValueAndValidity();
+    this.appointmentForm.get('visitType')?.updateValueAndValidity();
+    this.appointmentForm.get('sampleType')?.updateValueAndValidity();
+
+    // Limpiar médicos filtrados
+    this.filteredMedics = [];
+  }
+
+  onSpecialtyChange(): void {
+    const selectedSpecialty = this.appointmentForm.get('specialty')?.value;
+    this.filteredMedics = this.medics.filter(medic => medic.specialty === selectedSpecialty);
     this.appointmentForm.patchValue({ medicId: '' });
   }
 
-  submit() {
-    if (this.appointmentForm.invalid) return;
-    
+  getSubmitButtonText(): string {
+    const appointmentType = this.appointmentForm.get('appointmentType')?.value;
+    return appointmentType === 'laboratory' ? 'Agendar Cita de Laboratorio' : 'Agendar Cita Médica';
+  }
+
+  submit(): void {
+    if (this.appointmentForm.valid) {
+      this.loading = true;
+      const appointmentType = this.appointmentForm.get('appointmentType')?.value;
+
+      if (appointmentType === 'medical') {
+        this.createMedicalVisit();
+      } else if (appointmentType === 'laboratory') {
+        this.createLabAppointment();
+      }
+    } else {
+      Object.keys(this.appointmentForm.controls).forEach(key => {
+        this.appointmentForm.get(key)?.markAsTouched();
+      });
+    }
+  }
+
+  private createMedicalVisit(): void {
     const body = {
       patientId: { id: this.patientId },
       doctorId: { id: this.appointmentForm.value.medicId },
       visitDate: this.appointmentForm.value.visitDate,
       type: this.appointmentForm.value.visitType,
       medicalArea: this.appointmentForm.value.specialty,
-      notes: this.appointmentForm.value.notes
+      notes: this.appointmentForm.value.notes || ''
     };
 
     this.hospitalService.createMedicalVisit(this.hospitalId, body).subscribe({
       next: () => {
-        alert('Cita médica creada exitosamente');
-        this.appointmentForm.reset();
+        this.successMessage = 'cita médica';
+        this.showSuccessModal = true;
+        this.resetForm();
+        this.loading = false;
       },
       error: () => {
-        alert('Error al crear la cita médica');
+        this.loading = false;
+        console.error('Error al crear la cita médica');
       }
     });
+  }
+
+  private createLabAppointment(): void {
+    const appointment: LabAppointmentCreationDTO = {
+      medicalEntityId: this.hospitalId,
+      doctorId: null,
+      patientId: this.patientId,
+      sampleType: this.appointmentForm.value.sampleType,
+      notes: this.appointmentForm.value.notes || ''
+    };
+
+    this.labAppointmentService.create(appointment).subscribe({
+      next: () => {
+        this.successMessage = 'cita de laboratorio';
+        this.showSuccessModal = true;
+        this.resetForm();
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+        console.error('Error al crear la cita de laboratorio');
+      }
+    });
+  }
+
+  private resetForm(): void {
+    this.appointmentForm.reset();
+    this.filteredMedics = [];
+  }
+
+  closeSuccessModal(): void {
+    this.showSuccessModal = false;
+    this.successMessage = '';
   }
 }

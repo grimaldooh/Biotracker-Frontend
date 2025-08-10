@@ -1,7 +1,36 @@
-<div class="w-64 bg-white h-full border-r border-slate-200 flex flex-col">
+<div 
+  *ngIf="isMobileMenuOpen" 
+  class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+  (click)="closeMobileMenu()">
+</div>
+
+<!-- Sidebar -->
+<div class="lg:w-64 bg-white h-full border-r border-slate-200 flex flex-col transition-transform duration-300 ease-in-out z-50"
+     [class.fixed]="true"
+     [class.inset-y-0]="true" 
+     [class.left-0]="true"
+     [class.-translate-x-full]="!isMobileMenuOpen"
+     [class.translate-x-0]="isMobileMenuOpen"
+     [class.lg:translate-x-0]="true"
+     [class.lg:static]="true"
+     [class.lg:inset-0]="false"
+     [class.w-80]="true"
+     [class.lg:w-64]="true">
+  
   <!-- Header del Sidebar -->
   <div class="p-6 border-b border-slate-200">
-    <h2 class="text-lg font-semibold text-slate-800">{{ sidebarConfig.title }}</h2>
+    <div class="flex items-center justify-between">
+      <h2 class="text-lg font-semibold text-slate-800">{{ sidebarConfig.title }}</h2>
+      
+      <!-- Botón cerrar para móvil -->
+      <button 
+        class="lg:hidden p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+        (click)="closeMobileMenu()">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
   </div>
 
   <!-- Menu Items -->
@@ -13,7 +42,7 @@
         <button 
           *ngIf="!item.children"
           (click)="navigate(item.route)"
-          class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors group"
+          class="w-full flex items-center px-3 py-3 lg:py-2 text-sm font-medium rounded-lg text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors group"
           [class.bg-blue-50]="item.isActive"
           [class.text-blue-700]="item.isActive">
           
@@ -23,14 +52,14 @@
                viewBox="0 0 24 24">
             <path [attr.d]="item.icon"/>
           </svg>
-          {{ item.label }}
+          <span class="text-base lg:text-sm">{{ item.label }}</span>
         </button>
 
         <!-- Menu Item con Submenu -->
         <button 
           *ngIf="item.children"
           (click)="toggleSubmenu(item)"
-          class="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors group">
+          class="w-full flex items-center justify-between px-3 py-3 lg:py-2 text-sm font-medium rounded-lg text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors group">
           
           <div class="flex items-center">
             <svg class="w-5 h-5 mr-3 text-slate-500 group-hover:text-slate-700" 
@@ -38,7 +67,7 @@
                  viewBox="0 0 24 24">
               <path [attr.d]="item.icon"/>
             </svg>
-            {{ item.label }}
+            <span class="text-base lg:text-sm">{{ item.label }}</span>
           </div>
           
           <svg class="w-4 h-4 text-slate-400 transition-transform"
@@ -57,7 +86,7 @@
         <button 
           *ngFor="let child of item.children"
           (click)="navigate(child.route)"
-          class="w-full flex items-center px-3 py-2 text-sm rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+          class="w-full flex items-center px-3 py-3 lg:py-2 text-sm rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
           [class.bg-blue-50]="child.isActive"
           [class.text-blue-700]="child.isActive">
           
@@ -67,7 +96,7 @@
                viewBox="0 0 24 24">
             <path [attr.d]="child.icon"/>
           </svg>
-          {{ child.label }}
+          <span class="text-base lg:text-sm">{{ child.label }}</span>
         </button>
       </div>
     </div>
@@ -75,11 +104,11 @@
 
   <!-- Footer del Sidebar -->
   <div class="p-4 border-t border-slate-200">
-    <button class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg text-red-600 hover:bg-red-50 transition-colors">
+    <button class="w-full flex items-center px-3 py-3 lg:py-2 text-sm font-medium rounded-lg text-red-600 hover:bg-red-50 transition-colors">
       <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
       </svg>
-      Cerrar Sesión
+      <span class="text-base lg:text-sm">Cerrar Sesión</span>
     </button>
   </div>
 </div>

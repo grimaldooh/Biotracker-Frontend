@@ -1,0 +1,212 @@
+<div class="min-h-screen bg-slate-50 py-4 md:py-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl mx-auto">
+    
+    <!-- Header -->
+    <div class="mb-6 md:mb-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-semibold text-slate-800 mb-2">Mis Citas Médicas</h1>
+          <p class="text-slate-600">Gestiona y consulta tus citas médicas</p>
+        </div>
+        
+        <!-- Botón agendar nueva cita -->
+        <div class="mt-4 md:mt-0">
+          <button 
+            (click)="navigateToNewAppointment()"
+            routerLink="/patient/schedule"
+            class="w-full md:w-auto inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+            Agendar Nueva Cita
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="bg-white rounded-lg border border-slate-200 mb-6">
+      <div class="flex border-b border-slate-200">
+        <button 
+          (click)="setActiveTab('pending')"
+          class="flex-1 px-6 py-4 text-sm font-medium text-center transition-colors"
+          [class.text-blue-600]="activeTab === 'pending'"
+          [class.border-b-2]="activeTab === 'pending'"
+          [class.border-blue-600]="activeTab === 'pending'"
+          [class.text-slate-600]="activeTab !== 'pending'">
+          <div class="flex items-center justify-center">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
+            </svg>
+            Citas Pendientes ({{ pendingVisits.length }})
+          </div>
+        </button>
+        
+        <button 
+          (click)="setActiveTab('all')"
+          class="flex-1 px-6 py-4 text-sm font-medium text-center transition-colors"
+          [class.text-blue-600]="activeTab === 'all'"
+          [class.border-b-2]="activeTab === 'all'"
+          [class.border-blue-600]="activeTab === 'all'"
+          [class.text-slate-600]="activeTab !== 'all'">
+          <div class="flex items-center justify-center">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1"/>
+            </svg>
+            Todas las Citas ({{ allVisits.length }})
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div *ngIf="loading" class="bg-white rounded-lg border border-slate-200 p-12">
+      <div class="flex items-center justify-center">
+        <div class="flex items-center space-x-3">
+          <div class="animate-spin w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+          <span class="text-slate-600">Cargando citas médicas...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de citas -->
+    <div *ngIf="!loading" class="space-y-4">
+      
+      <!-- Citas Pendientes -->
+      <div *ngIf="activeTab === 'pending'">
+        <!-- Empty state -->
+        <div *ngIf="pendingVisits.length === 0" class="bg-white rounded-lg border border-slate-200 p-12">
+          <div class="text-center">
+            <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
+              </svg>
+            </div>
+            <h3 class="text-slate-800 font-medium mb-2">No tienes citas pendientes</h3>
+            <p class="text-slate-600 text-sm mb-4">Agenda una nueva cita para recibir atención médica.</p>
+            <button 
+              routerLink="/patient/schedule"
+              class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+              Agendar Cita
+            </button>
+          </div>
+        </div>
+
+        <!-- Lista de citas pendientes -->
+        <div *ngFor="let visit of pendingVisits" class="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-sm transition-shadow">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div class="flex-1">
+              <div class="flex items-start space-x-4">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+                  </svg>
+                </div>
+                
+                <div class="flex-1 min-w-0">
+                  <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-2">
+                    <h3 class="text-lg font-medium text-slate-800">{{ visit.medicalArea }}</h3>
+                    
+                  </div>
+                  
+                  <div class="space-y-1 text-sm text-slate-600">
+                    <p class="flex items-center">
+                      <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+                      </svg>
+                      Dr. {{ visit.doctorName }}
+                    </p>
+                    <p class="flex items-center">
+                      <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1"/>
+                      </svg>
+                      {{ visit.visitDate | date:'dd/MM/yyyy HH:mm' }}
+                    </p>
+                    <p class="flex items-center">
+                      <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3"/>
+                      </svg>
+                      {{ getVisitTypeLabel(visit.type) }}
+                    </p>
+                    <p *ngIf="visit.notes" class="flex items-start">
+                      <svg class="w-4 h-4 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                      </svg>
+                      {{ visit.notes }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Todas las Citas -->
+      <div *ngIf="activeTab === 'all'">
+        <!-- Empty state -->
+        <div *ngIf="allVisits.length === 0" class="bg-white rounded-lg border border-slate-200 p-12">
+          <div class="text-center">
+            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1"/>
+              </svg>
+            </div>
+            <h3 class="text-slate-800 font-medium mb-2">No tienes citas registradas</h3>
+            <p class="text-slate-600 text-sm">Comienza agendando tu primera cita médica.</p>
+          </div>
+        </div>
+
+        <!-- Lista de todas las citas -->
+        <div *ngFor="let visit of allVisits" class="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-sm transition-shadow">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div class="flex-1">
+              <div class="flex items-start space-x-4">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+                  </svg>
+                </div>
+                
+                <div class="flex-1 min-w-0">
+                  <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-2">
+                    <h3 class="text-lg font-medium text-slate-800">{{ visit.medicalArea }}</h3>
+                   
+                  </div>
+                  
+                  <div class="space-y-1 text-sm text-slate-600">
+                    <p class="flex items-center">
+                      <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+                      </svg>
+                      Dr. {{ visit.doctorName }}
+                    </p>
+                    <p class="flex items-center">
+                      <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1"/>
+                      </svg>
+                      {{ visit.visitDate | date:'dd/MM/yyyy HH:mm' }}
+                    </p>
+                    <p class="flex items-center">
+                      <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3"/>
+                      </svg>
+                      {{ getVisitTypeLabel(visit.type) }}
+                    </p>
+                    <p *ngIf="visit.notes" class="flex items-start">
+                      <svg class="w-4 h-4 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                      </svg>
+                      {{ visit.notes }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

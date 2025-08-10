@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 import { BaseLayoutComponent } from './shared/layouts/base-layout/base-layout.component';
 import { CreateLabAppointmentComponent } from './modules/reception/create-lab-appointment/create-lab-appointment.component';
 import { LabAppointmentsListComponent } from './modules/reception/lab-appointments-list/lab-appointments-list.component';
+import { MyAppointmentsComponent } from './modules/patient/my-appointments/my-appointments.component';
+import { ReportViewerComponent } from './modules/patient/report-viewer/report-viewer.component';
 
 export const routes: Routes = [
   {
@@ -168,6 +170,16 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./modules/reception/lab-appointments-list/lab-appointments-list.component')
             .then(m => m.LabAppointmentsListComponent)
+      },
+      {
+        path: 'patient/my-appointments',
+        loadComponent: () =>
+          import('./modules/patient/my-appointments/my-appointments.component')
+            .then(m => m.MyAppointmentsComponent)
+      },
+      {
+        path: 'patient/report',
+        component: ReportViewerComponent
       },
     ]
   },

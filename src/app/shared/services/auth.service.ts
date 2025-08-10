@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class AuthService {
   private currentUser = {
-    role: 'RECEPTION' // Esto vendría de tu sistema de autenticación
+    role: 'PATIENT' // Esto vendría de tu sistema de autenticación
   };
 
   getCurrentUserRole(): string {

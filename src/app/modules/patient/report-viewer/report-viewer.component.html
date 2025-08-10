@@ -1,0 +1,330 @@
+<div class="min-h-screen bg-slate-50 py-4 md:py-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl mx-auto">
+    
+    <!-- Header -->
+    <div class="mb-6 md:mb-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <button 
+            (click)="goBack()"
+            class="inline-flex items-center text-blue-600 hover:text-blue-700 mb-4">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Volver a Muestras
+          </button>
+          <h1 class="text-2xl md:text-3xl font-semibold text-slate-800 mb-2">
+            {{ isPatientFriendly ? 'Reporte Simplificado' : 'Reporte Médico' }}
+          </h1>
+          <p class="text-slate-600">Muestra ID: {{ sampleId }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="bg-white rounded-lg border border-slate-200 p-12">
+      <div class="flex items-center justify-center">
+        <div class="flex items-center space-x-3">
+          <div class="animate-spin w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+          <span class="text-slate-600">Cargando reporte...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="bg-white rounded-lg border border-red-200 p-12">
+      <div class="text-center">
+        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <h3 class="text-slate-800 font-medium mb-2">Error al cargar el reporte</h3>
+        <p class="text-slate-600 text-sm mb-4">No se pudo cargar el reporte solicitado. Inténtelo más tarde.</p>
+        <button 
+          (click)="goBack()"
+          class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+          Volver
+        </button>
+      </div>
+    </div>
+
+    <!-- Reporte Amigable para Paciente -->
+    <div *ngIf="!loading && !error && patientReport" class="space-y-6">
+      
+      <!-- Resumen del Test -->
+      <div class="bg-white rounded-lg border border-slate-200 p-6">
+        <div class="flex items-center mb-4">
+          <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+            <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-slate-800">Resumen de tu Análisis</h2>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <h3 class="font-medium text-slate-700 mb-2">¿Qué se analizó?</h3>
+            <p class="text-slate-600">{{ patientReport.patient_friendly_report.your_test_summary.what_was_tested }}</p>
+          </div>
+          
+          <div>
+            <h3 class="font-medium text-slate-700 mb-2">Fecha del análisis</h3>
+            <p class="text-slate-600">{{ patientReport.patient_friendly_report.your_test_summary.when_tested | date:'dd/MM/yyyy' }}</p>
+          </div>
+          
+          <div>
+            <h3 class="font-medium text-slate-700 mb-2">Hallazgos principales</h3>
+            <p class="text-slate-600">{{ patientReport.patient_friendly_report.your_test_summary.main_findings }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Significado de los Resultados -->
+      <div class="bg-white rounded-lg border border-slate-200 p-6">
+        <div class="flex items-center mb-4">
+          <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+            <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-slate-800">¿Qué significan tus resultados?</h2>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <h3 class="font-medium text-slate-700 mb-2">En términos simples</h3>
+            <p class="text-slate-600">{{ patientReport.patient_friendly_report.what_your_results_mean.in_simple_terms }}</p>
+          </div>
+          
+          <div>
+            <h3 class="font-medium text-slate-700 mb-2">¿Qué es normal?</h3>
+            <p class="text-slate-600">{{ patientReport.patient_friendly_report.what_your_results_mean.what_is_normal }}</p>
+          </div>
+          
+          <div>
+            <h3 class="font-medium text-slate-700 mb-2">Tus resultados específicos</h3>
+            <p class="text-slate-600">{{ patientReport.patient_friendly_report.what_your_results_mean.your_specific_results }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Impacto en la Salud -->
+      <div class="bg-white rounded-lg border border-slate-200 p-6">
+        <div class="flex items-center mb-4">
+          <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+            <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-slate-800">Impacto en tu Salud</h2>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <h3 class="font-medium text-slate-700 mb-2">¿Qué significa esto para ti?</h3>
+            <p class="text-slate-600">{{ patientReport.patient_friendly_report.health_impact.what_this_means_for_you }}</p>
+          </div>
+          
+          <div>
+            <h3 class="font-medium text-slate-700 mb-2">¿Debes preocuparte?</h3>
+            <p class="text-slate-600">{{ patientReport.patient_friendly_report.health_impact.should_you_be_concerned }}</p>
+          </div>
+          
+          <div>
+            <h3 class="font-medium text-slate-700 mb-2">Aspectos positivos</h3>
+            <p class="text-slate-600">{{ patientReport.patient_friendly_report.health_impact.positive_aspects }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Próximos Pasos -->
+      <div class="bg-white rounded-lg border border-slate-200 p-6">
+        <div class="flex items-center mb-4">
+          <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center mr-3">
+            <svg class="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-slate-800">Próximos Pasos</h2>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <h3 class="font-medium text-slate-700 mb-2">Acciones inmediatas</h3>
+            <p class="text-slate-600">{{ patientReport.patient_friendly_report.next_steps.immediate_actions }}</p>
+          </div>
+          
+          <div>
+            <h3 class="font-medium text-slate-700 mb-2">Consejos de estilo de vida</h3>
+            <p class="text-slate-600">{{ patientReport.patient_friendly_report.next_steps.lifestyle_tips }}</p>
+          </div>
+          
+          <div>
+            <h3 class="font-medium text-slate-700 mb-2">Seguimiento</h3>
+            <p class="text-slate-600">{{ patientReport.patient_friendly_report.next_steps.follow_up_care }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preguntas para hacer -->
+      <div class="bg-white rounded-lg border border-slate-200 p-6">
+        <div class="flex items-center mb-4">
+          <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-3">
+            <svg class="w-5 h-5 text-indigo-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-slate-800">Preguntas para tu Doctor</h2>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <h3 class="font-medium text-slate-700 mb-2">Preguntas sugeridas</h3>
+            <ul class="space-y-2">
+              <li *ngFor="let question of patientReport.patient_friendly_report.questions_to_ask.for_your_doctor" 
+                  class="flex items-start">
+                <svg class="w-4 h-4 text-indigo-600 mt-1 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="text-slate-600">{{ question }}</span>
+              </li>
+            </ul>
+          </div>
+          
+          <div>
+            <h3 class="font-medium text-slate-700 mb-2">Para entender mejor</h3>
+            <p class="text-slate-600">{{ patientReport.patient_friendly_report.questions_to_ask.understanding_better }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notas Importantes -->
+      <div class="bg-amber-50 border border-amber-200 rounded-lg p-6">
+        <div class="flex items-center mb-4">
+          <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center mr-3">
+            <svg class="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-amber-800">Notas Importantes</h2>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <h3 class="font-medium text-amber-700 mb-2">Limitaciones</h3>
+            <p class="text-amber-700">{{ patientReport.patient_friendly_report.important_notes.limitations }}</p>
+          </div>
+          
+          <div>
+            <h3 class="font-medium text-amber-700 mb-2">Recuerda</h3>
+            <p class="text-amber-700">{{ patientReport.patient_friendly_report.important_notes.remember }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reporte Médico -->
+    <div *ngIf="!loading && !error && medicalReport" class="space-y-6">
+      
+      <!-- Datos del Paciente -->
+      <div class="bg-white rounded-lg border border-slate-200 p-6">
+        <div class="flex items-center mb-4">
+          <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+            <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-slate-800">Datos del Paciente</h2>
+        </div>
+        <p class="text-slate-600"><strong>Nombre:</strong> {{ medicalReport.medical_study_report.patient_data.name }}</p>
+      </div>
+
+      <!-- Información de la Muestra -->
+      <div class="bg-white rounded-lg border border-slate-200 p-6">
+        <div class="flex items-center mb-4">
+          <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+            <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-slate-800">Información de la Muestra</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p class="text-sm text-slate-500">Tipo de muestra</p>
+            <p class="font-medium text-slate-800">{{ medicalReport.medical_study_report.sample_information.sample_type }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-slate-500">Modelo del analizador</p>
+            <p class="font-medium text-slate-800">{{ medicalReport.medical_study_report.sample_information.analyzer_model }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-slate-500">Fecha de recolección</p>
+            <p class="font-medium text-slate-800">{{ medicalReport.medical_study_report.sample_information.collection_date | date:'dd/MM/yyyy' }}</p>
+          </div>
+          <div class="md:col-span-2">
+            <p class="text-sm text-slate-500">Notas del laboratorio</p>
+            <p class="font-medium text-slate-800">{{ medicalReport.medical_study_report.sample_information.lab_notes }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hallazgos Clínicos -->
+      <div class="bg-white rounded-lg border border-slate-200 p-6">
+        <div class="flex items-center mb-4">
+          <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+            <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-slate-800">Hallazgos Clínicos</h2>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <h3 class="font-medium text-slate-700 mb-2">Resumen ejecutivo</h3>
+            <p class="text-slate-600">{{ medicalReport.medical_study_report.clinical_findings.executive_summary }}</p>
+          </div>
+          
+          <div>
+            <h3 class="font-medium text-slate-700 mb-2">Análisis de la muestra</h3>
+            <p class="text-slate-600">{{ medicalReport.medical_study_report.clinical_findings.sample_analysis }}</p>
+          </div>
+          
+          <div>
+            <h3 class="font-medium text-slate-700 mb-2">Significancia clínica</h3>
+            <p class="text-slate-600">{{ medicalReport.medical_study_report.clinical_findings.clinical_significance }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recomendaciones -->
+      <div class="bg-white rounded-lg border border-slate-200 p-6">
+        <div class="flex items-center mb-4">
+          <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center mr-3">
+            <svg class="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-slate-800">Recomendaciones</h2>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <h3 class="font-medium text-slate-700 mb-2">Plan de acción</h3>
+            <p class="text-slate-600">{{ medicalReport.medical_study_report.recommendations.action_plan }}</p>
+          </div>
+          
+          <div>
+            <h3 class="font-medium text-slate-700 mb-2">Limitaciones del análisis</h3>
+            <p class="text-slate-600">{{ medicalReport.medical_study_report.recommendations.analysis_limitations }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
