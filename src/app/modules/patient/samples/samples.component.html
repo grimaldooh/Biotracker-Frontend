@@ -150,13 +150,79 @@
           </div>
         </div>
 
-        <!-- Datos específicos del análisis -->
+        <!-- Datos específicos del análisis de sangre (parseado y organizado) -->
         <div *ngIf="selectedSample.bloodData" class="border-t border-slate-200 pt-6">
-          <h4 class="text-lg font-semibold text-slate-800 mb-4">Resultados del Análisis</h4>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div *ngFor="let item of (selectedSample.bloodData | keyvalue)" class="bg-slate-50 rounded-lg p-3">
-              <label class="block text-xs font-medium text-slate-600 mb-1">{{ item.key }}</label>
-              <p class="text-slate-900 font-medium">{{ item.value }}</p>
+          <h4 class="text-lg font-semibold text-slate-800 mb-6">Resultados del Análisis de Sangre</h4>
+          
+          <!-- Metadatos del laboratorio si existen -->
+          <div *ngIf="selectedSample.bloodData.analyzerModel || selectedSample.bloodData.centrifugationSpeedRpm" 
+               class="mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
+            <h5 class="font-medium text-slate-700 mb-3">Información del Laboratorio</h5>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div *ngIf="selectedSample.bloodData.analyzerModel">
+                <span class="text-slate-500">Equipo:</span>
+                <span class="ml-2 font-medium text-slate-700">{{ selectedSample.bloodData.analyzerModel }}</span>
+              </div>
+              <div *ngIf="selectedSample.bloodData.centrifugationSpeedRpm">
+                <span class="text-slate-500">Centrifugación:</span>
+                <span class="ml-2 font-medium text-slate-700">{{ selectedSample.bloodData.centrifugationSpeedRpm }} RPM</span>
+              </div>
+              <div *ngIf="selectedSample.bloodData.storageTemperatureCelsius">
+                <span class="text-slate-500">Temperatura de almacenamiento:</span>
+                <span class="ml-2 font-medium text-slate-700">{{ selectedSample.bloodData.storageTemperatureCelsius }}°C</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Secciones organizadas de resultados -->
+          <div class="space-y-6">
+            <div *ngFor="let section of getBloodDataSections(selectedSample.bloodData)" 
+                 class="border rounded-lg overflow-hidden" [ngClass]="section.borderColor">
+              
+              <!-- Header de la sección -->
+              <div class="px-4 py-3 flex items-center" [ngClass]="section.bgColor">
+                <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center mr-3 border" [ngClass]="section.borderColor">
+                  <svg class="w-4 h-4" [ngClass]="section.textColor" fill="currentColor" viewBox="0 0 24 24">
+                    <path [attr.d]="section.icon"/>
+                  </svg>
+                </div>
+                <h5 class="font-semibold" [ngClass]="section.textColor">{{ section.title }}</h5>
+              </div>
+
+              <!-- Campos de la sección -->
+              <div class="p-4 bg-white">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div *ngFor="let field of section.fields" 
+                       class="flex items-center justify-between p-3 rounded-lg border transition-colors hover:bg-slate-50">
+                    
+                    <div class="flex-1">
+                      <div class="flex items-center justify-between mb-1">
+                        <label class="text-sm font-medium text-slate-700">{{ field.label }}</label>
+                        <div class="flex items-center">
+                          <!-- Indicador de estado -->
+                          <div class="w-4 h-4 mr-2 rounded-full border flex items-center justify-center"
+                               [ngClass]="getValueStatusStyle(isValueNormal(field.value, field.normalRange))">
+                            <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24">
+                              <path [attr.d]="getValueStatusIcon(isValueNormal(field.value, field.normalRange))"/>
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="flex items-baseline justify-between">
+                        <span class="text-lg font-semibold text-slate-900">
+                          {{ field.value }}
+                          <span class="text-sm font-normal text-slate-500 ml-1">{{ field.unit }}</span>
+                        </span>
+                      </div>
+                      
+                      <div class="text-xs text-slate-500 mt-1">
+                        Rango normal: {{ field.normalRange }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

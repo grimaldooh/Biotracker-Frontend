@@ -19,8 +19,11 @@ export class SampleService {
     return this.http.post('http://localhost:8080/api/samples', sample);
   }
 
-   getSampleById(id: string): Observable<SampleDTO> {
+  getSampleById(id: string): Observable<SampleDTO> {
     return this.http.get<SampleDTO>(`http://localhost:8080/api/samples/${id}`);
   }
   
+  getGeneticSamples(patientId: string): Observable<any[]> {
+  return this.http.get<any[]>(`http://localhost:8080/api/genetic-samples/patient/${patientId}`);
+}
 }

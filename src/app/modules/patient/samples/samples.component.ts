@@ -189,4 +189,177 @@ getSampleTypeIcon(type: string): { icon: string, bgColor: string, textColor: str
     textColor: 'text-slate-600'
   };
 }
+
+// Método para parsear y organizar los datos de análisis de sangre
+getBloodDataSections(bloodData: any): any[] {
+  if (!bloodData) return [];
+
+  const sections = [
+    {
+      title: 'Química Sanguínea',
+      icon: 'M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2',
+      bgColor: 'bg-red-50',
+      borderColor: 'border-red-200',
+      textColor: 'text-red-700',
+      fields: [
+        { key: 'glucoseMgDl', label: 'Glucosa', unit: 'mg/dL', normalRange: '70-100' },
+        { key: 'cholesterolTotalMgDl', label: 'Colesterol Total', unit: 'mg/dL', normalRange: '<200' },
+        { key: 'cholesterolHdlMgDl', label: 'Colesterol HDL (Bueno)', unit: 'mg/dL', normalRange: '>40 (H), >50 (M)' },
+        { key: 'cholesterolLdlMgDl', label: 'Colesterol LDL (Malo)', unit: 'mg/dL', normalRange: '<100' },
+        { key: 'triglyceridesMgDl', label: 'Triglicéridos', unit: 'mg/dL', normalRange: '<150' }
+      ]
+    },
+    {
+      title: 'Función Renal',
+      icon: 'M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2',
+      bgColor: 'bg-blue-50',
+      borderColor: 'border-blue-200',
+      textColor: 'text-blue-700',
+      fields: [
+        { key: 'creatinineMgDl', label: 'Creatinina', unit: 'mg/dL', normalRange: '0.6-1.3' },
+        { key: 'ureaMgDl', label: 'Urea', unit: 'mg/dL', normalRange: '7-20' },
+        { key: 'bunMgDl', label: 'BUN (Nitrógeno Ureico)', unit: 'mg/dL', normalRange: '7-20' },
+        { key: 'gfrMlMin', label: 'Tasa de Filtración Glomerular', unit: 'mL/min', normalRange: '>60' }
+      ]
+    },
+    {
+      title: 'Hematología',
+      icon: 'M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2',
+      bgColor: 'bg-purple-50',
+      borderColor: 'border-purple-200',
+      textColor: 'text-purple-700',
+      fields: [
+        { key: 'hemoglobinGDl', label: 'Hemoglobina', unit: 'g/dL', normalRange: '12-17' },
+        { key: 'hematocritPercent', label: 'Hematocrito', unit: '%', normalRange: '36-50' },
+        { key: 'redBloodCellsMillionUl', label: 'Glóbulos Rojos', unit: 'mill/μL', normalRange: '4.2-5.8' },
+        { key: 'whiteBloodCellsThousandUl', label: 'Glóbulos Blancos', unit: 'K/μL', normalRange: '4.5-11.0' },
+        { key: 'plateletsThousandUl', label: 'Plaquetas', unit: 'K/μL', normalRange: '150-450' }
+      ]
+    },
+    {
+      title: 'Función Hepática',
+      icon: 'M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2',
+      bgColor: 'bg-amber-50',
+      borderColor: 'border-amber-200',
+      textColor: 'text-amber-700',
+      fields: [
+        { key: 'altSgptUL', label: 'ALT (SGPT)', unit: 'U/L', normalRange: '7-35' },
+        { key: 'astSgotUL', label: 'AST (SGOT)', unit: 'U/L', normalRange: '8-40' },
+        { key: 'bilirubinTotalMgDl', label: 'Bilirrubina Total', unit: 'mg/dL', normalRange: '0.2-1.2' },
+        { key: 'alkalinePhosphataseUL', label: 'Fosfatasa Alcalina', unit: 'U/L', normalRange: '44-147' }
+      ]
+    },
+    {
+      title: 'Proteínas',
+      icon: 'M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2',
+      bgColor: 'bg-emerald-50',
+      borderColor: 'border-emerald-200',
+      textColor: 'text-emerald-700',
+      fields: [
+        { key: 'totalProteinGDl', label: 'Proteína Total', unit: 'g/dL', normalRange: '6.0-8.3' },
+        { key: 'albuminGDl', label: 'Albúmina', unit: 'g/dL', normalRange: '3.5-5.0' }
+      ]
+    },
+    {
+      title: 'Electrolitos',
+      icon: 'M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2',
+      bgColor: 'bg-cyan-50',
+      borderColor: 'border-cyan-200',
+      textColor: 'text-cyan-700',
+      fields: [
+        { key: 'sodiumMeqL', label: 'Sodio', unit: 'mEq/L', normalRange: '136-145' },
+        { key: 'potassiumMeqL', label: 'Potasio', unit: 'mEq/L', normalRange: '3.5-5.0' },
+        { key: 'chlorideMeqL', label: 'Cloruro', unit: 'mEq/L', normalRange: '98-107' }
+      ]
+    },
+    {
+      title: 'Marcadores Inflamatorios',
+      icon: 'M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2',
+      bgColor: 'bg-orange-50',
+      borderColor: 'border-orange-200',
+      textColor: 'text-orange-700',
+      fields: [
+        { key: 'cReactiveProteinMgL', label: 'Proteína C Reactiva', unit: 'mg/L', normalRange: '<3.0' },
+        { key: 'esrMmHr', label: 'Velocidad de Sedimentación', unit: 'mm/hr', normalRange: '<15' }
+      ]
+    },
+    {
+      title: 'Análisis Genético',
+      icon: 'M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2',
+      bgColor: 'bg-indigo-50',
+      borderColor: 'border-indigo-200',
+      textColor: 'text-indigo-700',
+      fields: [
+        { key: 'geneticMarkersDetected', label: 'Marcadores Genéticos Detectados', unit: '', normalRange: 'Variable' },
+        { key: 'geneticQualityScore', label: 'Puntuación de Calidad Genética', unit: '%', normalRange: '>95' }
+      ]
+    }
+  ];
+
+  // Filtrar solo las secciones que tienen datos
+  return sections.filter(section => 
+    section.fields.some(field => bloodData[field.key] !== undefined && bloodData[field.key] !== null)
+  ).map(section => ({
+    ...section,
+    fields: section.fields.filter(field => 
+      bloodData[field.key] !== undefined && bloodData[field.key] !== null
+    ).map(field => ({
+      ...field,
+      value: bloodData[field.key]
+    }))
+  }));
+}
+
+// Método para determinar si un valor está dentro del rango normal (simplificado)
+isValueNormal(value: number, normalRange: string): 'normal' | 'high' | 'low' | 'unknown' {
+  // Esta es una implementación simplificada
+  // En un caso real, necesitarías parsing más sofisticado de los rangos
+  if (!value || !normalRange) return 'unknown';
+  
+  // Ejemplo básico para algunos rangos
+  if (normalRange.includes('<')) {
+    const limit = parseFloat(normalRange.replace('<', ''));
+    return value <= limit ? 'normal' : 'high';
+  }
+  
+  if (normalRange.includes('>')) {
+    const limit = parseFloat(normalRange.replace('>', ''));
+    return value >= limit ? 'normal' : 'low';
+  }
+  
+  if (normalRange.includes('-')) {
+    const [min, max] = normalRange.split('-').map(v => parseFloat(v));
+    if (value < min) return 'low';
+    if (value > max) return 'high';
+    return 'normal';
+  }
+  
+  return 'unknown';
+}
+
+getValueStatusStyle(status: 'normal' | 'high' | 'low' | 'unknown'): string {
+  switch (status) {
+    case 'normal':
+      return 'text-emerald-700 bg-emerald-50 border-emerald-200';
+    case 'high':
+      return 'text-red-700 bg-red-50 border-red-200';
+    case 'low':
+      return 'text-blue-700 bg-blue-50 border-blue-200';
+    default:
+      return 'text-slate-700 bg-slate-50 border-slate-200';
+  }
+}
+
+getValueStatusIcon(status: 'normal' | 'high' | 'low' | 'unknown'): string {
+  switch (status) {
+    case 'normal':
+      return 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z';
+    case 'high':
+      return 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z';
+    case 'low':
+      return 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
+    default:
+      return 'M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
+  }
+}
 }

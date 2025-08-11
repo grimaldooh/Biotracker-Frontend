@@ -269,6 +269,20 @@ export class SidebarComponent implements OnInit {
           icon: 'M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2',
           route: '/patient/smart-report',
           isActive: false
+        },
+        {
+          id: 'technical-report',
+          label: 'Reporte IA Técnico',
+          icon: 'M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V5H6V7H18V5H19V19M8,9H16V11H8V9M8,12H16V14H8V12M8,15H13V17H8V15Z',
+          route: '/patient/technical-report',
+          isActive: false
+        },
+        {
+          id: 'genetic-tests',
+          label: 'Pruebas Genéticas',
+          icon: 'M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z',
+          route: '/patient/genetic-tests',
+          isActive: false
         }
       ]
     };

@@ -64,4 +64,8 @@ export class PatientService {
       params: { query }
     });
   }
+
+  getLatestReportTextPatientFriendly(patientId: string): Observable<string> {
+    return this.http.get(`http://localhost:8080/api/patients/latest/${patientId}/summary-text/patient-friendly`, { responseType: 'text' });
+  }
 }

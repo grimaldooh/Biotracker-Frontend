@@ -1,0 +1,6 @@
+/* Estilos específicos si son necesarios */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

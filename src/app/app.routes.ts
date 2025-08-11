@@ -4,6 +4,7 @@ import { CreateLabAppointmentComponent } from './modules/reception/create-lab-ap
 import { LabAppointmentsListComponent } from './modules/reception/lab-appointments-list/lab-appointments-list.component';
 import { MyAppointmentsComponent } from './modules/patient/my-appointments/my-appointments.component';
 import { ReportViewerComponent } from './modules/patient/report-viewer/report-viewer.component';
+import { TechnicalReportComponent } from './modules/patient/technical-report/technical-report.component';
 
 export const routes: Routes = [
   {
@@ -179,8 +180,22 @@ export const routes: Routes = [
       },
       {
         path: 'patient/report',
-        component: ReportViewerComponent
+        loadComponent: () =>
+          import('./modules/patient/report-viewer/report-viewer.component')
+            .then(m => m.ReportViewerComponent)
       },
+      {
+        path: 'patient/technical-report',
+        loadComponent: () =>
+          import('./modules/patient/technical-report/technical-report.component')
+            .then(m => m.TechnicalReportComponent)
+      },
+      {
+        path: 'patient/genetic-tests',
+        loadComponent: () =>
+          import('./modules/patient/genetic-tests/genetic-tests.component')
+            .then(m => m.GeneticTestsComponent)
+      }
     ]
   },
   { path: '', redirectTo: 'patients/register', pathMatch: 'full' },

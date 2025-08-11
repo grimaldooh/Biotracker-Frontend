@@ -1,104 +1,363 @@
-<div class="min-h-screen bg-slate-50 p-4 sm:p-8">
-  <div *ngIf="loading" class="text-center text-slate-500 py-12">Cargando reporte...</div>
-  <div *ngIf="error" class="text-center text-red-600 py-12">{{ error }}</div>
+<div class="min-h-screen bg-neutral-50">
+  
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex items-center justify-center min-h-screen">
+    <div class="text-center">
+      <div class="w-8 h-8 border-2 border-neutral-300 border-t-neutral-600 rounded-full animate-spin mx-auto mb-4"></div>
+      <p class="text-neutral-600 text-sm">Generando tu reporte personalizado...</p>
+    </div>
+  </div>
 
-  <main *ngIf="!loading && !error" class="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200">
+  <!-- Error State -->
+  <div *ngIf="error" class="flex items-center justify-center min-h-screen">
+    <div class="text-center max-w-md mx-auto px-6">
+      <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <h3 class="text-neutral-800 font-medium mb-2">Error al cargar el reporte</h3>
+      <p class="text-neutral-600 text-sm">{{ error }}</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading && !error && report" class="max-w-4xl mx-auto p-6 space-y-8">
     
-    <header class="p-6 md:p-8 border-b border-slate-200">
-      <div class="flex justify-between items-start">
+    <!-- Header -->
+    <header class="bg-white rounded-xl border border-neutral-200 p-8">
+      <div class="flex items-start justify-between mb-6">
         <div>
-          <h1 class="text-2xl md:text-3xl font-bold text-slate-800">Reporte Inteligente de Salud</h1>
+          <h1 class="text-2xl font-semibold text-neutral-900 mb-2">Tu Reporte de Salud</h1>
+          <p class="text-neutral-600">Resumen personalizado de tu estado de salud actual</p>
         </div>
-        <button class="hidden md:flex items-center gap-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg px-3 py-2 transition-colors">
-          <span class="material-icons text-base">print</span>
-          Imprimir
+        <button class="inline-flex items-center px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-lg transition-colors text-sm font-medium">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          Descargar
         </button>
       </div>
-      <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-neutral-100">
         <div>
-          <div class="text-slate-500">Paciente</div>
-          <div class="font-semibold text-slate-700">{{ patientName }}</div>
+          <span class="text-sm text-neutral-500">Paciente</span>
+          <p class="font-medium text-neutral-900">{{ report.informacion_paciente.nombre }}</p>
         </div>
         <div>
-          <div class="text-slate-500">Fecha de Nacimiento</div>
-          <div class="font-semibold text-slate-700">{{ birthDate | date:'longDate' }}</div>
+          <span class="text-sm text-neutral-500">Fecha de nacimiento</span>
+          <p class="font-medium text-neutral-900">{{ report.informacion_paciente.fecha_nacimiento | date:'longDate' }}</p>
         </div>
         <div>
-          <div class="text-slate-500">CURP</div>
-          <div class="font-semibold text-slate-700 font-mono">{{ curp }}</div>
+          <span class="text-sm text-neutral-500">Edad</span>
+          <p class="font-medium text-neutral-900">{{ report.informacion_paciente.edad_aproximada }}</p>
         </div>
       </div>
     </header>
 
-    <section class="p-6 md:p-8 bg-indigo-50/50">
-      <div class="grid md:grid-cols-5 gap-8">
-        <div class="md:col-span-2">
-          <h2 class="section-title">Resumen General</h2>
-          <p class="text-slate-600 leading-relaxed">{{ summaryText }}</p>
-          <div *ngIf="detectedConditions.length > 0" class="mt-4">
-            <h3 class="font-semibold text-slate-700 mb-2">Condiciones detectadas:</h3>
-            <ul class="list-disc list-inside text-slate-600">
-              <li *ngFor="let cond of detectedConditions">{{ cond }}</li>
-            </ul>
+    <!-- Health Summary -->
+    <section class="bg-white rounded-xl border border-neutral-200 p-8">
+      <div class="flex items-center mb-6">
+        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+          <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12,2C13.1,2 14,2.9 14,4C14,5.1 13.1,6 12,6C10.9,6 10,5.1 10,4C10,2.9 10.9,2 12,2M21,9V7L15,1H5C3.89,1 3,1.89 3,3V21A2,2 0 0,0 5,23H19A2,2 0 0,0 21,21V9M19,9H14V4H5V21H19V9Z"/>
+          </svg>
+        </div>
+        <h2 class="text-xl font-semibold text-neutral-900">Resumen de tu Salud</h2>
+      </div>
+      
+      <div class="space-y-6">
+        <div class="p-4 bg-blue-50 rounded-lg border border-blue-100">
+          <p class="text-blue-900 font-medium">{{ report.resumen_de_tu_salud.mensaje_principal }}</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="font-medium text-neutral-800 mb-2">¿Qué se analizó?</h3>
+            <p class="text-neutral-600 text-sm">{{ report.resumen_de_tu_salud.que_se_analizo }}</p>
+          </div>
+          <div>
+            <h3 class="font-medium text-neutral-800 mb-2">Período analizado</h3>
+            <p class="text-neutral-600 text-sm">{{ report.resumen_de_tu_salud.periodo_analizado }}</p>
           </div>
         </div>
-        <div class="md:col-span-3">
-          <h2 class="section-title">Recomendaciones Clave</h2>
-          <ul class="space-y-3">
-            <li *ngFor="let rec of recommendations" class="flex items-start gap-3">
-              <span class="material-icons text-green-500 mt-1">check_circle</span>
-              <span class="text-slate-600 leading-relaxed">{{ rec }}</span>
+        
+        <div>
+          <h3 class="font-medium text-neutral-800 mb-2">Hallazgos importantes</h3>
+          <p class="text-neutral-600">{{ report.resumen_de_tu_salud.hallazgos_importantes }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Medical History -->
+    <section class="bg-white rounded-xl border border-neutral-200 p-8">
+      <div class="flex items-center mb-6">
+        <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mr-3">
+          <svg class="w-5 h-5 text-emerald-600" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1"/>
+          </svg>
+        </div>
+        <h2 class="text-xl font-semibold text-neutral-900">Tu Historial Médico</h2>
+      </div>
+      
+      <div class="mb-6">
+        <p class="text-neutral-600 p-4 bg-neutral-50 rounded-lg">{{ report.tu_historial_medico.progreso_de_tu_salud }}</p>
+      </div>
+      
+      <div class="space-y-4">
+        <h3 class="font-medium text-neutral-800">Visitas recientes</h3>
+        <div class="space-y-4">
+          <div *ngFor="let visit of report.tu_historial_medico.visitas_recientes" 
+               class="border border-neutral-200 rounded-lg p-4 hover:bg-neutral-50 transition-colors">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-sm font-medium text-blue-600">{{ visit.fecha | date:'longDate' }}</span>
+            </div>
+            <h4 class="font-medium text-neutral-800 mb-2">{{ visit.motivo_consulta }}</h4>
+            <div class="space-y-2 text-sm">
+              <div>
+                <span class="text-neutral-500">Hallazgos:</span>
+                <span class="text-neutral-700 ml-2">{{ visit.que_encontraron }}</span>
+              </div>
+              <div>
+                <span class="text-neutral-500">Recomendaciones:</span>
+                <span class="text-neutral-700 ml-2">{{ visit.recomendaciones_principales }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Study Results -->
+    <section class="bg-white rounded-xl border border-neutral-200 p-8">
+      <div class="flex items-center mb-6">
+        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+          <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3"/>
+          </svg>
+        </div>
+        <h2 class="text-xl font-semibold text-neutral-900">Resultados de Estudios</h2>
+      </div>
+      
+      <div class="mb-6">
+        <p class="text-neutral-600 p-4 bg-neutral-50 rounded-lg">{{ report.resultados_de_estudios.tendencias_importantes }}</p>
+      </div>
+      
+      <div class="space-y-4">
+        <div *ngFor="let study of report.resultados_de_estudios.estudios_realizados" 
+             class="border border-neutral-200 rounded-lg p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="font-medium text-neutral-800">{{ study.tipo_estudio }}</h4>
+            <span class="text-sm text-neutral-500">{{ study.fecha_estudio | date:'shortDate' }}</span>
+          </div>
+          <div class="space-y-3 text-sm">
+            <div>
+              <span class="text-neutral-500">Qué se midió:</span>
+              <p class="text-neutral-700 mt-1">{{ study.que_midieron }}</p>
+            </div>
+            <div>
+              <span class="text-neutral-500">Resultados principales:</span>
+              <p class="text-neutral-700 mt-1">{{ study.resultados_principales }}</p>
+            </div>
+            <div class="p-3 bg-blue-50 rounded-lg">
+              <span class="text-blue-700 font-medium">Qué significa para ti:</span>
+              <p class="text-blue-700 mt-1">{{ study.que_significa_para_ti }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Identified Conditions -->
+    <section *ngIf="report.condiciones_identificadas.condiciones_actuales.length > 0" 
+             class="bg-white rounded-xl border border-neutral-200 p-8">
+      <div class="flex items-center mb-6">
+        <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center mr-3">
+          <svg class="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12,2L13.09,8.26L22,9L13.09,9.74L12,16L10.91,9.74L2,9L10.91,8.26L12,2Z"/>
+          </svg>
+        </div>
+        <h2 class="text-xl font-semibold text-neutral-900">Condiciones Identificadas</h2>
+      </div>
+      
+      <div class="mb-6">
+        <p class="text-neutral-600 p-4 bg-neutral-50 rounded-lg">{{ report.condiciones_identificadas.areas_de_atencion }}</p>
+      </div>
+      
+      <div class="space-y-4">
+        <div *ngFor="let condition of report.condiciones_identificadas.condiciones_actuales" 
+             class="border border-neutral-200 rounded-lg p-4">
+          <div class="flex items-start justify-between mb-3">
+            <h4 class="font-medium text-neutral-800">{{ condition.nombre_condicion }}</h4>
+            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full border"
+                  [ngClass]="getConcernLevelStyle(condition.nivel_preocupacion)">
+              {{ condition.nivel_preocupacion }}
+            </span>
+          </div>
+          <div class="space-y-3 text-sm">
+            <div>
+              <span class="text-neutral-500">Qué significa:</span>
+              <p class="text-neutral-700 mt-1">{{ condition.que_significa }}</p>
+            </div>
+            <div>
+              <span class="text-neutral-500">Cómo te afecta:</span>
+              <p class="text-neutral-700 mt-1">{{ condition.como_te_afecta }}</p>
+            </div>
+            <div>
+              <span class="text-neutral-500">Evidencia:</span>
+              <p class="text-neutral-700 mt-1">{{ condition.evidencia_que_lo_respalda }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Care Plan -->
+    <section class="bg-white rounded-xl border border-neutral-200 p-8">
+      <div class="flex items-center mb-6">
+        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+          <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"/>
+          </svg>
+        </div>
+        <h2 class="text-xl font-semibold text-neutral-900">Plan de Cuidados</h2>
+      </div>
+      
+      <div class="space-y-6">
+        <!-- Immediate Actions -->
+        <div>
+          <h3 class="font-medium text-neutral-800 mb-4">Acciones inmediatas</h3>
+          <div class="space-y-3">
+            <div *ngFor="let action of report.plan_de_cuidados.acciones_inmediatas" 
+                 class="p-4 bg-red-50 border border-red-100 rounded-lg">
+              <h4 class="font-medium text-red-900 mb-2">{{ action.accion }}</h4>
+              <div class="space-y-2 text-sm">
+                <div>
+                  <span class="text-red-700">Por qué es importante:</span>
+                  <span class="text-red-800 ml-2">{{ action.por_que_es_importante }}</span>
+                </div>
+                <div>
+                  <span class="text-red-700">Cuándo hacerlo:</span>
+                  <span class="text-red-800 ml-2">{{ action.cuando_hacerlo }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Lifestyle Changes -->
+        <div>
+          <h3 class="font-medium text-neutral-800 mb-4">Cambios en el estilo de vida</h3>
+          <div class="space-y-3">
+            <div *ngFor="let change of report.plan_de_cuidados.cambios_estilo_vida" 
+                 class="p-4 border border-neutral-200 rounded-lg">
+              <div class="flex items-start justify-between mb-2">
+                <h4 class="font-medium text-neutral-800">{{ change.recomendacion }}</h4>
+                <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full"
+                      [ngClass]="getImplementationDifficultyStyle(change.facilidad_implementacion)">
+                  {{ change.facilidad_implementacion }}
+                </span>
+              </div>
+              <p class="text-neutral-600 text-sm">{{ change.beneficio_esperado }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Follow-up -->
+        <div class="p-4 bg-blue-50 border border-blue-100 rounded-lg">
+          <h4 class="font-medium text-blue-900 mb-2">Seguimiento médico</h4>
+          <p class="text-blue-800 text-sm">{{ report.plan_de_cuidados.seguimiento_medico }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Questions for Doctor -->
+    <section class="bg-white rounded-xl border border-neutral-200 p-8">
+      <div class="flex items-center mb-6">
+        <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-3">
+          <svg class="w-5 h-5 text-indigo-600" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <h2 class="text-xl font-semibold text-neutral-900">Preguntas para tu Doctor</h2>
+      </div>
+      
+      <div class="space-y-4">
+        <div>
+          <h3 class="font-medium text-neutral-800 mb-3">Preguntas sugeridas</h3>
+          <ul class="space-y-2">
+            <li *ngFor="let question of report.preguntas_para_tu_doctor.preguntas_sugeridas" 
+                class="flex items-start">
+              <svg class="w-4 h-4 text-indigo-600 mt-1 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span class="text-neutral-700 text-sm">{{ question }}</span>
             </li>
           </ul>
         </div>
-      </div>
-    </section>
-
-    <section class="p-6 md:p-8">
-      <h2 class="section-title mb-6">Historial de Visitas Médicas</h2>
-      <div class="relative pl-6 border-l-2 border-slate-200">
-        <div *ngFor="let visit of visits" class="timeline-item">
-          <div class="timeline-dot"></div>
-          <time class="font-semibold text-indigo-600 text-sm">{{ visit.fechaVisita | date:'longDate' }}</time>
-          <h3 class="text-lg font-bold text-slate-800 mt-1">{{ visit.diagnostico }}</h3>
-          <dl class="mt-2 text-sm space-y-2">
-            <div>
-              <dt class="font-semibold text-slate-600">Recomendaciones del Dr.</dt>
-              <dd class="text-slate-500">
-                <ul *ngIf="visit.recomendaciones && visit.recomendaciones.length > 0" class="list-disc list-inside">
-                  <li *ngFor="let r of visit.recomendaciones">{{ r }}</li>
-                </ul>
-                <span *ngIf="!visit.recomendaciones || visit.recomendaciones.length === 0">Sin recomendaciones</span>
-              </dd>
-            </div>
-            <div>
-              <dt class="font-semibold text-slate-600">Notas Adicionales</dt>
-              <dd class="text-slate-500">{{ visit.notas || 'Sin notas' }}</dd>
-            </div>
-          </dl>
+        
+        <div class="p-4 bg-indigo-50 border border-indigo-100 rounded-lg">
+          <h4 class="font-medium text-indigo-900 mb-2">Temas a discutir</h4>
+          <p class="text-indigo-800 text-sm">{{ report.preguntas_para_tu_doctor.temas_a_discutir }}</p>
         </div>
       </div>
     </section>
 
-    <section class="p-6 md:p-8 border-t border-slate-200">
-      <h2 class="section-title mb-4">Reporte de Estudios Recientes</h2>
-      <div class="space-y-3">
-        <details *ngFor="let study of studies" class="bg-slate-50 rounded-lg border border-slate-200">
-          <summary class="flex items-center justify-between p-4 cursor-pointer font-semibold text-slate-700">
-            <span>Estudio de {{ study.tipoMuestra }} - {{ study.fechaEstudio | date:'mediumDate' }}</span>
-            <span class="material-icons transition-transform duration-300">expand_more</span>
-          </summary>
-          <div class="p-4 border-t border-slate-200">
-            <dl class="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
-              <dt class="font-medium text-slate-500">Analizador:</dt>
-              <dd class="text-slate-700 md:col-span-2">{{ study.modeloAnalizador }}</dd>
-              <dt class="font-medium text-slate-500">Hallazgos:</dt>
-              <dd class="text-slate-700 md:col-span-2">{{ study.hallazgosPrincipales }}</dd>
-            </dl>
+    <!-- Support and Resources -->
+    <section class="bg-white rounded-xl border border-neutral-200 p-8">
+      <div class="flex items-center mb-6">
+        <div class="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center mr-3">
+          <svg class="w-5 h-5 text-pink-600" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5 C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"/>
+          </svg>
+        </div>
+        <h2 class="text-xl font-semibold text-neutral-900">Apoyo y Recursos</h2>
+      </div>
+      
+      <div class="space-y-4">
+        <div class="p-4 bg-green-50 border border-green-100 rounded-lg">
+          <p class="text-green-800 font-medium">{{ report.apoyo_y_recursos.mensaje_de_apoyo }}</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h4 class="font-medium text-neutral-800 mb-2">Próximos pasos</h4>
+            <p class="text-neutral-600 text-sm">{{ report.apoyo_y_recursos.proximos_pasos }}</p>
           </div>
-        </details>
+          <div>
+            <h4 class="font-medium text-neutral-800 mb-2">Cuándo buscar ayuda</h4>
+            <p class="text-neutral-600 text-sm">{{ report.apoyo_y_recursos.cuando_buscar_ayuda }}</p>
+          </div>
+        </div>
       </div>
     </section>
 
-  </main>
+    <!-- Important Notes -->
+    <section class="bg-neutral-100 rounded-xl border border-neutral-200 p-8">
+      <div class="flex items-center mb-6">
+        <div class="w-10 h-10 bg-neutral-200 rounded-lg flex items-center justify-center mr-3">
+          <svg class="w-5 h-5 text-neutral-600" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+          </svg>
+        </div>
+        <h2 class="text-xl font-semibold text-neutral-800">Notas Importantes</h2>
+      </div>
+      
+      <div class="space-y-4 text-sm text-neutral-600">
+        <div>
+          <span class="font-medium text-neutral-700">Limitaciones:</span>
+          <span class="ml-2">{{ report.notas_importantes.limitaciones }}</span>
+        </div>
+        <div>
+          <span class="font-medium text-neutral-700">Actualización:</span>
+          <span class="ml-2">{{ report.notas_importantes.actualizacion }}</span>
+        </div>
+        <div>
+          <span class="font-medium text-neutral-700">Confidencialidad:</span>
+          <span class="ml-2">{{ report.notas_importantes.confidencialidad }}</span>
+        </div>
+      </div>
+    </section>
+
+  </div>
 </div>

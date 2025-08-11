@@ -1,0 +1,387 @@
+<div class="min-h-screen bg-neutral-50">
+  
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex items-center justify-center min-h-screen">
+    <div class="text-center">
+      <div class="w-8 h-8 border-2 border-neutral-300 border-t-neutral-600 rounded-full animate-spin mx-auto mb-4"></div>
+      <p class="text-neutral-600 text-sm">Cargando pruebas genéticas...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="flex items-center justify-center min-h-screen">
+    <div class="text-center max-w-md mx-auto px-6">
+      <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <h3 class="text-neutral-800 font-medium mb-2">Error al cargar</h3>
+      <p class="text-neutral-600 text-sm">{{ error }}</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading && !error" class="max-w-7xl mx-auto p-6">
+    
+    <!-- Header -->
+    <header class="mb-8">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-3xl font-semibold text-neutral-900 mb-2">Pruebas Genéticas</h1>
+          <p class="text-neutral-600">Análisis genéticos y mutaciones detectadas</p>
+        </div>
+        <div class="flex items-center space-x-3">
+          <div class="bg-white rounded-lg px-4 py-2 border border-neutral-200">
+            <span class="text-sm text-neutral-500">Total de muestras:</span>
+            <span class="ml-2 font-semibold text-neutral-900">{{ geneticSamples.length }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="bg-white rounded-xl border border-neutral-200 p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Search -->
+          <div>
+            <label class="block text-sm font-medium text-neutral-700 mb-2">Buscar</label>
+            <div class="relative">
+              <input
+                type="text"
+                [(ngModel)]="searchTerm"
+                placeholder="Buscar por gen, notas..."
+                class="w-full pl-10 pr-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <svg class="absolute left-3 top-2.5 h-4 w-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Type Filter -->
+          <div>
+            <label class="block text-sm font-medium text-neutral-700 mb-2">Tipo de análisis</label>
+            <select
+              [(ngModel)]="selectedType"
+              class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option value="ALL">Todos los tipos</option>
+              <option value="DNA">Análisis de ADN</option>
+              <option value="MUTATIONS">Análisis de Mutaciones</option>
+              <option value="GENOMIC">Análisis Genómico</option>
+            </select>
+          </div>
+
+          <!-- Stats -->
+          <div>
+            <label class="block text-sm font-medium text-neutral-700 mb-2">Estadísticas</label>
+            <div class="flex space-x-2">
+              <div class="bg-emerald-50 text-emerald-700 px-3 py-2 rounded-lg text-sm">
+                {{ getHighRiskSampleCount() }} con mutaciones de alto riesgo
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Samples Grid -->
+    <div class="space-y-6">
+      <div *ngFor="let sample of getFilteredSamples()" 
+           class="bg-white rounded-xl border border-neutral-200 hover:border-neutral-300 transition-colors">
+        
+        <!-- Sample Header -->
+        <div class="p-6 border-b border-neutral-100">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <div class="flex items-center space-x-3 mb-3">
+                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14.4,6L14,4H5V21H7V14H12.6L13,16H20V6H14.4Z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-neutral-900">{{ getTypeLabel(sample.type) }}</h3>
+                  <p class="text-sm text-neutral-500">ID: {{ sample.id.substring(0, 8) }}...</p>
+                </div>
+              </div>
+              
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div>
+                  <span class="text-neutral-500">Fecha de recolección:</span>
+                  <p class="font-medium text-neutral-900">{{ sample.collectionDate | date:'shortDate' }}</p>
+                </div>
+                <div>
+                  <span class="text-neutral-500">Mutaciones:</span>
+                  <p class="font-medium text-neutral-900">{{ sample.mutationCount }}</p>
+                </div>
+                <div>
+                  <span class="text-neutral-500">Confianza:</span>
+                  <p class="font-medium" [ngClass]="getConfidenceColor(sample.confidenceScore)">
+                    {{ sample.confidenceScore }}%
+                  </p>
+                </div>
+                <div>
+                  <span class="text-neutral-500">Estado:</span>
+                  <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full border"
+                        [ngClass]="getStatusStyle(sample.status)">
+                    {{ sample.status }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <button
+              (click)="openSampleDetail(sample)"
+              class="ml-4 inline-flex items-center px-4 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg border border-purple-200 transition-colors">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+              Ver detalles
+            </button>
+          </div>
+        </div>
+
+        <!-- High Risk Mutations Preview -->
+        <div *ngIf="getHighRelevanceMutations(sample).length > 0" class="px-6 py-4 bg-red-50 border-b border-red-100">
+          <div class="flex items-center mb-3">
+            <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z"/>
+            </svg>
+            <h4 class="font-medium text-red-900">Mutaciones de Alto Riesgo</h4>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div *ngFor="let mutation of getHighRelevanceMutations(sample).slice(0, 4)" 
+                 class="flex items-center justify-between p-3 bg-white rounded-lg border border-red-200">
+              <div>
+                <span class="font-medium text-red-900">{{ mutation.gene }}</span>
+                <span class="text-sm text-red-700 ml-2">Chr {{ mutation.chromosome }}</span>
+              </div>
+              <span class="text-xs px-2 py-1 bg-red-100 text-red-800 rounded">{{ mutation.type }}</span>
+            </div>
+            <div *ngIf="getHighRelevanceMutations(sample).length > 4" 
+                 class="flex items-center justify-center p-3 bg-red-100 rounded-lg border border-red-200">
+              <span class="text-sm text-red-700">
+                +{{ getHighRelevanceMutations(sample).length - 4 }} más...
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sample Summary -->
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Genes Afectados -->
+            <div>
+              <h4 class="font-medium text-neutral-800 mb-3">Genes Afectados</h4>
+              <div class="flex flex-wrap gap-2">
+                <span *ngFor="let gene of getUniqueGenes(sample).slice(0, 6)" 
+                      class="inline-flex px-2 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded border border-blue-200">
+                  {{ gene }}
+                </span>
+                <span *ngIf="getUniqueGenes(sample).length > 6" 
+                      class="inline-flex px-2 py-1 bg-neutral-100 text-neutral-700 text-xs rounded">
+                  +{{ getUniqueGenes(sample).length - 6 }} más
+                </span>
+              </div>
+            </div>
+
+            <!-- Chromosomes -->
+            <div>
+              <h4 class="font-medium text-neutral-800 mb-3">Cromosomas</h4>
+              <div class="flex flex-wrap gap-2">
+                <span *ngFor="let chr of getUniqueChromosomes(sample).slice(0, 8)" 
+                      class="inline-flex px-2 py-1 bg-emerald-50 text-emerald-700 text-xs font-medium rounded border border-emerald-200">
+                  Chr {{ chr }}
+                </span>
+                <span *ngIf="getUniqueChromosomes(sample).length > 8" 
+                      class="inline-flex px-2 py-1 bg-neutral-100 text-neutral-700 text-xs rounded">
+                  +{{ getUniqueChromosomes(sample).length - 8 }} más
+                </span>
+              </div>
+            </div>
+
+            <!-- Technical Info -->
+            <div>
+              <h4 class="font-medium text-neutral-800 mb-3">Información Técnica</h4>
+              <div class="space-y-2 text-sm">
+                <div>
+                  <span class="text-neutral-500">Software:</span>
+                  <span class="ml-2 text-neutral-900">{{ sample.processingSoftware }}</span>
+                </div>
+                <div>
+                  <span class="text-neutral-500">Genoma de referencia:</span>
+                  <span class="ml-2 text-neutral-900">{{ sample.referenceGenome }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div *ngIf="sample.notes" class="mt-6 pt-6 border-t border-neutral-100">
+            <h4 class="font-medium text-neutral-800 mb-2">Notas</h4>
+            <p class="text-neutral-600 text-sm">{{ sample.notes }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="getFilteredSamples().length === 0" class="text-center py-12">
+      <div class="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+        </svg>
+      </div>
+      <h3 class="text-neutral-800 font-medium mb-2">No se encontraron pruebas genéticas</h3>
+      <p class="text-neutral-600">No hay muestras que coincidan con los filtros seleccionados.</p>
+    </div>
+  </div>
+
+  <!-- Detail Modal -->
+  <div *ngIf="showDetailModal && selectedSample" class="fixed inset-0 z-50 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+      <!-- Backdrop -->
+      <div class="fixed inset-0 transition-opacity bg-neutral-500 bg-opacity-75" 
+           (click)="closeModal()" 
+           aria-hidden="true"></div>
+      
+      <!-- Modal Content -->
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div class="inline-block w-full max-w-6xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-xl relative z-10"
+           (click)="$event.stopPropagation()">
+        
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between mb-6 pb-6 border-b border-neutral-200">
+          <div>
+            <h3 class="text-2xl font-semibold text-neutral-900">{{ getTypeLabel(selectedSample.type) }}</h3>
+            <p class="text-neutral-600">Análisis detallado de mutaciones genéticas</p>
+          </div>
+          <button
+            (click)="closeModal()"
+            class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors">
+            <svg class="w-5 h-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Sample Info -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 p-6 bg-neutral-50 rounded-xl">
+          <div>
+            <span class="text-sm text-neutral-500">ID de Muestra</span>
+            <p class="font-mono text-sm text-neutral-900">{{ selectedSample.id }}</p>
+          </div>
+          <div>
+            <span class="text-sm text-neutral-500">Fecha de Recolección</span>
+            <p class="font-medium text-neutral-900">{{ selectedSample.collectionDate | date:'longDate' }}</p>
+          </div>
+          <div>
+            <span class="text-sm text-neutral-500">Puntuación de Confianza</span>
+            <p class="font-medium" [ngClass]="getConfidenceColor(selectedSample.confidenceScore)">
+              {{ selectedSample.confidenceScore }}%
+            </p>
+          </div>
+          <div>
+            <span class="text-sm text-neutral-500">Total de Mutaciones</span>
+            <p class="font-medium text-neutral-900">{{ selectedSample.mutationCount }}</p>
+          </div>
+        </div>
+
+        <!-- Mutations by Relevance -->
+        <div class="space-y-6">
+          <div *ngFor="let relevanceGroup of getMutationsByRelevance(selectedSample) | keyvalue" 
+               class="border rounded-xl overflow-hidden">
+            
+            <!-- Relevance Header -->
+            <div class="px-6 py-4 border-b" 
+                 [ngClass]="relevanceGroup.key === 'HIGH' ? 'bg-red-50 border-red-200' : 
+                           relevanceGroup.key === 'MEDIUM' ? 'bg-amber-50 border-amber-200' : 
+                           'bg-emerald-50 border-emerald-200'">
+              <div class="flex items-center justify-between">
+                <h4 class="font-semibold" 
+                    [ngClass]="relevanceGroup.key === 'HIGH' ? 'text-red-900' : 
+                              relevanceGroup.key === 'MEDIUM' ? 'text-amber-900' : 
+                              'text-emerald-900'">
+                  Relevancia {{ relevanceGroup.key === 'HIGH' ? 'Alta' : relevanceGroup.key === 'MEDIUM' ? 'Media' : 'Baja' }}
+                </h4>
+                <span class="inline-flex px-3 py-1 text-sm font-medium rounded-full border"
+                      [ngClass]="getRelevanceStyle(relevanceGroup.key)">
+                  {{ relevanceGroup.value.length }} mutaciones
+                </span>
+              </div>
+            </div>
+
+            <!-- Mutations List -->
+            <div class="p-6 bg-white">
+              <div class="grid grid-cols-1 gap-4">
+                <div *ngFor="let mutation of relevanceGroup.value" 
+                     class="border border-neutral-200 rounded-lg p-4 hover:bg-neutral-50 transition-colors">
+                  <div class="flex items-start justify-between mb-3">
+                    <div class="flex items-center">
+                      <div class="w-8 h-8 rounded-lg border-2 flex items-center justify-center mr-3"
+                           [ngClass]="mutation.type === 'SNV' ? 'border-blue-200 bg-blue-50' :
+                                     mutation.type === 'DELETION' ? 'border-red-200 bg-red-50' :
+                                     mutation.type === 'INSERTION' ? 'border-green-200 bg-green-50' :
+                                     'border-purple-200 bg-purple-50'">
+                        <svg class="w-4 h-4" 
+                             [ngClass]="mutation.type === 'SNV' ? 'text-blue-600' :
+                                       mutation.type === 'DELETION' ? 'text-red-600' :
+                                       mutation.type === 'INSERTION' ? 'text-green-600' :
+                                       'text-purple-600'"
+                             fill="currentColor" viewBox="0 0 24 24">
+                          <path [attr.d]="getMutationTypeIcon(mutation.type)"/>
+                        </svg>
+                      </div>
+                      <div>
+                        <h5 class="font-semibold text-neutral-900">{{ mutation.gene }}</h5>
+                        <p class="text-sm text-neutral-500">Cromosoma {{ mutation.chromosome }}</p>
+                      </div>
+                    </div>
+                    <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full"
+                          [ngClass]="mutation.type === 'SNV' ? 'bg-blue-100 text-blue-800' :
+                                    mutation.type === 'DELETION' ? 'bg-red-100 text-red-800' :
+                                    mutation.type === 'INSERTION' ? 'bg-green-100 text-green-800' :
+                                    'bg-purple-100 text-purple-800'">
+                      {{ mutation.type }}
+                    </span>
+                  </div>
+                  <p class="text-neutral-700 text-sm">{{ mutation.comment }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Technical Details -->
+        <div class="mt-8 p-6 bg-neutral-50 rounded-xl">
+          <h4 class="font-semibold text-neutral-900 mb-4">Detalles Técnicos</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+            <div>
+              <span class="text-neutral-500">Software de Procesamiento:</span>
+              <p class="font-medium text-neutral-900">{{ selectedSample.processingSoftware }}</p>
+            </div>
+            <div>
+              <span class="text-neutral-500">Genoma de Referencia:</span>
+              <p class="font-medium text-neutral-900">{{ selectedSample.referenceGenome }}</p>
+            </div>
+            <div>
+              <span class="text-neutral-500">Estado:</span>
+              <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full border ml-2"
+                    [ngClass]="getStatusStyle(selectedSample.status)">
+                {{ getStatusLabel(selectedSample.status) }}
+              </span>
+            </div>
+            <div>
+              <span class="text-neutral-500">Fecha de Creación:</span>
+              <p class="font-medium text-neutral-900">{{ selectedSample.createdAt | date:'longDate' }}</p>
+            </div>
+          </div>
+          <div *ngIf="selectedSample.notes" class="mt-4">
+            <span class="text-neutral-500">Notas:</span>
+            <p class="text-neutral-700 mt-1">{{ selectedSample.notes }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
