@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { SampleService } from '../../../core/services/sample.service';
 
 interface Mutation {
   id: string;
@@ -30,6 +31,25 @@ interface GeneticSample {
   mutationCount: number;
 }
 
+interface GeneticReport {
+  reportId: string;
+  geneticSample: {
+    id: string;
+    type: string;
+    status: string;
+    medicalEntityId: string;
+    collectionDate: string;
+    notes: string;
+    createdAt: string;
+    confidenceScore: number;
+    processingSoftware: string;
+    referenceGenome: string;
+  };
+  sample: any;
+  s3Url: string;
+  s3UrlPatient: string | null;
+}
+
 @Component({
   selector: 'app-genetic-tests',
   standalone: true,
@@ -41,6 +61,7 @@ export class GeneticTestsComponent implements OnInit {
   loading = true;
   error = '';
   geneticSamples: GeneticSample[] = [];
+  geneticReports: GeneticReport[] = [];
   selectedSample: GeneticSample | null = null;
   showDetailModal = false;
   
@@ -51,10 +72,14 @@ export class GeneticTestsComponent implements OnInit {
   selectedRelevance = 'ALL';
   searchTerm = '';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private sampleService: SampleService
+  ) {}
 
   ngOnInit() {
     this.loadGeneticSamples();
+    this.loadGeneticReports();
   }
 
   loadGeneticSamples() {
@@ -71,6 +96,51 @@ export class GeneticTestsComponent implements OnInit {
           this.loading = false;
         }
       });
+  }
+
+  loadGeneticReports() {
+    this.sampleService.getGeneticReports(this.patientId).subscribe({
+      next: (reports) => {
+        this.geneticReports = reports;
+      },
+      error: (error) => {
+        console.error('Error loading genetic reports:', error);
+      }
+    });
+  }
+
+  getReportsForSample(sampleId: string): GeneticReport[] {
+    return this.geneticReports.filter(report => report.geneticSample.id === sampleId);
+  }
+
+  hasTechnicalReport(sampleId: string): boolean {
+    const reports = this.getReportsForSample(sampleId);
+    return reports.some(report => report.s3Url);
+  }
+
+  hasPatientFriendlyReport(sampleId: string): boolean {
+    const reports = this.getReportsForSample(sampleId);
+    return reports.some(report => report.s3UrlPatient);
+  }
+
+  openTechnicalReport(sampleId: string) {
+    const reports = this.getReportsForSample(sampleId);
+    const reportWithTechnical = reports.find(report => report.s3Url);
+    
+    if (reportWithTechnical) {
+      // Navegar al componente de reporte técnico
+      window.open(`/patient/genetic-report?url=${encodeURIComponent(reportWithTechnical.s3Url)}&type=technical`, '_blank');
+    }
+  }
+
+  openPatientFriendlyReport(sampleId: string) {
+    const reports = this.getReportsForSample(sampleId);
+    const reportWithPatient = reports.find(report => report.s3UrlPatient);
+    
+    if (reportWithPatient) {
+      // Navegar al componente de reporte amigable
+      window.open(`/patient/genetic-report?url=${encodeURIComponent(reportWithPatient.s3UrlPatient!)}&type=patient`, '_blank');
+    }
   }
 
   getFilteredSamples(): GeneticSample[] {
@@ -173,14 +243,12 @@ export class GeneticTestsComponent implements OnInit {
   openSampleDetail(sample: GeneticSample) {
     this.selectedSample = sample;
     this.showDetailModal = true;
-    // Prevenir scroll del body cuando el modal está abierto
     document.body.style.overflow = 'hidden';
   }
 
   closeModal() {
     this.showDetailModal = false;
     this.selectedSample = null;
-    // Restaurar scroll del body
     document.body.style.overflow = 'auto';
   }
 

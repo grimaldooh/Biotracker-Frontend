@@ -195,6 +195,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./modules/patient/genetic-tests/genetic-tests.component')
             .then(m => m.GeneticTestsComponent)
+      },
+      {
+        path: 'patient/genetic-report',
+        loadComponent: () =>
+          import('./modules/patient/genetic-report-viewer/genetic-report-viewer.component')
+            .then(m => m.GeneticReportViewerComponent)
       }
     ]
   },
