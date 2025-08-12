@@ -243,6 +243,9 @@ export class VisitManagementComponent implements OnInit {
   // Nueva propiedad para almacenar TODOS los medicamentos
   allPatientMedications: Medication[] = [];
 
+  // Nueva propiedad para el ID del doctor actual
+  currentDoctorId: string = '';
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -268,6 +271,17 @@ export class VisitManagementComponent implements OnInit {
       startDate: [new Date().toISOString().split('T')[0], Validators.required],
       endDate: ['']
     });
+
+    // Obtener doctorId dinámico
+    const userData = localStorage.getItem('currentUser');
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        this.currentDoctorId = user.userId || user.id || '';
+      } catch {
+        this.currentDoctorId = '';
+      }
+    }
   }
 
   ngOnInit() {
@@ -424,10 +438,9 @@ export class VisitManagementComponent implements OnInit {
         patientId: this.extractPatientId(this.currentVisit),
         patientName: this.currentVisit.patientName,
         withSameDoctor: withSameDoctor,
-        doctorId: withSameDoctor ? '00d79e66-4457-4d27-9228-fe467823ce8e' : null, // ID del doctor actual
+        doctorId: withSameDoctor ? this.currentDoctorId : null, // ID del doctor actual dinámico
         specialty: withSameDoctor ? this.currentVisit.medicalArea : null
       };
-      
       localStorage.setItem('newAppointmentData', JSON.stringify(appointmentData));
       this.router.navigate(['/doctors/new-appointment']);
     }
@@ -549,7 +562,7 @@ export class VisitManagementComponent implements OnInit {
       frequency: formValue.frequency,
       startDate: formValue.startDate,
       endDate: formValue.endDate || undefined,
-      prescribedById: 'c332337f-ea0f-48b1-a1a6-9dac44364343' // ID del doctor actual
+      prescribedById: this.currentDoctorId // ID del doctor actual dinámico
     };
 
     this.medicationsToAdd.push(newMedication);

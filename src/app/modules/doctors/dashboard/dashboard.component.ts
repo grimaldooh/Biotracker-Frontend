@@ -12,8 +12,8 @@ import { forkJoin } from 'rxjs';
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements OnInit {
-  doctorId = 'c332337f-ea0f-48b1-a1a6-9dac44364343'; // Obtener del servicio de autenticación
-  doctorName = 'Dr. García'; // Obtener del servicio de autenticación
+  doctorId = '';
+  doctorName = '';
   
   stats: DoctorStats = {
     totalPatients: 0,
@@ -31,7 +31,20 @@ export class DashboardComponent implements OnInit {
   constructor(
     private router: Router,
     private doctorService: DoctorService
-  ) {}
+  ) {
+    // Obtener datos dinámicos del usuario autenticado (localStorage)
+    const userData = localStorage.getItem('currentUser');
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        this.doctorId = user.userId || user.id || '';
+        this.doctorName = user.name || '';
+      } catch {
+        this.doctorId = '';
+        this.doctorName = '';
+      }
+    }
+  }
 
   ngOnInit() {
     this.loadDashboardData();
@@ -40,7 +53,6 @@ export class DashboardComponent implements OnInit {
   loadDashboardData() {
     this.loading = true;
     
-    // Cargar todas las citas y las pendientes en paralelo
     forkJoin({
       stats: this.doctorService.getDoctorStats(this.doctorId),
       allVisits: this.doctorService.getAllVisits(this.doctorId),
@@ -50,13 +62,10 @@ export class DashboardComponent implements OnInit {
         this.stats = data.stats;
         this.allVisits = data.allVisits;
         this.pendingVisits = data.pendingVisits;
-        
-        // Procesar las citas para obtener las de hoy y próximas
         this.processMedicalVisits();
         this.loading = false;
       },
       error: () => {
-        // Datos de ejemplo en caso de error
         this.setFallbackData();
         this.loading = false;
       }
@@ -70,20 +79,18 @@ export class DashboardComponent implements OnInit {
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    // Filtrar citas de hoy (pendientes)
     this.todayAppointments = this.pendingVisits.filter(visit => {
       const visitDate = new Date(visit.visitDate);
       visitDate.setHours(0, 0, 0, 0);
       return visitDate.getTime() === today.getTime();
     }).sort((a, b) => new Date(a.visitDate).getTime() - new Date(b.visitDate).getTime());
 
-    // Filtrar próximas citas (pendientes, no de hoy)
     this.upcomingAppointments = this.pendingVisits.filter(visit => {
       const visitDate = new Date(visit.visitDate);
       visitDate.setHours(0, 0, 0, 0);
       return visitDate.getTime() >= tomorrow.getTime();
     }).sort((a, b) => new Date(a.visitDate).getTime() - new Date(b.visitDate).getTime())
-    .slice(0, 5); // Solo las próximas 5
+    .slice(0, 5);
   }
 
   private setFallbackData() {
@@ -94,12 +101,11 @@ export class DashboardComponent implements OnInit {
       completedAppointments: 156
     };
 
-    // Datos de ejemplo para citas
     this.todayAppointments = [
       {
         id: '1',
         patientName: 'María González',
-        doctorName: 'Dr. García',
+        doctorName: this.doctorName,
         visitDate: '2025-01-08T10:30:00',
         type: 'CONSULTATION',
         notes: 'Control rutinario',
@@ -112,7 +118,7 @@ export class DashboardComponent implements OnInit {
       {
         id: '2',
         patientName: 'Juan Pérez',
-        doctorName: 'Dr. García',
+        doctorName: this.doctorName,
         visitDate: '2025-01-08T11:15:00',
         type: 'FOLLOW_UP',
         notes: 'Seguimiento post-operatorio',
@@ -128,7 +134,7 @@ export class DashboardComponent implements OnInit {
       {
         id: '3',
         patientName: 'Ana Rodríguez',
-        doctorName: 'Dr. García',
+        doctorName: this.doctorName,
         visitDate: '2025-01-09T09:00:00',
         type: 'CONSULTATION',
         notes: 'Primera consulta',
@@ -141,7 +147,7 @@ export class DashboardComponent implements OnInit {
       {
         id: '4',
         patientName: 'Carlos López',
-        doctorName: 'Dr. García',
+        doctorName: this.doctorName,
         visitDate: '2025-01-09T14:30:00',
         type: 'FOLLOW_UP',
         notes: 'Revisión de exámenes',
@@ -154,7 +160,6 @@ export class DashboardComponent implements OnInit {
     ];
   }
 
-  // Navegación
   goToPatients() {
     this.router.navigate(['/doctor/patients']);
   }
@@ -171,7 +176,6 @@ export class DashboardComponent implements OnInit {
     this.router.navigate(['/doctor/reports']);
   }
 
-  // Utilidades
   getAppointmentTypeLabel(type: string): string {
     const labels: Record<string, string> = {
       'CONSULTATION': 'Consulta',

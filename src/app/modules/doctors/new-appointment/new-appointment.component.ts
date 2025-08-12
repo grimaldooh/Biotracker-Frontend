@@ -29,8 +29,8 @@ interface Patient {
   styleUrl: './new-appointment.component.css'
 })
 export class NewAppointmentComponent implements OnInit {
-  hospitalId = '00d79e66-4457-4d27-9228-fe467823ce8e';
-  currentDoctorId = 'c332337f-ea0f-48b1-a1a6-9dac44364343';
+  hospitalId = '';
+  currentDoctorId = '';
   
   // Formularios
   appointmentForm!: FormGroup;
@@ -77,6 +77,28 @@ export class NewAppointmentComponent implements OnInit {
     private labService: LabService
   ) {
     this.initializeForms();
+
+    // Obtener hospitalId dinámico
+    const hospitalInfo = localStorage.getItem('hospitalInfo');
+    if (hospitalInfo) {
+      try {
+        const hospital = JSON.parse(hospitalInfo);
+        this.hospitalId = hospital.id || '';
+      } catch {
+        this.hospitalId = '';
+      }
+    }
+
+    // Obtener doctorId dinámico
+    const userData = localStorage.getItem('currentUser');
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        this.currentDoctorId = user.userId || user.id || '';
+      } catch {
+        this.currentDoctorId = '';
+      }
+    }
   }
 
   ngOnInit() {

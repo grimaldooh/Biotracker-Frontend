@@ -41,11 +41,23 @@ export class VisitHistoryComponent implements OnInit {
     today: 0
   };
 
+  doctorId: string = '';
+
   constructor(
     private doctorService: DoctorService,
-    //private authService: AuthService,
     private router: Router
-  ) {}
+  ) {
+    // Obtener doctorId dinámico
+    const userData = localStorage.getItem('currentUser');
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        this.doctorId = user.userId || user.id || '';
+      } catch {
+        this.doctorId = '';
+      }
+    }
+  }
 
   ngOnInit() {
     this.loadVisits();
@@ -53,16 +65,12 @@ export class VisitHistoryComponent implements OnInit {
 
   loadVisits() {
     this.loading = true;
-    // const doctorId = this.authService.getCurrentUserId();
-    const doctorId = '79edd3d9-fec1-4f31-8e50-7064d3c97237'; // ID hardcodeado temporalmente
-
-    if (!doctorId) {
+    if (!this.doctorId) {
       console.error('Doctor ID not found');
       this.loading = false;
       return;
     }
-
-    this.doctorService.getAllVisits(doctorId).subscribe({
+    this.doctorService.getAllVisits(this.doctorId).subscribe({
       next: (visits) => {
         this.allVisits = visits.sort((a, b) => 
           new Date(b.visitDate).getTime() - new Date(a.visitDate).getTime()

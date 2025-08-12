@@ -16,7 +16,7 @@ interface AppointmentGroup {
   styleUrl: './schedule-appointments.component.css'
 })
 export class ScheduleAppointmentsComponent implements OnInit {
-  doctorId = 'c332337f-ea0f-48b1-a1a6-9dac44364343'; // Obtener del servicio de autenticación
+  doctorId: string = '';
   pendingVisits: MedicalVisit[] = [];
   groupedAppointments: AppointmentGroup[] = [];
   loading = true;
@@ -25,7 +25,18 @@ export class ScheduleAppointmentsComponent implements OnInit {
   constructor(
     private router: Router,
     private doctorService: DoctorService
-  ) {}
+  ) {
+    // Obtener doctorId dinámico
+    const userData = localStorage.getItem('currentUser');
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        this.doctorId = user.userId || user.id || '';
+      } catch {
+        this.doctorId = '';
+      }
+    }
+  }
 
   ngOnInit() {
     this.loadPendingAppointments();
