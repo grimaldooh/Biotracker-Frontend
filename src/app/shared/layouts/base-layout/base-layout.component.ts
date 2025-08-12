@@ -34,6 +34,11 @@ export class BaseLayoutComponent implements OnInit {
   currentUserRole: string = '';
 
   ngOnInit() {
-    this.currentUserRole = this.authService.getCurrentUserRole();
+    //this.currentUserRole = this.authService.getCurrentUserRole();
+    const user = localStorage.getItem('currentUser');
+    if (user) {
+      const parsedUser = JSON.parse(user);
+      this.currentUserRole = parsedUser.role || '';
+    }
   }
 }

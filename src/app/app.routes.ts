@@ -5,8 +5,23 @@ import { LabAppointmentsListComponent } from './modules/reception/lab-appointmen
 import { MyAppointmentsComponent } from './modules/patient/my-appointments/my-appointments.component';
 import { ReportViewerComponent } from './modules/patient/report-viewer/report-viewer.component';
 import { TechnicalReportComponent } from './modules/patient/technical-report/technical-report.component';
+import { AuthLayoutComponent } from './shared/layouts/auth-layout/auth-layout.component';
+import { LoginComponent } from './modules/auth/login/login.component';
+import { RegisterPatientComponent } from './modules/patients/register-patient/register-patient.component';
+import { RegisterUserComponent } from './modules/users/register-user/register-user.component';
 
 export const routes: Routes = [
+  // Rutas de autenticación (sin sidebar)
+  {
+    path: 'auth',
+    component: AuthLayoutComponent,
+    children: [
+      { path: 'login', component: LoginComponent },
+      { path: 'signup/patient', component: RegisterPatientComponent },
+      { path: 'signup/user', component: RegisterUserComponent },
+      { path: '', redirectTo: 'login', pathMatch: 'full' }
+    ]
+  },
   {
     path: '',
     component: BaseLayoutComponent,

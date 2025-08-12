@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { SidebarConfig, MenuItem } from '../../interfaces/sidebar.interface';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -20,7 +21,7 @@ export class SidebarComponent implements OnInit {
   isMobileMenuOpen = false;
 
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   ngOnInit() {
     this.loadSidebarConfig();
@@ -280,7 +281,7 @@ export class SidebarComponent implements OnInit {
         {
           id: 'genetic-tests',
           label: 'Pruebas Genéticas',
-          icon: 'M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z',
+          icon: 'M14.4,6L14,4H5V21H7V14H12.6L13,16H20V6H14.4Z',
           route: '/patient/genetic-tests',
           isActive: false
         }
@@ -305,5 +306,13 @@ export class SidebarComponent implements OnInit {
     if (menuItem.children) {
       menuItem.isExpanded = !menuItem.isExpanded;
     }
+  }
+
+  getCurrentUser() {
+    return this.authService.getCurrentUser();
+  }
+
+  logout() {
+    this.authService.logout();
   }
 }

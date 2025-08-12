@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { UserService, RegisterUserDTO } from '../../../core/services/user.service';
+import { AuthService, SignupUserRequest } from '../../../shared/services/auth.service';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register-user',
@@ -43,7 +45,7 @@ export class RegisterUserComponent {
     'Medicina General'
   ];
 
-  constructor(private fb: FormBuilder, private userService: UserService) {
+  constructor(private fb: FormBuilder, private userService: UserService, private router: Router) {
     this.userForm = this.fb.group({
       name: ['', Validators.required],
       phoneNumber: ['', Validators.required],
@@ -81,6 +83,7 @@ export class RegisterUserComponent {
           alert('Usuario registrado exitosamente');
           this.userForm.reset();
           this.loading = false;
+          this.router.navigate(['/login']);
         },
         error: () => {
           alert('Error al registrar usuario');

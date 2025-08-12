@@ -1,0 +1,22 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+  <div class="w-full max-w-md">
+    <!-- Logo y título -->
+    <div class="text-center mb-8">
+      <div class="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z"/>
+        </svg>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-900">BioTrack</h1>
+      <p class="text-gray-600 mt-2">Sistema de Gestión Médica</p>
+    </div>
+
+    <!-- Contenido dinámico -->
+    <router-outlet></router-outlet>
+    
+    <!-- Footer -->
+    <div class="text-center mt-8 text-sm text-gray-500">
+      <p>&copy; 2025 BioTrack. Todos los derechos reservados.</p>
+    </div>
+  </div>
+</div>

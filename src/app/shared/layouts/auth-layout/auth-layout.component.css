@@ -1,0 +1,22 @@
+/* Animaciones suaves */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilos responsive */
+@media (max-width: 640px) {
+  .min-h-screen {
+    padding: 1rem;
+  }
+}

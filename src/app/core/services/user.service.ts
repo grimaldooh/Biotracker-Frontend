@@ -16,6 +16,10 @@ export class UserService {
   constructor(private http: HttpClient) {}
 
   registerUser(hospitalId: string, user: RegisterUserDTO): Observable<any> {
-    return this.http.post(`http://localhost:8080/api/hospitals/register-user/${hospitalId}`, user);
+    // Nuevo endpoint y payload según lo solicitado
+    return this.http.post(
+      `http://localhost:8080/api/auth/signup/user/${hospitalId}`,
+      user
+    );
   }
 }
