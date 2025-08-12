@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { SampleService } from '../../../core/services/sample.service';
+import { AuthService } from '../../../shared/services/auth.service';
 
 interface Mutation {
   id: string;
@@ -74,8 +75,9 @@ export class GeneticTestsComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private sampleService: SampleService
-  ) {}
+    private sampleService: SampleService,
+    private authService : AuthService
+  ) {this.patientId = this.authService.getCurrentUserId() || ''; }
 
   ngOnInit() {
     this.loadGeneticSamples();

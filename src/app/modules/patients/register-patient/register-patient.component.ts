@@ -62,7 +62,7 @@ export class RegisterPatientComponent {
     this.loading = true;
     const formData = this.patientForm.value;
 
-    if (this.registrationMode === 'signup') {
+    if (this.registrationMode === 'reception') {
       // Registro con autenticación automática
       const signupData: SignupPatientRequest = {
         firstName: formData.firstName,
@@ -75,10 +75,13 @@ export class RegisterPatientComponent {
         curp: formData.curp || undefined
       };
 
-      this.authService.signupPatient(signupData).subscribe({
+      const hospitalId = '00d79e66-4457-4d27-9228-fe467823ce8e'; // Usa el hospitalId correcto aquí
+
+      this.authService.signupPatient(signupData, hospitalId).subscribe({
         next: (response) => {
+          console.log('Registro exitoso:', response);
           this.snackBar.open('Cuenta creada exitosamente', 'Cerrar', { duration: 3000 });
-          this.authService.redirectAfterLogin();
+          //this.authService.redirectAfterLogin();
           this.loading = false;
         },
         error: (error) => {
@@ -90,6 +93,7 @@ export class RegisterPatientComponent {
       // Registro tradicional por recepción
       this.patientService.registerPatient(formData).subscribe({
         next: () => {
+          console.log('Paciente registrado exitosamente con registro tradicional');
           this.snackBar.open('Paciente registrado exitosamente', 'Cerrar', { duration: 3000 });
           this.patientForm.reset();
           this.loading = false;

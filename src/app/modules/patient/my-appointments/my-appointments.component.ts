@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PatientService } from '../../../core/services/patient.service';
+import { AuthService } from '../../../shared/services/auth.service'; // Importa AuthService
 
 export interface MedicalVisit {
   id: string;
@@ -28,16 +29,41 @@ export class MyAppointmentsComponent implements OnInit {
   loading = false;
   activeTab: 'all' | 'pending' = 'pending';
   
-  // ID hardcodeado del paciente
-  patientId = '60ede05e-702c-442a-aba1-4507bb2fe542';
+  // ID dinámico del paciente
+  private readonly patientId: string | null;
+  hospitalName: string = '';
+  hospitalAddress: string = '';
 
-  constructor(private patientService: PatientService) {}
+  constructor(
+    private patientService: PatientService,
+    private authService: AuthService
+  ) {
+    this.patientId = this.authService.getCurrentUserId();
+
+    // Leer hospitalInfo de localStorage
+    const hospitalInfo = localStorage.getItem('hospitalInfo');
+    if (hospitalInfo) {
+      try {
+        const hospital = JSON.parse(hospitalInfo);
+        this.hospitalName = hospital.name || '';
+        this.hospitalAddress = hospital.fullAddress || '';
+      } catch {
+        this.hospitalName = '';
+        this.hospitalAddress = '';
+      }
+    }
+  }
 
   ngOnInit(): void {
     this.loadAppointments();
   }
 
   loadAppointments(): void {
+    if (!this.patientId) {
+      this.loading = false;
+      return;
+    }
+
     this.loading = true;
     
     // Cargar citas pendientes
@@ -106,5 +132,4 @@ export class MyAppointmentsComponent implements OnInit {
     // Navegar a la página de agendar nueva cita
     window.location.href = '/patient/schedule';
   }
-  
 }

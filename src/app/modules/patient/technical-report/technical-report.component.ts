@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PatientService } from '../../../core/services/patient.service';
 import { SampleService } from '../../../core/services/sample.service';
+import { AuthService } from '../../../shared/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { SampleDetailModalComponent } from '../../samples/sample-detail-modal/sample-detail-modal.component';
 
@@ -87,27 +88,52 @@ export class TechnicalReportComponent implements OnInit {
   loading = true;
   error = '';
   report: TechnicalReport | null = null;
+  noDataAvailable = false;
   
   // Modal states
   showSampleModal = false;
   selectedSample: any = null;
   
-  patientId = '60ede05e-702c-442a-aba1-4507bb2fe542';
+  // ID dinámico del paciente
+  patientId: string | null = null;
 
   constructor(
     private patientService: PatientService,
-    private sampleService: SampleService
-  ) {}
+    private sampleService: SampleService,
+    private authService: AuthService
+  ) {
+    // Obtener el patientId dinámicamente del usuario autenticado
+    this.patientId = this.authService.getCurrentUserId();
+  }
 
   ngOnInit() {
+    if (!this.patientId) {
+      this.error = 'No se pudo obtener el ID del paciente. Inicia sesión nuevamente.';
+      this.loading = false;
+      return;
+    }
+
     this.patientService.getLatestReportText(this.patientId).subscribe({
       next: (text) => {
-        this.parseReport(text);
+        if (!text || text.trim() === '') {
+          this.noDataAvailable = true;
+        } else {
+          this.parseReport(text);
+        }
         this.loading = false;
       },
-      error: () => {
-        this.error = 'No se pudo cargar el reporte técnico.';
+      error: (errorResponse) => {
         this.loading = false;
+        
+        // Manejo específico de errores
+        if (errorResponse.status === 404 || errorResponse.status === 500) {
+          this.noDataAvailable = true;
+        } else if (errorResponse.status === 400 || errorResponse.status === 422) {
+          this.noDataAvailable = true;
+        
+        } else {
+          this.error = 'Error del servidor. Intenta nuevamente más tarde.';
+        }
       }
     });
   }
@@ -115,9 +141,19 @@ export class TechnicalReportComponent implements OnInit {
   parseReport(text: string) {
     try {
       const json = JSON.parse(text);
+      
+      // Verificar si el reporte tiene la estructura válida
+      if (!json.reporteMedico || 
+          !json.reporteMedico.paciente || 
+          !json.reporteMedico.resumen) {
+        this.noDataAvailable = true;
+        return;
+      }
+      
       this.report = json.reporteMedico;
     } catch (e) {
-      this.error = 'El formato del reporte no es válido.';
+      console.error('Error parsing technical report:', e);
+      this.noDataAvailable = true;
     }
   }
 
@@ -223,5 +259,19 @@ export class TechnicalReportComponent implements OnInit {
   isValidSampleId(sampleId: string): boolean {
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     return uuidRegex.test(sampleId);
+  }
+
+  // Método para navegar a agendar cita
+  scheduleAppointment(): void {
+    window.location.href = '/patient/schedule';
+  }
+
+  // Método para recargar el reporte
+  retryLoadReport(): void {
+    this.loading = true;
+    this.error = '';
+    this.noDataAvailable = false;
+    this.report = null;
+    this.ngOnInit();
   }
 }

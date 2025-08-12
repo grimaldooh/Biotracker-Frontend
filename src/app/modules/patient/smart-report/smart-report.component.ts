@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PatientService } from '../../../core/services/patient.service';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../shared/services/auth.service';
 
 interface PatientInfo {
   nombre: string;
@@ -111,20 +112,41 @@ export class SmartReportComponent implements OnInit {
   loading = true;
   error = '';
   report: PatientReport | null = null;
+  noDataAvailable = false;
   
-  patientId = '60ede05e-702c-442a-aba1-4507bb2fe542';
+  patientId: string | null = null;
 
-  constructor(private patientService: PatientService) {}
+  constructor(private patientService: PatientService, private authService: AuthService) {
+    this.patientId = this.authService.getCurrentUserId();
+  }
 
   ngOnInit() {
+    if (!this.patientId) {
+      this.error = 'No se pudo obtener el ID del paciente. Inicia sesión nuevamente.';
+      this.loading = false;
+      return;
+    }
+
     this.patientService.getLatestReportTextPatientFriendly(this.patientId).subscribe({
       next: (text) => {
-        this.parseReport(text);
+        if (!text || text.trim() === '') {
+          this.noDataAvailable = true;
+        } else {
+          this.parseReport(text);
+        }
         this.loading = false;
       },
-      error: () => {
-        this.error = 'No se pudo cargar el reporte de salud.';
+      error: (errorResponse) => {
         this.loading = false;
+        
+        // Verificar diferentes tipos de errores
+        if (errorResponse.status === 404 || errorResponse.status === 500) {
+          this.noDataAvailable = true;
+        } else if (errorResponse.status === 400 || errorResponse.status === 422) {
+          this.noDataAvailable = true;
+        } else {
+          this.error = 'Error del servidor. Intenta nuevamente más tarde.';
+        }
       }
     });
   }
@@ -132,9 +154,18 @@ export class SmartReportComponent implements OnInit {
   parseReport(text: string) {
     try {
       const json = JSON.parse(text);
+      
+      // Verificar si el reporte tiene contenido válido
+      if (!json.resumen_clinico_paciente || 
+          !json.resumen_clinico_paciente.informacion_paciente) {
+        this.noDataAvailable = true;
+        return;
+      }
+      
       this.report = json.resumen_clinico_paciente;
     } catch (e) {
-      this.error = 'El formato del reporte no es válido.';
+      console.error('Error parsing report:', e);
+      this.noDataAvailable = true;
     }
   }
 
@@ -162,5 +193,19 @@ export class SmartReportComponent implements OnInit {
       default:
         return 'bg-slate-50 text-slate-700';
     }
+  }
+
+  // Método para navegar a agendar cita
+  scheduleAppointment(): void {
+    window.location.href = '/patient/schedule';
+  }
+
+  // Método para recargar el reporte
+  retryLoadReport(): void {
+    this.loading = true;
+    this.error = '';
+    this.noDataAvailable = false;
+    this.report = null;
+    this.ngOnInit();
   }
 }

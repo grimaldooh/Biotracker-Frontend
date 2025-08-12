@@ -9,7 +9,7 @@
   </div>
 
   <!-- Error State -->
-  <div *ngIf="error" class="flex items-center justify-center min-h-screen">
+  <div *ngIf="!loading && error" class="flex items-center justify-center min-h-screen">
     <div class="text-center max-w-md mx-auto px-6">
       <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
         <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -17,12 +17,72 @@
         </svg>
       </div>
       <h3 class="text-slate-800 font-medium mb-2">Error al cargar el reporte</h3>
-      <p class="text-slate-600 text-sm">{{ error }}</p>
+      <p class="text-slate-600 text-sm mb-4">{{ error }}</p>
+      <button 
+        (click)="retryLoadReport()"
+        class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        Intentar de nuevo
+      </button>
     </div>
   </div>
 
-  <!-- Main Content -->
-  <div *ngIf="!loading && !error && report" class="max-w-6xl mx-auto p-6 space-y-6">
+  <!-- No Data Available State -->
+  <div *ngIf="!loading && noDataAvailable && !error" class="max-w-4xl mx-auto p-6">
+    <div class="bg-white rounded-lg border border-slate-200 p-12 text-center">
+      <div class="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <svg class="w-12 h-12 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+      </div>
+      
+      <h3 class="text-xl font-semibold text-slate-900 mb-4">
+        Reporte Técnico no disponible
+      </h3>
+      
+      <p class="text-slate-600 mb-6 max-w-md mx-auto leading-relaxed">
+        Actualmente no tienes estudios de laboratorio o citas médicas suficientes para generar un reporte técnico detallado. 
+        Necesitamos más información clínica para crear un análisis completo.
+      </p>
+      
+      <div class="space-y-4">
+        <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6">
+          <h4 class="font-medium text-purple-900 mb-2">Para generar tu reporte técnico necesitas:</h4>
+          <ul class="text-purple-800 text-sm space-y-1 text-left max-w-xs mx-auto">
+            <li>• Al menos 3 citas médicas completadas</li>
+            <li>• Estudios de laboratorio procesados</li>
+            <li>• Muestras analizadas (sangre, ADN, etc.)</li>
+            <li>• Diagnósticos médicos registrados</li>
+          </ul>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+          <button 
+            (click)="scheduleAppointment()"
+            class="inline-flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+            Agendar Cita Médica
+          </button>
+          
+          <button 
+            (click)="retryLoadReport()"
+            class="inline-flex items-center px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg transition-colors">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            Intentar de nuevo
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content - Solo se muestra si hay reporte válido -->
+  <div *ngIf="!loading && !error && !noDataAvailable && report" class="max-w-6xl mx-auto p-6 space-y-6">
     
     <!-- Header -->
     <header class="bg-white rounded-lg border border-slate-200 p-6">

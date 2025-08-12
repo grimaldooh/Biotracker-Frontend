@@ -4,6 +4,7 @@ import { SampleService } from '../../../core/services/sample.service';
 import { StatusColorPipe } from '../../../core/pipes/status-color.pipe'; // Ajusta la ruta
 import { PatientReport, ReportsService } from '../../../core/services/reports.service';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../shared/services/auth.service';
 
 @Component({
   selector: 'app-patient-samples',
@@ -16,15 +17,19 @@ export class SamplesComponent implements OnInit {
   samples: any[] = [];
   loading = true;
   selectedSample: any = null;
-  patientId = '60ede05e-702c-442a-aba1-4507bb2fe542'; // Puedes obtenerlo de un servicio de sesión
   reports : PatientReport[] = [];
+  patientId: string = 'default-patient-id'; // Valor por defecto
 
 
   constructor(
     private sampleService: SampleService,
     private reportsService: ReportsService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private authService: AuthService 
+  ) {
+    // Obtén el patientId dinámicamente del usuario autenticado
+    this.patientId = this.authService.getCurrentUserId() || this.patientId;
+  }
   
   ngOnInit(): void {
     this.loadSamples();

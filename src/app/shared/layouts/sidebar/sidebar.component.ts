@@ -37,7 +37,7 @@ export class SidebarComponent implements OnInit {
 
   private loadSidebarConfig() {
     switch (this.userRole.toUpperCase()) {
-      case 'RECEPTION':
+      case 'RECEPTIONIST':
         this.sidebarConfig = this.getReceptionConfig();
         break;
       case 'MEDIC':

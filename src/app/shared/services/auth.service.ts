@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, tap } from 'rxjs';
+import { Observable, BehaviorSubject, tap, switchMap } from 'rxjs';
 import { Router } from '@angular/router';
 
 export interface LoginRequest {
@@ -9,6 +9,7 @@ export interface LoginRequest {
 }
 
 export interface AuthResponse {
+  id: string; 
   email: string;
   name: string | null;
   firstName: string | null;
@@ -37,6 +38,12 @@ export interface SignupPatientRequest {
   birthDate: string;
   gender: string;
   curp?: string;
+}
+
+export interface HospitalInfo {
+  id: string;
+  name: string;
+  fullAddress: string;
 }
 
 @Injectable({
@@ -75,26 +82,109 @@ export class AuthService {
       .pipe(
         tap(response => {
           this.setCurrentUser(response);
+        }),
+        switchMap(response => {
+          // Después del login exitoso, obtener información del hospital
+          return this.loadUserHospitalInfo(response);
         })
       );
   }
 
-  signupUser(userData: SignupUserRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/signup/user`, userData)
+  signupUser(userData: SignupUserRequest, hospitalId?: string): Observable<AuthResponse> {
+    const endpoint = hospitalId 
+      ? `${this.apiUrl}/signup/user/${hospitalId}`
+      : `${this.apiUrl}/signup/user`;
+      
+    return this.http.post<AuthResponse>(endpoint, userData)
       .pipe(
         tap(response => {
           this.setCurrentUser(response);
+        }),
+        switchMap(response => {
+          // Después del signup exitoso, obtener información del hospital
+          return this.loadUserHospitalInfo(response);
         })
       );
   }
 
-  signupPatient(patientData: SignupPatientRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/signup/patient`, patientData)
+  signupPatient(patientData: SignupPatientRequest, hospitalId?: string): Observable<AuthResponse> {
+    const endpoint = hospitalId 
+      ? `${this.apiUrl}/signup/patient/${hospitalId}`
+      : `${this.apiUrl}/signup/patient`;
+      
+    return this.http.post<AuthResponse>(endpoint, patientData)
       .pipe(
         tap(response => {
-          this.setCurrentUser(response);
+          // Solo establecer usuario si no se proporcionó hospitalId (modo signup directo)
+          if (!hospitalId) {
+            this.setCurrentUser(response);
+          }
+        }),
+        switchMap(response => {
+          // Si es modo signup directo, cargar info del hospital
+          if (!hospitalId) {
+            return this.loadUserHospitalInfo(response);
+          }
+          // Si es modo recepción, solo retornar la respuesta
+          return new Observable<AuthResponse>(observer => {
+            observer.next(response);
+            observer.complete();
+          });
         })
       );
+  }
+
+  private loadUserHospitalInfo(user: AuthResponse): Observable<AuthResponse> {
+    return new Observable(observer => {
+      // Primero extraer el userId del token JWT o usar otro método
+      const userId = user.id
+      
+      if (!userId) {
+        console.error('No se pudo extraer el userId');
+        observer.next(user);
+        observer.complete();
+        return;
+      }
+
+      // Determinar el endpoint según el tipo de usuario
+      const endpoint = user.role === 'PATIENT' 
+        ? `http://localhost:8080/api/patients/${userId}/primary-hospital`
+        : `http://localhost:8080/api/users/${userId}/primary-hospital`;
+
+      this.http.get<HospitalInfo>(endpoint).subscribe({
+        next: (hospitalInfo) => {
+          // Guardar información del hospital en localStorage
+          localStorage.setItem('hospitalInfo', JSON.stringify(hospitalInfo));
+          
+          // Actualizar usuario con el ID
+          const updatedUser = { ...user, userId };
+          this.setCurrentUser(updatedUser);
+          
+          observer.next(updatedUser);
+          observer.complete();
+        },
+        error: (error) => {
+          console.error('Error loading hospital info:', error);
+          // Continuar sin información del hospital
+          const updatedUser = { ...user, userId };
+          this.setCurrentUser(updatedUser);
+          observer.next(updatedUser);
+          observer.complete();
+        }
+      });
+    });
+  }
+
+  private extractUserIdFromToken(token: string): string | null {
+    try {
+      // Decodificar el payload del JWT
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // Asumir que el userId está en el campo 'sub' o 'userId'
+      return payload.sub || payload.userId || null;
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return null;
+    }
   }
 
   private setCurrentUser(user: AuthResponse): void {
@@ -108,11 +198,30 @@ export class AuthService {
     return user ? user.role : '';
   }
 
+  getCurrentUserId(): string | null {
+    const user = this.getCurrentUser();
+    return user?.id || null;
+  }
+
+  getHospitalInfo(): HospitalInfo | null {
+    const hospitalData = localStorage.getItem('hospitalInfo');
+    if (hospitalData) {
+      try {
+        return JSON.parse(hospitalData);
+      } catch (error) {
+        console.error('Error parsing hospital data:', error);
+        return null;
+      }
+    }
+    return null;
+  }
+
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('hospitalInfo');
     this.currentUserSubject.next(null);
-    this.router.navigate(['/login']);
+    this.router.navigate(['/auth/login']);
   }
 
   isAuthenticated(): boolean {

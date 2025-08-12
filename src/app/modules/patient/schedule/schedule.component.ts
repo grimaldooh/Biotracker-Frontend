@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { HospitalService } from '../../../core/services/hospital.service';
 import { LabAppointmentService, LabAppointmentCreationDTO } from '../../../core/services/lab-appointment.service';
+import { AuthService } from '../../../shared/services/auth.service'; // Importa AuthService
 
 interface Medic {
   id: string;
@@ -27,9 +28,9 @@ export class ScheduleComponent implements OnInit {
   showSuccessModal = false;
   successMessage = '';
 
-  // IDs hardcodeados
-  patientId = '60ede05e-702c-442a-aba1-4507bb2fe542';
-  hospitalId = '00d79e66-4457-4d27-9228-fe467823ce8e';
+  // IDs dinámicos
+  patientId: string | null = null;
+  hospitalId: string | null = null;
 
   visitTypes = [
     { value: 'CONSULTATION', label: 'Consulta' },
@@ -50,7 +51,8 @@ export class ScheduleComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private hospitalService: HospitalService,
-    private labAppointmentService: LabAppointmentService
+    private labAppointmentService: LabAppointmentService,
+    private authService: AuthService // Inyecta AuthService
   ) {
     this.appointmentForm = this.fb.group({
       appointmentType: ['', Validators.required],
@@ -67,6 +69,16 @@ export class ScheduleComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Obtener IDs dinámicamente del AuthService y localStorage
+    this.patientId = this.authService.getCurrentUserId();
+    const hospitalInfo = this.authService.getHospitalInfo();
+    this.hospitalId = hospitalInfo?.id || null;
+
+    if (!this.hospitalId) {
+      this.loadingMedics = false;
+      return;
+    }
+
     this.loadingMedics = true;
     this.hospitalService.getMedicsByHospital(this.hospitalId).subscribe({
       next: (data) => {
@@ -142,6 +154,8 @@ export class ScheduleComponent implements OnInit {
   }
 
   private createMedicalVisit(): void {
+    if (!this.patientId || !this.hospitalId) return;
+
     const body = {
       patientId: { id: this.patientId },
       doctorId: { id: this.appointmentForm.value.medicId },
@@ -166,6 +180,8 @@ export class ScheduleComponent implements OnInit {
   }
 
   private createLabAppointment(): void {
+    if (!this.patientId || !this.hospitalId) return;
+
     const appointment: LabAppointmentCreationDTO = {
       medicalEntityId: this.hospitalId,
       doctorId: null,

@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Observable, forkJoin, Subject, BehaviorSubject } from 'rxjs';
 import { takeUntil, map, catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { AuthService } from '../../../shared/services/auth.service'; // Importa AuthService
 
 interface MedicalVisit {
   id: string;
@@ -42,9 +43,11 @@ const VISIT_TYPE_LABELS: Record<string, string> = {
   imports: [CommonModule]
 })
 export class AppointmentsHistorialComponent implements OnInit, OnDestroy {
-  private readonly patientId = '60ede05e-702c-442a-aba1-4507bb2fe542';
   private readonly destroy$ = new Subject<void>();
   private readonly baseUrl = 'http://localhost:8080/api/medical-visits';
+
+  // IDs dinámicos
+  private readonly patientId: string | null;
 
   // Estado reactivo
   private state$ = new BehaviorSubject<AppointmentsState>({
@@ -71,7 +74,13 @@ export class AppointmentsHistorialComponent implements OnInit, OnDestroy {
     return this.state$.pipe(map(state => state.error));
   }
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService // Inyecta AuthService
+  ) {
+    // Obtén el patientId dinámicamente del usuario autenticado
+    this.patientId = this.authService.getCurrentUserId();
+  }
 
   ngOnInit(): void {
     this.loadAppointments();
@@ -84,6 +93,14 @@ export class AppointmentsHistorialComponent implements OnInit, OnDestroy {
 
   private loadAppointments(): void {
     this.updateState({ loading: true, error: null });
+
+    if (!this.patientId) {
+      this.updateState({ 
+        error: 'No se pudo obtener el ID del paciente. Inicia sesión nuevamente.',
+        loading: false
+      });
+      return;
+    }
 
     const pending$ = this.http.get<MedicalVisit[]>(`${this.baseUrl}/patient/${this.patientId}/pending`)
       .pipe(catchError(() => of([])));
