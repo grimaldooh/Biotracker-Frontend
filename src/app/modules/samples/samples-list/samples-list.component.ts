@@ -12,14 +12,25 @@ import { SampleDTO } from '../sample.model';
   styleUrl: './samples-list.component.css'
 })
 export class SamplesListComponent implements OnInit {
-  hospitalId = '00d79e66-4457-4d27-9228-fe467823ce8e';
+  hospitalId = '';
   searchTerm: string = '';
 
   samples: SampleDTO[] = [];
   loading = true;
   selectedSample: SampleDTO | null = null;
 
-  constructor(private sampleService: SampleService) {}
+  constructor(private sampleService: SampleService) {
+    // Hospital dinámico
+    const hospitalInfo = localStorage.getItem('hospitalInfo');
+    if (hospitalInfo) {
+      try {
+        const hospital = JSON.parse(hospitalInfo);
+        this.hospitalId = hospital.id || '';
+      } catch {
+        this.hospitalId = '';
+      }
+    }
+  }
 
   ngOnInit() {
     this.sampleService.getSamplesByHospital(this.hospitalId).subscribe({

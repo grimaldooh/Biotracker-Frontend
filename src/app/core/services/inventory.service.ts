@@ -1,31 +1,36 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { InventoryMedicine, InventoryItem} from '../../modules/inventory/inventory.component';
+import { InventoryMedicine, InventoryItem } from '../../modules/inventory/inventory.component';
 
 @Injectable({ providedIn: 'root' })
 export class InventoryService {
+  private itemsUrl = 'http://localhost:8080/api/inventory-items';
+  private medicinesUrl = 'http://localhost:8080/api/inventory-medicines';
+
   constructor(private http: HttpClient) {}
 
-  // Medicinas
-  getMedicines(): Observable<InventoryMedicine[]> {
-    return this.http.get<InventoryMedicine[]>('http://localhost:8080/api/inventory-medicines');
-  }
-  addMedicine(medicine: InventoryMedicine): Observable<any> {
-    return this.http.post('http://localhost:8080/api/inventory-medicines', medicine);
-  }
-  updateMedicineQuantity(id: string, medicine: InventoryMedicine): Observable<any> {
-    return this.http.put(`http://localhost:8080/api/inventory-medicines/${id}`, medicine);
+  addMedicine(medicine: InventoryMedicine, hospitalId: string): Observable<any> {
+    return this.http.post(`${this.medicinesUrl}/hospital/${hospitalId}`, medicine);
   }
 
-  // Items
-  getItems(): Observable<InventoryItem[]> {
-    return this.http.get<InventoryItem[]>('http://localhost:8080/api/inventory-items');
+  addItem(item: InventoryItem, hospitalId: string): Observable<any> {
+    return this.http.post(`${this.itemsUrl}/hospital/${hospitalId}`, item);
   }
-  addItem(item: InventoryItem): Observable<any> {
-    return this.http.post('http://localhost:8080/api/inventory-items', item);
+
+  getMedicines(hospitalId: string): Observable<InventoryMedicine[]> {
+    return this.http.get<InventoryMedicine[]>(`${this.medicinesUrl}?hospitalId=${hospitalId}`);
   }
-  updateItemQuantity(id: string, item: InventoryItem): Observable<any> {
-    return this.http.put(`http://localhost:8080/api/inventory-items/${id}`, item);
+
+  getItems(hospitalId: string): Observable<InventoryItem[]> {
+    return this.http.get<InventoryItem[]>(`${this.itemsUrl}?hospitalId=${hospitalId}`);
+  }
+
+  updateMedicineQuantity(id: string, updated: InventoryMedicine): Observable<any> {
+    return this.http.put(`${this.medicinesUrl}/${id}`, updated);
+  }
+
+  updateItemQuantity(id: string, updated: InventoryItem): Observable<any> {
+    return this.http.put(`${this.itemsUrl}/${id}`, updated);
   }
 }

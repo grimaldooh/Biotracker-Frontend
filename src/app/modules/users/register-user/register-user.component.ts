@@ -27,7 +27,7 @@ export class RegisterUserComponent {
     { value: 'NURSE', label: 'Enfermero/a' },
     { value: 'ADMIN', label: 'Administrador' },
     { value: 'RECEPTIONIST', label: 'Recepcionista' },
-    { value: 'TECHNICIAN', label: 'Técnico' }
+    { value: 'LAB_TECHNICIAN', label: 'Técnico' }
   ];
 
   specialties = [
@@ -46,6 +46,17 @@ export class RegisterUserComponent {
   ];
 
   constructor(private fb: FormBuilder, private userService: UserService, private router: Router) {
+    // Hospital dinámico
+    const hospitalInfo = localStorage.getItem('hospitalInfo');
+    if (hospitalInfo) {
+      try {
+        const hospital = JSON.parse(hospitalInfo);
+        this.hospitalId = hospital.id || '';
+      } catch {
+        this.hospitalId = '';
+      }
+    }
+
     this.userForm = this.fb.group({
       name: ['', Validators.required],
       phoneNumber: ['', Validators.required],

@@ -19,12 +19,23 @@ export class LabAppointmentsListComponent implements OnInit {
   searchPatientTerm = '';
   filteredPatients: Patient[] = [];
   selectedPatient: Patient | null = null;
-  hospitalId = '00d79e66-4457-4d27-9228-fe467823ce8e'; // ID hardcodeado
+  hospitalId = '';
 
   constructor(
     private labAppointmentService: LabAppointmentService,
     private patientService: PatientService
-  ) {}
+  ) {
+    // Hospital dinámico
+    const hospitalInfo = localStorage.getItem('hospitalInfo');
+    if (hospitalInfo) {
+      try {
+        const hospital = JSON.parse(hospitalInfo);
+        this.hospitalId = hospital.id || '';
+      } catch {
+        this.hospitalId = '';
+      }
+    }
+  }
 
   ngOnInit(): void {
     // No cargamos todas las citas por defecto, esperamos a que seleccionen un paciente

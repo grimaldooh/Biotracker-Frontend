@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { FormsModule } from '@angular/forms'; // Agregar este import
+import { FormsModule } from '@angular/forms';
 
 interface LabAppointment {
   id: string;
@@ -28,12 +28,14 @@ interface RecentSample {
 @Component({
   selector: 'app-lab-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule], // Agregar FormsModule aquí
+  imports: [CommonModule, FormsModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements OnInit {
-  hospitalId = '00d79e66-4457-4d27-9228-fe467823ce8e';
+  hospitalId: string = '';
+  hospitalName: string = '';
+  hospitalAddress: string = '';
   
   stats = {
     todaySamples: 0,
@@ -51,7 +53,22 @@ export class DashboardComponent implements OnInit {
   constructor(
     private router: Router,
     private http: HttpClient
-  ) {}
+  ) {
+    // Obtener hospitalInfo de localStorage de forma segura
+    const hospitalInfo = localStorage.getItem('hospitalInfo');
+    if (hospitalInfo) {
+      try {
+        const hospital = JSON.parse(hospitalInfo);
+        this.hospitalId = hospital.id || '';
+        this.hospitalName = hospital.name || '';
+        this.hospitalAddress = hospital.fullAddress || '';
+      } catch {
+        this.hospitalId = '';
+        this.hospitalName = '';
+        this.hospitalAddress = '';
+      }
+    }
+  }
 
   ngOnInit() {
     this.loadRecentSamples();
@@ -60,6 +77,7 @@ export class DashboardComponent implements OnInit {
   }
 
   loadRecentSamples() {
+    if (!this.hospitalId) return;
     this.loadingRecentSamples = true;
     this.http.get<RecentSample[]>(`http://localhost:8080/api/samples/hospital/${this.hospitalId}/latest`)
       .subscribe({
@@ -75,16 +93,16 @@ export class DashboardComponent implements OnInit {
   }
 
   loadTodayAppointments() {
+    if (!this.hospitalId) return;
     this.loadingTodayAppointments = true;
     this.http.get<LabAppointment[]>(`http://localhost:8080/api/lab-appointments/hospital/${this.hospitalId}/solicited`)
       .subscribe({
         next: (appointments) => {
-          // Filtrar solo las de hoy para el dashboard
           const today = new Date();
           this.todayAppointments = appointments.filter(apt => {
             const aptDate = new Date(apt.createdAt);
             return aptDate.toDateString() === today.toDateString();
-          }).slice(0, 5); // Solo mostrar las primeras 5
+          }).slice(0, 5);
           
           this.stats.pendingAppointments = appointments.length;
           this.loadingTodayAppointments = false;
@@ -98,7 +116,6 @@ export class DashboardComponent implements OnInit {
 
   loadStats() {
     // Aquí puedes cargar estadísticas adicionales si tienes endpoints específicos
-    // Por ahora mantenemos valores básicos
   }
 
   goToRegisterSample() {
@@ -106,9 +123,8 @@ export class DashboardComponent implements OnInit {
   }
 
   goToUploadMutations() {
-  this.router.navigate(['/lab/upload-mutations']);
+    this.router.navigate(['/lab/upload-mutations']);
   }
-
 
   goToPendingAppointments() {
     this.router.navigate(['/lab/pending-appointments']);
@@ -119,7 +135,6 @@ export class DashboardComponent implements OnInit {
   }
 
   processAppointment(appointment: LabAppointment) {
-    // Guardar datos de la cita para pre-llenar el formulario
     const appointmentData = {
       patientId: appointment.patientId,
       patientName: appointment.patientName,
@@ -129,7 +144,6 @@ export class DashboardComponent implements OnInit {
       notes: appointment.notes,
       appointmentId: appointment.id
     };
-    
     localStorage.setItem('labAppointmentData', JSON.stringify(appointmentData));
     this.router.navigate(['/lab/process-appointment']);
   }

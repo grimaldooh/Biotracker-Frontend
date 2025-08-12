@@ -43,7 +43,7 @@ export class SidebarComponent implements OnInit {
       case 'MEDIC':
         this.sidebarConfig = this.getMedicConfig();
         break;
-      case 'LAB':
+      case 'LAB_TECHNICIAN':
         this.sidebarConfig = this.getLabConfig();
         break;
       case 'PATIENT':
@@ -314,5 +314,6 @@ export class SidebarComponent implements OnInit {
 
   logout() {
     this.authService.logout();
+    this.router.navigate(['/auth/login']);
   }
 }

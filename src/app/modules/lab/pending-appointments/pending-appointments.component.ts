@@ -24,7 +24,9 @@ interface LabAppointment {
   templateUrl: './pending-appointments.component.html',
 })
 export class PendingAppointmentsComponent implements OnInit {
-  hospitalId = '00d79e66-4457-4d27-9228-fe467823ce8e';
+  hospitalId = '';
+  hospitalName = '';
+  hospitalAddress = '';
   appointments: LabAppointment[] = [];
   filteredAppointments: LabAppointment[] = [];
   loading = false;
@@ -38,13 +40,29 @@ export class PendingAppointmentsComponent implements OnInit {
   constructor(
     private router: Router,
     private http: HttpClient
-  ) {}
+  ) {
+    // Obtener hospitalInfo de localStorage de forma segura
+    const hospitalInfo = localStorage.getItem('hospitalInfo');
+    if (hospitalInfo) {
+      try {
+        const hospital = JSON.parse(hospitalInfo);
+        this.hospitalId = hospital.id || '';
+        this.hospitalName = hospital.name || '';
+        this.hospitalAddress = hospital.fullAddress || '';
+      } catch {
+        this.hospitalId = '';
+        this.hospitalName = '';
+        this.hospitalAddress = '';
+      }
+    }
+  }
 
   ngOnInit() {
     this.loadAppointments();
   }
 
   loadAppointments() {
+    if (!this.hospitalId) return;
     this.loading = true;
     this.http.get<LabAppointment[]>(`http://localhost:8080/api/lab-appointments/hospital/${this.hospitalId}/solicited`)
       .subscribe({

@@ -28,7 +28,7 @@ interface Patient {
   styleUrl: './create-appointment.component.css'
 })
 export class CreateAppointmentComponent implements OnInit {
-  hospitalId = '00d79e66-4457-4d27-9228-fe467823ce8e';
+  hospitalId = '';
   medics: Medic[] = [];
   specialties: string[] = [];
   filteredMedics: Medic[] = [];
@@ -54,6 +54,17 @@ export class CreateAppointmentComponent implements OnInit {
     private patientService: PatientService,
     private hospitalService: HospitalService
   ) {
+    // HospitalId dinámico
+    const hospitalInfo = localStorage.getItem('hospitalInfo');
+    if (hospitalInfo) {
+      try {
+        const hospital = JSON.parse(hospitalInfo);
+        this.hospitalId = hospital.id || '';
+      } catch {
+        this.hospitalId = '';
+      }
+    }
+
     this.appointmentForm = this.fb.group({
       specialty: ['', Validators.required],
       medicId: ['', Validators.required],

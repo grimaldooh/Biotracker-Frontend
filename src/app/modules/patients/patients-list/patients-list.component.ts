@@ -15,10 +15,21 @@ import { Router } from '@angular/router';
 export class PatientsListComponent implements OnInit {
   patients: Patient[] = [];
   loading = true;
-  hospitalId = '00d79e66-4457-4d27-9228-fe467823ce8e'; // Usa el id que ya tienes
+  hospitalId = '';
   searchTerm = '';
 
-  constructor(private patientService: PatientService, private router: Router) {}
+  constructor(private patientService: PatientService, private router: Router) {
+    // HospitalId dinámico
+    const hospitalInfo = localStorage.getItem('hospitalInfo');
+    if (hospitalInfo) {
+      try {
+        const hospital = JSON.parse(hospitalInfo);
+        this.hospitalId = hospital.id || '';
+      } catch {
+        this.hospitalId = '';
+      }
+    }
+  }
 
   ngOnInit() {
     this.patientService.getPatientsByHospital(this.hospitalId).subscribe({

@@ -260,9 +260,16 @@ export class AuthService {
     const user = this.getCurrentUser();
     if (user?.role === 'PATIENT') {
       this.router.navigate(['/patient/home']);
-    } else {
-      // Para DOCTOR, ADMIN, RECEPTIONIST, LAB_TECHNICIAN
-      this.router.navigate(['/dashboard']);
+    }else if (user?.role === 'MEDIC') {
+      this.router.navigate(['/doctors/dashboard']);
+    }
+    else if (user?.role === 'RECEPTIONIST') {
+      this.router.navigate(['/reception/dashboard']);
+    } else if (user?.role === 'LAB_TECHNICIAN') {
+      this.router.navigate(['/lab/dashboard']);
+    }
+    else {
+      this.router.navigate(['/']);
     }
   }
 }

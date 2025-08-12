@@ -22,6 +22,7 @@ export class InventoryComponent implements OnInit {
   itemForm: FormGroup;
   medicineOrder: string[] = [];
   itemOrder: string[] = [];
+  hospitalId: string = '';
 
   constructor(private fb: FormBuilder, private inventoryService: InventoryService) {
     this.medicineForm = this.fb.group({
@@ -40,6 +41,17 @@ export class InventoryComponent implements OnInit {
       location: ['', Validators.required],
       category: ['', Validators.required]
     });
+
+    // Obtener hospitalId dinámico de localStorage
+    const hospitalInfo = localStorage.getItem('hospitalInfo');
+    if (hospitalInfo) {
+      try {
+        const hospital = JSON.parse(hospitalInfo);
+        this.hospitalId = hospital.id || '';
+      } catch {
+        this.hospitalId = '';
+      }
+    }
   }
 
   ngOnInit() {
@@ -48,7 +60,11 @@ export class InventoryComponent implements OnInit {
   }
 
   loadMedicines() {
-    this.inventoryService.getMedicines().subscribe({
+    if (!this.hospitalId) {
+      this.loadingMedicines = false;
+      return;
+    }
+    this.inventoryService.getMedicines(this.hospitalId).subscribe({
       next: (data) => {
         if (this.medicineOrder.length === 0) {
           this.medicineOrder = data.map(m => m.id!);
@@ -64,7 +80,11 @@ export class InventoryComponent implements OnInit {
   }
 
   loadItems() {
-    this.inventoryService.getItems().subscribe({
+    if (!this.hospitalId) {
+      this.loadingItems = false;
+      return;
+    }
+    this.inventoryService.getItems(this.hospitalId).subscribe({
       next: (data) => {
         if (this.itemOrder.length === 0) {
           this.itemOrder = data.map(i => i.id!);
@@ -79,16 +99,16 @@ export class InventoryComponent implements OnInit {
   }
 
   addMedicine() {
-    if (this.medicineForm.invalid) return;
-    this.inventoryService.addMedicine(this.medicineForm.value).subscribe(() => {
+    if (this.medicineForm.invalid || !this.hospitalId) return;
+    this.inventoryService.addMedicine(this.medicineForm.value, this.hospitalId).subscribe(() => {
       this.medicineForm.reset();
       this.loadMedicines();
     });
   }
 
   addItem() {
-    if (this.itemForm.invalid) return;
-    this.inventoryService.addItem(this.itemForm.value).subscribe(() => {
+    if (this.itemForm.invalid || !this.hospitalId) return;
+    this.inventoryService.addItem(this.itemForm.value, this.hospitalId).subscribe(() => {
       this.itemForm.reset();
       this.loadItems();
     });

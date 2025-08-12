@@ -14,7 +14,7 @@ import { Patient } from '../../patients/patient.model'
 })
 export class CreateLabAppointmentComponent {
   appointmentForm: FormGroup;
-  hospitalId = '00d79e66-4457-4d27-9228-fe467823ce8e';
+  hospitalId = '';
   loading = false;
   loadingPatients = false;
   searchPatientTerm = '';
@@ -35,6 +35,17 @@ export class CreateLabAppointmentComponent {
     private labAppointmentService: LabAppointmentService,
     private patientService: PatientService
   ) {
+    // Hospital dinámico
+    const hospitalInfo = localStorage.getItem('hospitalInfo');
+    if (hospitalInfo) {
+      try {
+        const hospital = JSON.parse(hospitalInfo);
+        this.hospitalId = hospital.id || '';
+      } catch {
+        this.hospitalId = '';
+      }
+    }
+
     this.appointmentForm = this.fb.group({
       patientId: ['', Validators.required],
       sampleType: ['', Validators.required],

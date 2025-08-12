@@ -15,7 +15,7 @@ export class ProcessAppointmentComponent implements OnInit {
   sampleForm!: FormGroup;
   appointmentData: any = null;
   loading = false;
-  medicalEntityId: string = '00d79e66-4457-4d27-9228-fe467823ce8e'; // ID de la entidad médica predefinida
+  medicalEntityId: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -23,6 +23,17 @@ export class ProcessAppointmentComponent implements OnInit {
     private http: HttpClient
   ) {
     this.initializeForm();
+
+    // Obtener hospitalInfo de localStorage de forma segura
+    const hospitalInfo = localStorage.getItem('hospitalInfo');
+    if (hospitalInfo) {
+      try {
+        const hospital = JSON.parse(hospitalInfo);
+        this.medicalEntityId = hospital.id || '';
+      } catch {
+        this.medicalEntityId = '';
+      }
+    }
   }
 
   ngOnInit() {
