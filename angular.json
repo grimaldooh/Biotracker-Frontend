@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/biotrack-frontend/browser",
+            "outputPath": "dist/biotrack-frontend",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [

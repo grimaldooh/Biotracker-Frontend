@@ -1,0 +1,93 @@
+name: Deploy Frontend to AWS
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # 1. Checkout del código
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    # 2. Setup Node.js
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    # 3. Instalar dependencias
+    - name: Install dependencies
+      run: npm ci
+      
+    # 4. Lint (opcional)
+    - name: Run linting
+      run: npm run lint --if-present
+      continue-on-error: true
+      
+    # 5. Build para producción
+    - name: Build Angular app
+      run: npm run build:prod
+      env:
+        NODE_OPTIONS: '--max-old-space-size=4096'
+        
+    # 6. Verificar que el build existe
+    - name: Verify build output
+      run: |
+        if [ ! -d "dist/biotrack-frontend/browser" ]; then
+          echo "Build failed - browser folder not found"
+          exit 1
+        fi
+        echo "📁 Listing browser folder contents:"
+        ls -la dist/biotrack-frontend/browser/
+        echo "📄 Checking for index.html:"
+        ls -la dist/biotrack-frontend/browser/index.html
+
+    # 7. Configure AWS credentials
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+        
+    # 8. Deploy to S3
+    - name: Deploy to S3
+      run: |
+        # Subir archivos estáticos con cache largo (JS, CSS, assets)
+        aws s3 sync dist/biotrack-frontend/browser/ s3://${{ secrets.S3_BUCKET_NAME }} \
+          --delete \
+          --cache-control "public, max-age=31536000" \
+          --exclude "*.html" \
+          --exclude "*.json"
+        
+        # Subir HTML y JSON con cache corto para actualizaciones rápidas
+        aws s3 sync dist/biotrack-frontend/browser/ s3://${{ secrets.S3_BUCKET_NAME }} \
+          --delete \
+          --cache-control "public, max-age=0, must-revalidate" \
+          --include "*.html" \
+          --include "*.json"
+          
+    # 9. Invalidar CloudFront
+    - name: Invalidate CloudFront
+      run: |
+        aws cloudfront create-invalidation \
+          --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+          --paths "/*"
+          
+    # 10. Notificación de éxito
+    - name: Deployment Success
+      run: |
+        echo "✅ Frontend deployed successfully!"
+        echo "🌐 URL: https://${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}.cloudfront.net"
+        echo "📦 S3 Bucket: ${{ secrets.S3_BUCKET_NAME }}"
+        echo "📁 Files deployed from: dist/biotrack-frontend/browser/"
