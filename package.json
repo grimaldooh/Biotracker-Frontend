@@ -5,8 +5,10 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:prod": "ng build --configuration=production",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "deploy:aws": "ng build --configuration=production && aws s3 sync dist/biotrack-frontend/ s3://your-bucket-name --delete"
   },
   "private": true,
   "dependencies": {

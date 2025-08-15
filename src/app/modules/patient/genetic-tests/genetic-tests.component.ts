@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { SampleService } from '../../../core/services/sample.service';
 import { AuthService } from '../../../shared/services/auth.service';
+import { environment } from '../../../../environments/environment';
 
 interface Mutation {
   id: string;
@@ -85,7 +86,7 @@ export class GeneticTestsComponent implements OnInit {
   }
 
   loadGeneticSamples() {
-    this.http.get<GeneticSample[]>(`http://localhost:8080/api/genetic-samples/patient/${this.patientId}`)
+    this.http.get<GeneticSample[]>(`${environment.apiUrl}/genetic-samples/patient/${this.patientId}`)
       .subscribe({
         next: (samples) => {
           this.geneticSamples = samples.sort((a, b) => 

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface RegisterUserDTO {
   name: string;
@@ -18,7 +19,7 @@ export class UserService {
   registerUser(hospitalId: string, user: RegisterUserDTO): Observable<any> {
     // Nuevo endpoint y payload según lo solicitado
     return this.http.post(
-      `http://localhost:8080/api/auth/signup/user/${hospitalId}`,
+      `${environment.apiUrl}/auth/signup/user/${hospitalId}`,
       user
     );
   }

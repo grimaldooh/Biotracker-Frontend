@@ -7,6 +7,7 @@ import { PatientService } from '../../../core/services/patient.service';
 import { SampleService } from '../../../core/services/sample.service';
 import { Sample, StudyReport } from '../../../core/interfaces/sample.interface'; // Removemos AIReport de aquí
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment'; // Importamos el entorno para la URL de la API
 
 //Modales
 
@@ -345,7 +346,7 @@ export class VisitManagementComponent implements OnInit {
   loadAllPatientMedications(patientId: string) {
     this.medicationLoading = true;
     
-    this.http.get<Medication[]>(`http://localhost:8080/api/medications/patient/${patientId}`)
+    this.http.get<Medication[]>(`${environment.apiUrl}/medications/patient/${patientId}`)
       .subscribe({
         next: (medications) => {
           // Guardar TODOS los medicamentos
@@ -365,7 +366,7 @@ export class VisitManagementComponent implements OnInit {
   loadPatientMedications(patientId: string) {
     this.medicationLoading = true;
     
-    this.http.get<Medication[]>(`http://localhost:8080/api/medications/patient/${patientId}`)
+    this.http.get<Medication[]>(`${environment.apiUrl}/medications/patient/${patientId}`)
       .subscribe({
         next: (medications) => {
           this.allPatientMedications = medications;
@@ -519,7 +520,7 @@ export class VisitManagementComponent implements OnInit {
   // loadPatientMedications(patientId: string) {
   //   this.medicationLoading = true;
     
-  //   this.http.get<Medication[]>(`http://localhost:8080/api/medications/patient/${patientId}`)
+  //   this.http.get<Medication[]>(`${environment.apiUrl}/medications/patient/${patientId}`)
   //     .subscribe({
   //       next: (medications) => {
   //         this.allPatientMedications = medications;
@@ -614,7 +615,7 @@ export class VisitManagementComponent implements OnInit {
 
     const request: MedicationUpdateRequest = { operations };
 
-    this.http.patch(`http://localhost:8080/api/medications/patient/${patientId}`, request)
+    this.http.patch(`${environment.apiUrl}/medications/patient/${patientId}`, request)
       .subscribe({
         next: (response) => {
           console.log('Medications updated successfully:', response);
@@ -707,7 +708,7 @@ export class VisitManagementComponent implements OnInit {
       
       // El backend devuelve el JSON como string directamente
       const response = await this.http.post(
-        'http://localhost:8080/api/medications/compatibility-analysis',
+        `${environment.apiUrl}/medications/compatibility-analysis`,
         request,
         { 
           responseType: 'text', // Importante: recibir como texto

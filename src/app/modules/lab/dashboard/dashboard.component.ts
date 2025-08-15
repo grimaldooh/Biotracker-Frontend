@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { environment } from '../../../../environments/environment';
 
 interface LabAppointment {
   id: string;
@@ -79,39 +80,49 @@ export class DashboardComponent implements OnInit {
   loadRecentSamples() {
     if (!this.hospitalId) return;
     this.loadingRecentSamples = true;
-    this.http.get<RecentSample[]>(`http://localhost:8080/api/samples/hospital/${this.hospitalId}/latest`)
-      .subscribe({
-        next: (samples) => {
-          this.recentSamples = samples;
-          this.loadingRecentSamples = false;
-        },
-        error: (error) => {
-          console.error('Error loading recent samples:', error);
-          this.loadingRecentSamples = false;
-        }
-      });
+    const token = localStorage.getItem('token');
+    const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;
+
+    this.http.get<RecentSample[]>(
+      `${environment.apiUrl}/samples/hospital/${this.hospitalId}/latest`,
+      { headers }
+    ).subscribe({
+      next: (samples) => {
+        this.recentSamples = samples;
+        this.loadingRecentSamples = false;
+      },
+      error: (error) => {
+        console.error('Error loading recent samples:', error);
+        this.loadingRecentSamples = false;
+      }
+    });
   }
 
   loadTodayAppointments() {
     if (!this.hospitalId) return;
     this.loadingTodayAppointments = true;
-    this.http.get<LabAppointment[]>(`http://localhost:8080/api/lab-appointments/hospital/${this.hospitalId}/solicited`)
-      .subscribe({
-        next: (appointments) => {
-          const today = new Date();
-          this.todayAppointments = appointments.filter(apt => {
-            const aptDate = new Date(apt.createdAt);
-            return aptDate.toDateString() === today.toDateString();
-          }).slice(0, 5);
-          
-          this.stats.pendingAppointments = appointments.length;
-          this.loadingTodayAppointments = false;
-        },
-        error: (error) => {
-          console.error('Error loading appointments:', error);
-          this.loadingTodayAppointments = false;
-        }
-      });
+    const token = localStorage.getItem('token');
+    const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;
+
+    this.http.get<LabAppointment[]>(
+      `${environment.apiUrl}/lab-appointments/hospital/${this.hospitalId}/solicited`,
+      { headers }
+    ).subscribe({
+      next: (appointments) => {
+        const today = new Date();
+        this.todayAppointments = appointments.filter(apt => {
+          const aptDate = new Date(apt.createdAt);
+          return aptDate.toDateString() === today.toDateString();
+        }).slice(0, 5);
+
+        this.stats.pendingAppointments = appointments.length;
+        this.loadingTodayAppointments = false;
+      },
+      error: (error) => {
+        console.error('Error loading appointments:', error);
+        this.loadingTodayAppointments = false;
+      }
+    });
   }
 
   loadStats() {

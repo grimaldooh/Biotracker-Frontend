@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { environment } from '../../../../environments/environment';
 
 interface LabAppointment {
   id: string;
@@ -64,7 +65,7 @@ export class PendingAppointmentsComponent implements OnInit {
   loadAppointments() {
     if (!this.hospitalId) return;
     this.loading = true;
-    this.http.get<LabAppointment[]>(`http://localhost:8080/api/lab-appointments/hospital/${this.hospitalId}/solicited`)
+    this.http.get<LabAppointment[]>(`${environment.apiUrl}/lab-appointments/hospital/${this.hospitalId}/solicited`)
       .subscribe({
         next: (appointments) => {
           this.appointments = appointments.sort((a, b) => 

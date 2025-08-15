@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-process-appointment',
@@ -156,7 +157,7 @@ export class ProcessAppointmentComponent implements OnInit {
     formData.medicalEntityId = this.medicalEntityId;
     console.log('Submitting sample data:', formData);
 
-    this.http.post('http://localhost:8080/api/samples', formData)
+    this.http.post(`${environment.apiUrl}/samples`, formData)
       .subscribe({
         next: (response) => {
           alert('Muestra registrada exitosamente');

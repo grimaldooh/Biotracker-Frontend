@@ -5,6 +5,7 @@ import { Observable, forkJoin, Subject, BehaviorSubject } from 'rxjs';
 import { takeUntil, map, catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AuthService } from '../../../shared/services/auth.service'; // Importa AuthService
+import { environment } from '../../../../environments/environment';
 
 interface MedicalVisit {
   id: string;
@@ -44,7 +45,7 @@ const VISIT_TYPE_LABELS: Record<string, string> = {
 })
 export class AppointmentsHistorialComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
-  private readonly baseUrl = 'http://localhost:8080/api/medical-visits';
+  private readonly baseUrl = `${environment.apiUrl}/medical-visits`;
 
   // IDs dinámicos
   private readonly patientId: string | null;

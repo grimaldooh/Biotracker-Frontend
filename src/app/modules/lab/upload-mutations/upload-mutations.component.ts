@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
 
 interface Mutation {
   gene: string;
@@ -118,7 +119,7 @@ export class UploadMutationsComponent implements OnInit {
 
   private loadPatients() {
     this.loading = true;
-    this.http.get<Patient[]>('http://localhost:8080/api/hospitals/00d79e66-4457-4d27-9228-fe467823ce8e/patients')
+    this.http.get<Patient[]>(`${environment.apiUrl}/hospitals/00d79e66-4457-4d27-9228-fe467823ce8e/patients`)
       .subscribe({
         next: (patients) => {
           this.patients = patients;
@@ -312,7 +313,7 @@ export class UploadMutationsComponent implements OnInit {
       // 2. Crear la muestra con las mutaciones incluidas
       const sampleData = this.prepareSampleData(mutations);
       //console.log('Datos de la muestra a crear:', sampleData);
-      const createdSample = await this.http.post<GeneticSampleResponse>('http://localhost:8080/api/genetic-samples', sampleData).toPromise();
+      const createdSample = await this.http.post<GeneticSampleResponse>(`${environment.apiUrl}/genetic-samples`, sampleData).toPromise();
       //aqui si se estan creando bien las mutaciones 
       if (createdSample) {
         alert('Muestra genética creada exitosamente con las mutaciones del archivo CSV');
@@ -345,7 +346,7 @@ export class UploadMutationsComponent implements OnInit {
       // 2. Crear la muestra con las mutaciones incluidas
       const sampleData = this.prepareSampleData(mutations);
       //console.log('Sample data to be created:', sampleData);
-      const createdSample = await this.http.post<GeneticSampleResponse>('http://localhost:8080/api/genetic-samples', sampleData).toPromise();
+      const createdSample = await this.http.post<GeneticSampleResponse>(`${environment.apiUrl}/genetic-samples`, sampleData).toPromise();
       
       if (createdSample) {
         alert('Muestra genética creada exitosamente con las mutaciones registradas');
@@ -400,7 +401,7 @@ export class UploadMutationsComponent implements OnInit {
     formData.append('file', fileToUpload);
     formData.append('sampleId', sampleId);
 
-    const resultFile = await this.http.post<ResultFileDTO>('http://localhost:8080/api/result-files/upload', formData).toPromise();
+    const resultFile = await this.http.post<ResultFileDTO>(`${environment.apiUrl}/result-files/upload`, formData).toPromise();
     
     if (resultFile) {
       await this.processMutations(resultFile.id);
@@ -426,7 +427,7 @@ export class UploadMutationsComponent implements OnInit {
   private async processMutations(resultFileId: string): Promise<void> {
     this.processing = true;
     try {
-      await this.http.post(`http://localhost:8080/api/mutations/process?resultFileId=${resultFileId}`, {}).toPromise();
+      await this.http.post(`${environment.apiUrl}/mutations/process?resultFileId=${resultFileId}`, {}).toPromise();
     } catch (error) {
       //console.error('Error processing mutations:', error);
       throw error;

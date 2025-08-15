@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+
 
 export interface DoctorStats {
   totalPatients: number;
@@ -34,12 +36,12 @@ export interface VisitAdvanceDto {
   providedIn: 'root'
 })
 export class DoctorService {
-  private apiUrl = 'http://localhost:8080/api/medical-visits';
+  private apiUrl = `${environment.apiUrl}/medical-visits`;
 
   constructor(private http: HttpClient) {}
 
   getDoctorStats(doctorId: string): Observable<DoctorStats> {
-    return this.http.get<DoctorStats>(`http://localhost:8080/api/users/${doctorId}/stats`);
+    return this.http.get<DoctorStats>(`${environment.apiUrl}/users/${doctorId}/stats`);
   }
 
   // Todas las citas del doctor

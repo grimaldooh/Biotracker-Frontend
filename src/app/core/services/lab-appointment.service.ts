@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface LabAppointmentDTO {
   id: string;
@@ -25,7 +26,7 @@ export interface LabAppointmentCreationDTO {
   providedIn: 'root'
 })
 export class LabAppointmentService {
-  private baseUrl = 'http://localhost:8080/api/lab-appointments';
+  private baseUrl = `${environment.apiUrl}/lab-appointments`;
 
   constructor(private http: HttpClient) {}
 

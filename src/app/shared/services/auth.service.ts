@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap, switchMap } from 'rxjs';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 export interface LoginRequest {
   email: string;
@@ -50,7 +51,7 @@ export interface HospitalInfo {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/api/auth';
+  private apiUrl = `${environment.apiUrl}/auth`;
   private currentUserSubject = new BehaviorSubject<AuthResponse | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -84,7 +85,6 @@ export class AuthService {
           this.setCurrentUser(response);
         }),
         switchMap(response => {
-          // Después del login exitoso, obtener información del hospital
           return this.loadUserHospitalInfo(response);
         })
       );
@@ -101,7 +101,6 @@ export class AuthService {
           this.setCurrentUser(response);
         }),
         switchMap(response => {
-          // Después del signup exitoso, obtener información del hospital
           return this.loadUserHospitalInfo(response);
         })
       );
@@ -115,17 +114,14 @@ export class AuthService {
     return this.http.post<AuthResponse>(endpoint, patientData)
       .pipe(
         tap(response => {
-          // Solo establecer usuario si no se proporcionó hospitalId (modo signup directo)
           if (!hospitalId) {
             this.setCurrentUser(response);
           }
         }),
         switchMap(response => {
-          // Si es modo signup directo, cargar info del hospital
           if (!hospitalId) {
             return this.loadUserHospitalInfo(response);
           }
-          // Si es modo recepción, solo retornar la respuesta
           return new Observable<AuthResponse>(observer => {
             observer.next(response);
             observer.complete();
@@ -136,8 +132,7 @@ export class AuthService {
 
   private loadUserHospitalInfo(user: AuthResponse): Observable<AuthResponse> {
     return new Observable(observer => {
-      // Primero extraer el userId del token JWT o usar otro método
-      const userId = user.id
+      const userId = user.id;
       
       if (!userId) {
         console.error('No se pudo extraer el userId');
@@ -146,26 +141,20 @@ export class AuthService {
         return;
       }
 
-      // Determinar el endpoint según el tipo de usuario
       const endpoint = user.role === 'PATIENT' 
-        ? `http://localhost:8080/api/patients/${userId}/primary-hospital`
-        : `http://localhost:8080/api/users/${userId}/primary-hospital`;
+        ? `${environment.apiUrl}/patients/${userId}/primary-hospital`
+        : `${environment.apiUrl}/users/${userId}/primary-hospital`;
 
       this.http.get<HospitalInfo>(endpoint).subscribe({
         next: (hospitalInfo) => {
-          // Guardar información del hospital en localStorage
           localStorage.setItem('hospitalInfo', JSON.stringify(hospitalInfo));
-          
-          // Actualizar usuario con el ID
           const updatedUser = { ...user, userId };
           this.setCurrentUser(updatedUser);
-          
           observer.next(updatedUser);
           observer.complete();
         },
         error: (error) => {
           console.error('Error loading hospital info:', error);
-          // Continuar sin información del hospital
           const updatedUser = { ...user, userId };
           this.setCurrentUser(updatedUser);
           observer.next(updatedUser);
@@ -260,15 +249,13 @@ export class AuthService {
     const user = this.getCurrentUser();
     if (user?.role === 'PATIENT') {
       this.router.navigate(['/patient/home']);
-    }else if (user?.role === 'MEDIC') {
+    } else if (user?.role === 'MEDIC') {
       this.router.navigate(['/doctors/dashboard']);
-    }
-    else if (user?.role === 'RECEPTIONIST') {
+    } else if (user?.role === 'RECEPTIONIST') {
       this.router.navigate(['/reception/dashboard']);
     } else if (user?.role === 'LAB_TECHNICIAN') {
       this.router.navigate(['/lab/dashboard']);
-    }
-    else {
+    } else {
       this.router.navigate(['/']);
     }
   }

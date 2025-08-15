@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { SampleDTO } from '../../modules/samples/sample.model'
+import { environment } from '../../../environments/environment';
 
 interface GeneticReport {
   reportId: string;
@@ -24,28 +25,28 @@ interface GeneticReport {
 
 @Injectable({ providedIn: 'root' })
 export class SampleService {
-  private apiUrl = 'http://localhost:8080/api';
+  private apiUrl = `${environment.apiUrl}`;
 
   constructor(private http: HttpClient) {}
 
   getSamplesByHospital(hospitalId: string): Observable<SampleDTO[]> {
-    return this.http.get<SampleDTO[]>(`http://localhost:8080/api/hospitals/${hospitalId}/samples`);
+    return this.http.get<SampleDTO[]>(`${environment.apiUrl}/hospitals/${hospitalId}/samples`);
   }
 
   getSamplesByPatient(patientId: string) {
-    return this.http.get<SampleDTO[]>(`http://localhost:8080/api/samples/patient/${patientId}`);
+    return this.http.get<SampleDTO[]>(`${environment.apiUrl}/samples/patient/${patientId}`);
   }
 
   registerSample(sample: any) {
-    return this.http.post('http://localhost:8080/api/samples', sample);
+    return this.http.post(`${environment.apiUrl}/samples`, sample);
   }
 
   getSampleById(id: string): Observable<SampleDTO> {
-    return this.http.get<SampleDTO>(`http://localhost:8080/api/samples/${id}`);
+    return this.http.get<SampleDTO>(`${environment.apiUrl}/samples/${id}`);
   }
   
   getGeneticSamples(patientId: string): Observable<any[]> {
-    return this.http.get<any[]>(`http://localhost:8080/api/genetic-samples/patient/${patientId}`);
+    return this.http.get<any[]>(`${environment.apiUrl}/genetic-samples/patient/${patientId}`);
   }
 
   getGeneticReports(patientId: string): Observable<GeneticReport[]> {

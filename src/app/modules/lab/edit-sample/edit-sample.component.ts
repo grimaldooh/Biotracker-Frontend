@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
 interface SampleDTO {
   id: string;
@@ -157,7 +158,7 @@ export class EditSampleComponent implements OnInit {
 
   loadSample() {
     this.loading = true;
-    this.http.get<SampleDTO>(`http://localhost:8080/api/samples/${this.sampleId}`)
+    this.http.get<SampleDTO>(`${environment.apiUrl}/samples/${this.sampleId}`)
       .subscribe({
         next: (sample) => {
           this.sample = sample;
@@ -207,7 +208,7 @@ export class EditSampleComponent implements OnInit {
     const formData = this.sampleForm.value;
     console.log('Form Data:', formData);
 
-    this.http.put(`http://localhost:8080/api/samples/${this.sampleId}`, formData)
+    this.http.put(`${environment.apiUrl}/samples/${this.sampleId}`, formData)
       .subscribe({
         next: (response) => {
           alert('Muestra actualizada exitosamente');
