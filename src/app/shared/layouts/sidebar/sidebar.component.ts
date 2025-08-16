@@ -98,7 +98,7 @@ export class SidebarComponent implements OnInit {
             {
               id: 'create-appointment',
               label: 'Crear Cita',
-              icon: 'M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z',
+              icon: 'M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2',
               route: '/appointments/create',
               isActive: false
             },
