@@ -18,14 +18,15 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    // Temporalmente deshabilitar service worker para debug
     provideServiceWorker('ngsw-worker.js', {
-      enabled: false,
+      enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000'
     }),
 
+    // Habilita interceptores registrados via DI
     provideHttpClient(withInterceptorsFromDi()),
 
+    // Registra el interceptor (sigue el provider para compatibilidad)
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
