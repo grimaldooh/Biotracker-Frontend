@@ -239,7 +239,7 @@
               </h4>
               
               <div class="space-y-2">
-                <div *ngFor="let interaction of compatibilityReport.medication_compatibility_report.drug_interactions.slice(0, 2)" 
+                <div *ngFor="let interaction of compatibilityReport.medication_compatibility_report.drug_interactions" 
                      class="bg-white rounded-md p-3 border border-red-200">
                   
                   <div class="flex items-center space-x-2 mb-2">
@@ -256,10 +256,7 @@
                   <p class="text-red-700 text-xs">{{ interaction.clinical_significance }}</p>
                 </div>
                 
-                <div *ngIf="compatibilityReport.medication_compatibility_report.drug_interactions.length > 2" 
-                     class="text-center">
-                  <p class="text-red-700 text-xs">+{{ compatibilityReport.medication_compatibility_report.drug_interactions.length - 2 }} interacciones más</p>
-                </div>
+                
               </div>
             </div>
 
@@ -274,7 +271,7 @@
               </h4>
               
               <div class="space-y-2">
-                <div *ngFor="let action of compatibilityReport.medication_compatibility_report.immediate_actions.slice(0, 2)" 
+                <div *ngFor="let action of compatibilityReport.medication_compatibility_report.immediate_actions" 
                      class="bg-white rounded-md p-3 border border-orange-200">
                   
                   <div class="flex items-start space-x-2">
@@ -289,10 +286,7 @@
                   </div>
                 </div>
                 
-                <div *ngIf="compatibilityReport.medication_compatibility_report.immediate_actions.length > 2" 
-                     class="text-center">
-                  <p class="text-orange-700 text-xs">+{{ compatibilityReport.medication_compatibility_report.immediate_actions.length - 2 }} acciones más</p>
-                </div>
+                
               </div>
             </div>
 
@@ -309,16 +303,12 @@
               <div class="space-y-2 text-xs">
                 <div *ngIf="compatibilityReport.medication_compatibility_report.recommendations_summary.continue_medications.length > 0">
                   <p class="font-medium text-green-900 mb-1">Continuar:</p>
-                  <p class="text-green-800">{{ compatibilityReport.medication_compatibility_report.recommendations_summary.continue_medications.slice(0, 2).join(', ') }}</p>
-                  <span *ngIf="compatibilityReport.medication_compatibility_report.recommendations_summary.continue_medications.length > 2" 
-                        class="text-green-700">+{{ compatibilityReport.medication_compatibility_report.recommendations_summary.continue_medications.length - 2 }} más</span>
+                  <p class="text-green-800">{{ compatibilityReport.medication_compatibility_report.recommendations_summary.continue_medications }}</p>
                 </div>
                 
                 <div *ngIf="compatibilityReport.medication_compatibility_report.recommendations_summary.modify_medications.length > 0">
                   <p class="font-medium text-green-900 mb-1">Modificar:</p>
-                  <p class="text-green-800">{{ compatibilityReport.medication_compatibility_report.recommendations_summary.modify_medications.slice(0, 2).join(', ') }}</p>
-                  <span *ngIf="compatibilityReport.medication_compatibility_report.recommendations_summary.modify_medications.length > 2" 
-                        class="text-green-700">+{{ compatibilityReport.medication_compatibility_report.recommendations_summary.modify_medications.length - 2 }} más</span>
+                  <p class="text-green-800">{{ compatibilityReport.medication_compatibility_report.recommendations_summary.modify_medications}}</p>
                 </div>
               </div>
             </div>
@@ -416,99 +406,118 @@
             </button>
           </div>
 
-          <!-- Reporte IA - Vista Previa Minimalista -->
-          <div *ngIf="showAIReport && aiReport" class="space-y-4">
-            
-            <!-- Header del Reporte -->
-            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-              <div class="flex items-center justify-between">
-                <div>
-                  <h4 class="font-semibold text-gray-800 text-sm">{{ aiReport.reporteMedico.paciente.nombre }}</h4>
-                  <p class="text-gray-600 text-xs">Análisis generado el {{ getCurrentDate() | date:'mediumDate' }}</p>
+          <!-- Reporte IA - Vista Previa Minimalista (con validación de datos) -->
+          <div *ngIf="showAIReport">
+            <!-- Si existe aiReport y contiene datos del paciente -->
+            <ng-container *ngIf="aiReport?.reporteMedico?.paciente?.nombre; else noAiData">
+              <div *ngIf="aiReport" class="space-y-4">
+                <!-- Header del Reporte -->
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <h4 class="font-semibold text-gray-800 text-sm">{{ aiReport.reporteMedico.paciente.nombre }}</h4>
+                      <p class="text-gray-600 text-xs">Análisis generado el {{ getCurrentDate() | date:'mediumDate' }}</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                      <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-b-sm">
+                       Nivel de confianza : {{ aiReport.reporteMedico.trazabilidadEvidencia.nivelConfianzaResumen }}
+                      </span>
+                      <span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">
+                        {{ aiReport.reporteMedico.trazabilidadEvidencia.muestrasAnalizadas.length }} estudios
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div class="flex items-center space-x-2">
-                  <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-b-sm">
-                   Nivel de confianza : {{ aiReport.reporteMedico.trazabilidadEvidencia.nivelConfianzaResumen }}
-                  </span>
-                  <span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">
-                    {{ aiReport.reporteMedico.trazabilidadEvidencia.muestrasAnalizadas.length }} estudios
-                  </span>
+
+                <!-- Resumen Ejecutivo -->
+                <div class="bg-white border border-gray-200 rounded-lg p-4">
+                  <h5 class="font-medium text-gray-800 text-sm mb-2 flex items-center">
+                    <!-- ícono -->
+                    Resumen Ejecutivo
+                  </h5>
+                  <p class="text-gray-700 text-sm leading-relaxed line-clamp-3">{{ aiReport.reporteMedico.resumen.texto }}</p>
+                </div>
+
+                <!-- Condiciones Detectadas -->
+                <div *ngIf="aiReport.reporteMedico.resumen.enfermedadesDetectadas.length > 0" class="bg-white border border-gray-200 rounded-lg p-4">
+                  <h5 class="font-medium text-gray-800 text-sm mb-3 flex items-center">
+                    <svg class="w-4 h-4 text-red-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z"/>
+                    </svg>
+                    Condiciones Identificadas ({{ aiReport.reporteMedico.resumen.enfermedadesDetectadas.length }})
+                  </h5>
+                  <div class="flex flex-wrap gap-2">
+                    <span *ngFor="let condition of aiReport.reporteMedico.resumen.enfermedadesDetectadas" 
+                          class="bg-red-50 text-red-700 text-xs font-medium px-3 py-1 rounded-full border border-red-200">
+                      {{ condition }}
+                    </span>
+                    
+                  </div>
+                </div>
+
+                <!-- Recomendaciones IA -->
+                <div *ngIf="aiReport.reporteMedico.recomendaciones.length > 0" class="bg-white border border-gray-200 rounded-lg p-4">
+                  <h5 class="font-medium text-gray-800 text-sm mb-3 flex items-center">
+                    <svg class="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"/>
+                    </svg>
+                    Recomendaciones Principales ({{ aiReport.reporteMedico.recomendaciones.length }})
+                  </h5>
+                  <div class="space-y-2">
+                    <div *ngFor="let rec of aiReport.reporteMedico.recomendaciones; let i = index" 
+                         class="flex items-start space-x-2">
+                      <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-full min-w-max">
+                        {{ i + 1 }}
+                      </span>
+                      <p class="text-gray-700 text-xs leading-relaxed">{{ rec }}</p>
+                    </div>
+                    <div *ngIf="aiReport.reporteMedico.recomendaciones.length > 2" 
+                         class="text-xs text-gray-500 ml-6">
+                      +{{ aiReport.reporteMedico.recomendaciones.length - 2 }} recomendaciones adicionales
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Botón Ver Reporte Completo -->
+                <div class="pt-4 border-t border-gray-200">
+                  <button (click)="openFullAIReport()" 
+                          class="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center space-x-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                    </svg>
+                    <span>Ver Reporte Completo</span>
+                  </button>
                 </div>
               </div>
-            </div>
+            </ng-container>
 
-            <!-- Resumen Ejecutivo -->
-            <div class="bg-white border border-gray-200 rounded-lg p-4">
-              <h5 class="font-medium text-gray-800 text-sm mb-2 flex items-center">
-                <svg class="w-4 h-4 text-gray-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-                </svg>
-                Resumen Ejecutivo
-              </h5>
-              <p class="text-gray-700 text-sm leading-relaxed line-clamp-3">{{ aiReport.reporteMedico.resumen.texto }}</p>
-            </div>
-
-            <!-- Condiciones Detectadas -->
-            <div *ngIf="aiReport.reporteMedico.resumen.enfermedadesDetectadas.length > 0" class="bg-white border border-gray-200 rounded-lg p-4">
-              <h5 class="font-medium text-gray-800 text-sm mb-3 flex items-center">
-                <svg class="w-4 h-4 text-red-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z"/>
-                </svg>
-                Condiciones Identificadas ({{ aiReport.reporteMedico.resumen.enfermedadesDetectadas.length }})
-              </h5>
-              <div class="flex flex-wrap gap-2">
-                <span *ngFor="let condition of aiReport.reporteMedico.resumen.enfermedadesDetectadas.slice(0, 3)" 
-                      class="bg-red-50 text-red-700 text-xs font-medium px-3 py-1 rounded-full border border-red-200">
-                  {{ condition }}
-                </span>
-                <span *ngIf="aiReport.reporteMedico.resumen.enfermedadesDetectadas.length > 3" 
-                      class="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full">
-                  +{{ aiReport.reporteMedico.resumen.enfermedadesDetectadas.length - 3 }} más
-                </span>
-              </div>
-            </div>
-
-            <!-- Recomendaciones IA -->
-            <div *ngIf="aiReport.reporteMedico.recomendaciones.length > 0" class="bg-white border border-gray-200 rounded-lg p-4">
-              <h5 class="font-medium text-gray-800 text-sm mb-3 flex items-center">
-                <svg class="w-4 h-4 text-green-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"/>
-                </svg>
-                Recomendaciones Principales ({{ aiReport.reporteMedico.recomendaciones.length }})
-              </h5>
-              <div class="space-y-2">
-                <div *ngFor="let rec of aiReport.reporteMedico.recomendaciones.slice(0, 2); let i = index" 
-                     class="flex items-start space-x-2">
-                  <span class="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-full min-w-max">
-                    {{ i + 1 }}
-                  </span>
-                  <p class="text-gray-700 text-xs leading-relaxed">{{ rec }}</p>
+            <!-- Template alternativo cuando NO hay datos del paciente -->
+            <ng-template #noAiData>
+              <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm text-center">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 1.343-3 3v1h6v-1c0-1.657-1.343-3-3-3zM5 20h14a1 1 0 001-1v-1a6 6 0 00-6-6H10a6 6 0 00-6 6v1a1 1 0 001 1z"/>
+                  </svg>
                 </div>
-                <div *ngIf="aiReport.reporteMedico.recomendaciones.length > 2" 
-                     class="text-xs text-gray-500 ml-6">
-                  +{{ aiReport.reporteMedico.recomendaciones.length - 2 }} recomendaciones adicionales
+
+                <h4 class="text-lg font-semibold text-gray-800 mb-2">Reporte inteligente no disponible</h4>
+                <p class="text-gray-600 text-sm mb-4 max-w-sm mx-auto">
+                  No se puede generar el análisis inteligente por falta de información del paciente.
+                  Verifica que el paciente tenga datos clínicos y muestras asociadas antes de intentar nuevamente.
+                </p>
+
+                <div class="flex items-center justify-center space-x-2">
+                  <button (click)="showAIReport = false"
+                          class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium">
+                    Cerrar
+                  </button>
+                  <button (click)="loadAIReport()"
+                          class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium">
+                    Intentar de nuevo
+                  </button>
                 </div>
               </div>
-            </div>
-
-            <!-- Botón Ver Reporte Completo -->
-            <div class="pt-4 border-t border-gray-200">
-              <button (click)="openFullAIReport()" 
-                      class="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center space-x-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                </svg>
-                <span>Ver Reporte Completo</span>
-              </button>
-            </div>
-
-            <!-- Botón Minimizar -->
-            <div class="flex justify-center">
-              <button (click)="showAIReport = false" 
-                      class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors">
-                Minimizar
-              </button>
-            </div>
+            </ng-template>
           </div>
         </div>
 
@@ -846,8 +855,6 @@
     </div>
   </div>
 
-  
-
   <!-- Modal para Estudio de Laboratorio -->
   <div *ngIf="showSampleModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
@@ -862,9 +869,12 @@
           </button>
         </div>
       </div>
+    </div>
+
     
       <app-sample-detail-modal [visible]="showSampleModal" [sample]="selectedSample" (close)="closeModals()">
       </app-sample-detail-modal>
+    </div>
       
 
   <!-- Modal Post-Consulta -->
@@ -1158,46 +1168,260 @@
       </app-sample-detail-modal>
       
 
-  <!-- Modal Post-Consulta -->
-  <div *ngIf="showPostConsultationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6">
-      <div class="text-center mb-6">
-        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-          </svg>
+ 
+
+  <!-- Modal para Agregar Medicamento -->
+  <div *ngIf="showMedicationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-slate-200">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl font-semibold text-slate-800 flex items-center">
+            <svg class="w-5 h-5 text-orange-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+            </svg>
+            Agregar Nuevo Medicamento
+          </h3>
+          <button (click)="closeMedicationModal()" 
+                  class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors">
+            <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
         </div>
-        <h3 class="text-xl font-semibold text-slate-800 mb-2">¡Consulta Completada!</h3>
-        <p class="text-slate-600">La consulta se ha registrado exitosamente.</p>
       </div>
+      
+      <form [formGroup]="medicationForm" (ngSubmit)="addMedicationToList()" class="p-6 space-y-6">
+        <!-- Información Básica -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              Nombre del Medicamento *
+            </label>
+            <input 
+              type="text"
+              formControlName="name"
+              class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-colors"
+              [class.border-red-300]="isMedicationFieldInvalid('name')"
+              placeholder="Ej: Paracetamol">
+            <div *ngIf="isMedicationFieldInvalid('name')" class="mt-1 text-sm text-red-600">
+              {{ getMedicationFieldError('name') }}
+            </div>
+          </div>
 
-      <div class="space-y-3 mb-6">
-        <p class="text-sm font-medium text-slate-700">¿Deseas agendar una nueva cita para este paciente?</p>
-        
-        <button (click)="scheduleNewAppointment(true)" 
-                class="w-full px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors flex items-center justify-center space-x-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-          </svg>
-          <span>Sí, conmigo mismo</span>
-        </button>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              Marca *
+            </label>
+            <input 
+              type="text"
+              formControlName="brand"
+              class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-colors"
+              [class.border-red-300]="isMedicationFieldInvalid('brand')"
+              placeholder="Ej: Tylenol">
+            <div *ngIf="isMedicationFieldInvalid('brand')" class="mt-1 text-sm text-red-600">
+              {{ getMedicationFieldError('brand') }}
+            </div>
+          </div>
+        </div>
 
-        <button (click)="scheduleNewAppointment(false)" 
-                class="w-full px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors flex items-center justify-center space-x-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-          </svg>
-          <span>Sí, con otro doctor</span>
-        </button>
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">
+            Sustancia Activa *
+          </label>
+          <input 
+            type="text"
+            formControlName="activeSubstance"
+            class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-colors"
+            [class.border-red-300]="isMedicationFieldInvalid('activeSubstance')"
+            placeholder="Ej: Acetaminophen">
+          <div *ngIf="isMedicationFieldInvalid('activeSubstance')" class="mt-1 text-sm text-red-600">
+            {{ getMedicationFieldError('activeSubstance') }}
+          </div>
+        </div>
 
-        <button (click)="closePostConsultationModal()" 
-                class="w-full px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-colors">
-          No, terminar
-        </button>
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">
+            Indicación *
+          </label>
+          <textarea 
+            formControlName="indication"
+            rows="3"
+            class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-colors resize-none"
+            [class.border-red-300]="isMedicationFieldInvalid('indication')"
+            placeholder="Ej: Para el control del dolor y la fiebre">
+          </textarea>
+          <div *ngIf="isMedicationFieldInvalid('indication')" class="mt-1 text-sm text-red-600">
+            {{ getMedicationFieldError('indication') }}
+          </div>
+        </div>
+
+        <!-- Dosificación -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              Dosis *
+            </label>
+            <input 
+              type="text"
+              formControlName="dosage"
+              class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-colors"
+              [class.border-red-300]="isMedicationFieldInvalid('dosage')"
+              placeholder="Ej: 500mg">
+            <div *ngIf="isMedicationFieldInvalid('dosage')" class="mt-1 text-sm text-red-600">
+              {{ getMedicationFieldError('dosage') }}
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              Frecuencia *
+            </label>
+            <input 
+              type="text"
+              formControlName="frequency"
+              class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-colors"
+              [class.border-red-300]="isMedicationFieldInvalid('frequency')"
+              placeholder="Ej: Cada 8 horas">
+            <div *ngIf="isMedicationFieldInvalid('frequency')" class="mt-1 text-sm text-red-600">
+              {{ getMedicationFieldError('frequency') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Fechas -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              Fecha de Inicio *
+            </label>
+            <input 
+              type="date"
+              formControlName="startDate"
+              class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-colors"
+              [class.border-red-300]="isMedicationFieldInvalid('startDate')">
+            <div *ngIf="isMedicationFieldInvalid('startDate')" class="mt-1 text-sm text-red-600">
+              {{ getMedicationFieldError('startDate') }}
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+              Fecha de Fin (Opcional)
+            </label>
+            <input 
+              type="date"
+              formControlName="endDate"
+              class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-colors">
+            <p class="mt-1 text-xs text-slate-500">Deja en blanco si es un tratamiento continuo</p>
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex items-center justify-end space-x-4 pt-4 border-t border-slate-200">
+          <button 
+            type="button"
+            (click)="closeMedicationModal()"
+            class="px-6 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg font-medium transition-colors">
+            Cancelar
+          </button>
+          <button 
+            type="submit"
+            class="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg transition-colors flex items-center space-x-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            <span>Agregar a la Lista</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal para Visita Médica -->
+  <div *ngIf="showVisitModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-slate-200">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl font-semibold text-slate-800">Detalles de la Consulta</h3>
+          <button (click)="closeModals()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors">
+            <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <div *ngIf="selectedVisit" class="p-6 space-y-6">
+        <!-- Información General -->
+        <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4">
+          <h4 class="font-semibold text-blue-900 mb-3">Información General</h4>
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p class="text-blue-700 font-medium">Paciente</p>
+              <p class="text-blue-800">{{ selectedVisit.patientName }}</p>
+            </div>
+            <div>
+              <p class="text-blue-700 font-medium">Tipo de Consulta</p>
+              <p class="text-blue-800">{{ getVisitTypeLabel(selectedVisit.type) }}</p>
+            </div>
+            <div>
+              <p class="text-blue-700 font-medium">Fecha y Hora</p>
+              <p class="text-blue-800">{{ selectedVisit.visitDate | date:'medium' }}</p>
+            </div>
+            <div>
+              <p class="text-blue-700 font-medium">Estado</p>
+              <p class="text-blue-800">{{ selectedVisit.visitCompleted ? 'Completada' : 'Pendiente' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Área Médica -->
+        <div *ngIf="selectedVisit.medicalArea" class="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4">
+          <h4 class="font-semibold text-green-900 mb-2">Área Médica</h4>
+          <p class="text-green-800">{{ selectedVisit.medicalArea }}</p>
+        </div>
+
+        <!-- Notas -->
+        <div *ngIf="selectedVisit.notes" class="bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg p-4">
+          <h4 class="font-semibold text-amber-900 mb-2">Notas de la Consulta</h4>
+          <p class="text-amber-800 text-sm">{{ selectedVisit.notes }}</p>
+        </div>
+
+        <!-- Diagnóstico -->
+        <div *ngIf="selectedVisit.diagnosis" class="bg-gradient-to-r from-red-50 to-red-100 rounded-lg p-4">
+          <h4 class="font-semibold text-red-900 mb-2">Diagnóstico</h4>
+          <p class="text-red-800 text-sm">{{ selectedVisit.diagnosis }}</p>
+        </div>
+
+        <!-- Recomendaciones -->
+        <div *ngIf="selectedVisit.recommendations" class="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4">
+          <h4 class="font-semibold text-purple-900 mb-2">Recomendaciones</h4>
+          <p class="text-purple-800 text-sm">{{ selectedVisit.recommendations }}</p>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- Modal para Estudio de Laboratorio -->
+  <div *ngIf="showSampleModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-slate-200">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl font-semibold text-slate-800">Detalles del Estudio de Laboratorio</h3>
+          <button (click)="closeModals()"
+            class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors">
+            <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    
+      <app-sample-detail-modal [visible]="showSampleModal" [sample]="selectedSample" (close)="closeModals()">
+      </app-sample-detail-modal>
+      
+
+  
   <!-- Modal para Agregar Medicamento -->
   <div *ngIf="showMedicationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">

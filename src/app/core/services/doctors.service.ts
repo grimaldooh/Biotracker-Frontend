@@ -14,6 +14,7 @@ export interface DoctorStats {
 export interface MedicalVisit {
   id: string;
   patientName: string;
+  patientId: string;
   doctorName: string;
   visitDate: string;
   notes: string | null;

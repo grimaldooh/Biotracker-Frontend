@@ -88,6 +88,7 @@ export class ScheduleAppointmentsComponent implements OnInit {
       {
         id: '1',
         patientName: 'María González',
+        patientId: '60ede05e-702c-442a-aba1-4507bb2fe542',
         doctorName: 'Dr. García',
         visitDate: '2025-01-08T10:30:00',
         type: 'CONSULTATION',
@@ -101,6 +102,7 @@ export class ScheduleAppointmentsComponent implements OnInit {
       {
         id: '2',
         patientName: 'Juan Pérez',
+        patientId: '60ede05e-702c-442a-aba1-4507bb2fe543',
         doctorName: 'Dr. García',
         visitDate: '2025-01-08T11:15:00',
         type: 'FOLLOW_UP',
@@ -114,6 +116,7 @@ export class ScheduleAppointmentsComponent implements OnInit {
       {
         id: '3',
         patientName: 'Ana Rodríguez',
+        patientId: '60ede05e-702c-442a-aba1-4507bb2fe544',
         doctorName: 'Dr. García',
         visitDate: '2025-01-09T09:00:00',
         type: 'CONSULTATION',
@@ -127,6 +130,7 @@ export class ScheduleAppointmentsComponent implements OnInit {
       {
         id: '4',
         patientName: 'Carlos López',
+        patientId: '60ede05e-702c-442a-aba1-4507bb2fe545',
         doctorName: 'Dr. García',
         visitDate: '2025-01-10T14:30:00',
         type: 'FOLLOW_UP',

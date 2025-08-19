@@ -381,7 +381,8 @@ export class VisitManagementComponent implements OnInit {
   }
 
   private extractPatientId(visit: MedicalVisit): string {
-    return '60ede05e-702c-442a-aba1-4507bb2fe542';
+    console.log('Extracting patient ID from visit:', visit.patientId);
+    return visit.patientId;
   }
 
   // Modal methods
