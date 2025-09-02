@@ -9,6 +9,7 @@ import { AuthLayoutComponent } from './shared/layouts/auth-layout/auth-layout.co
 import { LoginComponent } from './modules/auth/login/login.component';
 import { RegisterPatientComponent } from './modules/patients/register-patient/register-patient.component';
 import { RegisterUserComponent } from './modules/users/register-user/register-user.component';
+import { AuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   // Rutas de autenticación (sin sidebar)
@@ -216,6 +217,64 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./modules/patient/genetic-report-viewer/genetic-report-viewer.component')
             .then(m => m.GeneticReportViewerComponent)
+      },
+      {
+        path: 'patient/insurance',
+        loadComponent: () =>
+          import('./modules/patient/insurance/insurance.component')
+            .then(m => m.InsuranceComponent)
+      }
+    ]
+  },
+  {
+    path: 'patient',
+    canActivate: [AuthGuard],
+    children: [
+      {
+        path: 'home',
+        loadComponent: () => import('./modules/patient/home/home.component').then(m => m.HomeComponent)
+      },
+      {
+        path: 'appointments',
+        loadComponent: () => import('./modules/patient/my-appointments/my-appointments.component').then(m => m.MyAppointmentsComponent)
+      },
+      {
+        path: 'genetic-tests',
+        loadComponent: () => import('./modules/patient/genetic-tests/genetic-tests.component').then(m => m.GeneticTestsComponent)
+      },
+      {
+        path: 'samples',
+        loadComponent: () => import('./modules/patient/samples/samples.component').then(m => m.SamplesComponent)
+      },
+      {
+        path: 'schedule',
+        loadComponent: () => import('./modules/patient/schedule/schedule.component').then(m => m.ScheduleComponent)
+      },
+      {
+        path: 'insurance',
+        loadComponent: () => import('./modules/patient/insurance/insurance.component').then(m => m.InsuranceComponent)
+      },
+      {
+        path: 'reports',
+        children: [
+          {
+            path: 'genetic',
+            loadComponent: () => import('./modules/patient/genetic-report-viewer/genetic-report-viewer.component').then(m => m.GeneticReportViewerComponent)
+          },
+          {
+            path: 'smart',
+            loadComponent: () => import('./modules/patient/smart-report/smart-report.component').then(m => m.SmartReportComponent)
+          },
+          {
+            path: 'technical',
+            loadComponent: () => import('./modules/patient/technical-report/technical-report.component').then(m => m.TechnicalReportComponent)
+          }
+        ]
+      },
+      {
+        path: '',
+        redirectTo: 'home',
+        pathMatch: 'full'
       }
     ]
   },

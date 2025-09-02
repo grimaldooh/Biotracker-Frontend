@@ -19,6 +19,7 @@ export interface MedicalVisit {
   visitCompleted: boolean;
   type: string;
   medicalArea: string | null;
+  patientVisitsCount: number;
 }
 
 @Injectable({

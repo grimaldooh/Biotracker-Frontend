@@ -1,0 +1,167 @@
+<div class="space-y-6">
+  
+  <!-- Header con Filtros -->
+  <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h2 class="text-xl font-semibold text-gray-800">Historial de Cotizaciones</h2>
+        <p class="text-gray-600 mt-1">Revisa todas tus cotizaciones anteriores y actuales</p>
+      </div>
+    </div>
+
+    <!-- Filtros de Estado -->
+    <div class="flex flex-wrap gap-2">
+      <button
+        (click)="setFilter('all')"
+        [class]="filterStatus === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+        class="px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2">
+        <span>Todas</span>
+        <span class="bg-white bg-opacity-20 text-xs px-2 py-1 rounded-full">{{ statusCounts.all }}</span>
+      </button>
+      <button
+        (click)="setFilter('ACTIVE')"
+        [class]="filterStatus === 'ACTIVE' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+        class="px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2">
+        <span>Activas</span>
+        <span class="bg-white bg-opacity-20 text-xs px-2 py-1 rounded-full">{{ statusCounts.active }}</span>
+      </button>
+      <button
+        (click)="setFilter('ACCEPTED')"
+        [class]="filterStatus === 'ACCEPTED' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+        class="px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2">
+        <span>Aceptadas</span>
+        <span class="bg-white bg-opacity-20 text-xs px-2 py-1 rounded-full">{{ statusCounts.accepted }}</span>
+      </button>
+      <button
+        (click)="setFilter('REJECTED')"
+        [class]="filterStatus === 'REJECTED' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+        class="px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2">
+        <span>Rechazadas</span>
+        <span class="bg-white bg-opacity-20 text-xs px-2 py-1 rounded-full">{{ statusCounts.rejected }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Lista de Cotizaciones -->
+  <div class="space-y-4">
+    <div *ngIf="filteredQuotes.length === 0" class="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm text-center">
+      <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+      </svg>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">No hay cotizaciones</h3>
+      <p class="text-gray-600">No se encontraron cotizaciones con el filtro seleccionado</p>
+    </div>
+
+    <div *ngFor="let quote of filteredQuotes; trackBy: trackByQuoteId" 
+         class="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+      
+      <!-- Header de la Cotización -->
+      <div class="p-6 border-b border-gray-200 cursor-pointer" (click)="selectQuote(quote)">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="flex-shrink-0">
+              <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center space-x-2">
+                <h3 class="text-lg font-semibold text-gray-900">{{ quote.coverageType }}</h3>
+                <span [class]="getStatusColor(quote.status)" class="text-xs font-medium px-2 py-1 rounded-full">
+                  {{ getStatusText(quote.status) }}
+                </span>
+                <span *ngIf="isExpired(quote.validUntil) && quote.status === 'ACTIVE'" 
+                      class="bg-red-100 text-red-700 text-xs font-medium px-2 py-1 rounded-full">
+                  Expirada
+                </span>
+              </div>
+              <p class="text-sm text-gray-600 mt-1">Creada el {{ formatDate(quote.quoteDate) }}</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-4">
+            <div class="text-right">
+              <div class="text-2xl font-bold text-gray-900">${{ quote.monthlyPremium }}</div>
+              <div class="text-sm text-gray-600">por mes</div>
+            </div>
+            <svg class="w-5 h-5 text-gray-400 transform transition-transform"
+                 [class.rotate-180]="selectedQuote?.quoteId === quote.quoteId"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detalles Expandibles -->
+      <div *ngIf="selectedQuote?.quoteId === quote.quoteId" class="p-6 border-t border-gray-100 bg-gray-50">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          <!-- Información de Cobertura -->
+          <div>
+            <h4 class="font-medium text-gray-800 mb-3">Detalles de Cobertura</h4>
+            <div class="space-y-2 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Tipo de cobertura:</span>
+                <span class="font-medium text-gray-900">{{ quote.coverageType }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Monto de cobertura:</span>
+                <span class="font-medium text-gray-900">${{ quote.coverageAmount | number }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Deducible:</span>
+                <span class="font-medium text-gray-900">${{ quote.deductible | number }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Score de riesgo:</span>
+                <span class="font-medium text-gray-900">{{ quote.riskScore }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Prima anual:</span>
+                <span class="font-medium text-gray-900">${{ quote.annualPremium | number }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fechas y Recomendaciones -->
+          <div>
+            <h4 class="font-medium text-gray-800 mb-3">Información Adicional</h4>
+            <div class="space-y-3 text-sm">
+              <div>
+                <span class="text-gray-600">Válida hasta:</span>
+                <span class="font-medium text-gray-900 ml-2">{{ formatDate(quote.validUntil) }}</span>
+              </div>
+              
+              <div *ngIf="quote.recommendations.length > 0">
+                <span class="text-gray-600">Recomendaciones:</span>
+                <div class="mt-2 space-y-1">
+                  <div *ngFor="let recommendation of quote.recommendations" 
+                       class="bg-blue-50 text-blue-800 p-2 rounded text-xs">
+                    {{ recommendation }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Acciones -->
+        <div *ngIf="quote.status === 'ACTIVE' || quote.status === 'PENDING'" 
+             class="flex items-center justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
+          <button 
+            (click)="onRejectQuote(quote)"
+            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors">
+            Rechazar
+          </button>
+          <button 
+            (click)="onAcceptQuote(quote)"
+            class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors">
+            Aceptar Cotización
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

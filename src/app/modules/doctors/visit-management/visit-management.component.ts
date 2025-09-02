@@ -5,13 +5,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DoctorService, MedicalVisit, VisitAdvanceDto } from '../../../core/services/doctors.service';
 import { PatientService } from '../../../core/services/patient.service';
 import { SampleService } from '../../../core/services/sample.service';
-import { Sample, StudyReport } from '../../../core/interfaces/sample.interface'; // Removemos AIReport de aquí
+import { InsuranceService } from '../../../core/services/insurance.service'; // NUEVA IMPORTACIÓN
+import { Sample, StudyReport } from '../../../core/interfaces/sample.interface';
+import { InsuranceQuote } from '../../../core/interfaces/insurance.interface'; // NUEVA IMPORTACIÓN
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment'; // Importamos el entorno para la URL de la API
+import { environment } from '../../../../environments/environment';
 
-//Modales
-
+// Modales
 import { SampleDetailModalComponent } from '../../samples/sample-detail-modal/sample-detail-modal.component';
+import { QuoteFormComponent } from '../../patient/insurance/quote-form/quote-form.component'; // NUEVA IMPORTACIÓN
 
 interface Medication {
   id: string;
@@ -197,7 +199,12 @@ interface CompatibilityResponse {
 @Component({
   selector: 'app-visit-management',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, SampleDetailModalComponent],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    SampleDetailModalComponent,
+    QuoteFormComponent
+  ],
   templateUrl: './visit-management.component.html',
 })
 export class VisitManagementComponent implements OnInit {
@@ -247,6 +254,14 @@ export class VisitManagementComponent implements OnInit {
   // Nueva propiedad para el ID del doctor actual
   currentDoctorId: string = '';
 
+  // PROPIEDADES PARA EVALUACIÓN DE SEGUROS
+  showInsuranceEvaluation = false;
+  showInsuranceForm = false;
+  insuranceEvaluationCompleted = false;
+  allQuotes: InsuranceQuote[] = [];
+  activeQuotes: InsuranceQuote[] = [];
+  currentPatientId = '';
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -254,6 +269,7 @@ export class VisitManagementComponent implements OnInit {
     private doctorService: DoctorService,
     private patientService: PatientService,
     private sampleService: SampleService,
+    private insuranceService: InsuranceService, // Asegúrate de tener este servicio
     private http: HttpClient
   ) {
     this.visitForm = this.fb.group({
@@ -297,12 +313,83 @@ export class VisitManagementComponent implements OnInit {
       
       if (this.visitData) {
         this.currentVisit = this.visitData;
+        
+        // EXTRAER PATIENT ID PARA EL FORMULARIO DE SEGUROS
+        this.currentPatientId = this.extractPatientId(this.currentVisit);
+        
+        // VERIFICAR SI DEBE MOSTRAR EVALUACIÓN DE SEGUROS
+        this.checkInsuranceEvaluationNeeded();
+        
         await this.loadPatientData();
       }
     } catch (error) {
       console.error('Error loading visit data:', error);
     } finally {
       this.loading = false;
+    }
+  }
+
+  // MÉTODO: Verificar si necesita evaluación de seguros
+  checkInsuranceEvaluationNeeded() {
+    if (this.currentVisit && this.currentVisit.patientVisitsCount) {
+      // Mostrar evaluación cada 5 visitas (5, 10, 15, 20, etc.)
+      this.showInsuranceEvaluation = this.currentVisit.patientVisitsCount % 1 === 0;
+      
+      if (this.showInsuranceEvaluation) {
+        console.log(` Evaluación de seguros requerida - Visita #${this.currentVisit.patientVisitsCount}`);
+        // Cargar cotizaciones existentes del paciente
+        this.loadPatientQuotes();
+      }
+    }
+  }
+
+  // MÉTODO: Cargar cotizaciones existentes del paciente
+  loadPatientQuotes() {
+    if (!this.currentPatientId) return;
+    
+    this.insuranceService.getPatientQuotes(this.currentPatientId).subscribe({
+      next: (quotes) => {
+        this.allQuotes = quotes;
+        this.activeQuotes = quotes.filter(q => q.status === 'ACTIVE' || q.status === 'PENDING');
+      },
+      error: (error) => {
+        console.error('Error loading patient quotes:', error);
+        // No es crítico, continúa sin las cotizaciones existentes
+      }
+    });
+  }
+
+  // MÉTODO: Mostrar formulario de evaluación
+  startInsuranceEvaluation() {
+    this.showInsuranceForm = true;
+  }
+
+  // MÉTODO: Manejar cotización creada
+  onQuoteCreated(quote: InsuranceQuote) {
+    this.allQuotes.unshift(quote);
+    this.activeQuotes = this.allQuotes.filter(q => q.status === 'ACTIVE' || q.status === 'PENDING');
+    
+    // Marcar como completada y ocultar formulario
+    this.insuranceEvaluationCompleted = true;
+    this.showInsuranceForm = false;
+    
+    // Mostrar mensaje de éxito
+    alert(' Cotización de seguros generada exitosamente. El paciente podrá revisarla en su portal.');
+    
+    // Log para seguimiento
+    console.log('Nueva cotización generada por el médico:', quote);
+  }
+
+  // MÉTODO: Cancelar evaluación
+  cancelInsuranceEvaluation() {
+    this.showInsuranceForm = false;
+  }
+
+  // MÉTODO: Omitir evaluación completamente
+  skipInsuranceEvaluation() {
+    if (confirm('¿Está seguro de que desea omitir la evaluación de seguros? Esta oportunidad se perdería hasta la próxima evaluación programada.')) {
+      this.showInsuranceEvaluation = false;
+      this.insuranceEvaluationCompleted = true; // Marcar como completada (omitida)
     }
   }
 
@@ -380,9 +467,12 @@ export class VisitManagementComponent implements OnInit {
       });
   }
 
-  private extractPatientId(visit: MedicalVisit): string {
-    console.log('Extracting patient ID from visit:', visit.patientId);
-    return visit.patientId;
+  // MÉTODO HELPER: Extraer Patient ID de la información de visita
+  extractPatientId(visit: any): string {
+    return visit.patientId || 
+           visit.patient?.id || 
+           visit.id?.split('-')[0] || 
+           '';
   }
 
   // Modal methods

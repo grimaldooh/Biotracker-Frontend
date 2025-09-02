@@ -97,7 +97,8 @@ export class ScheduleAppointmentsComponent implements OnInit {
         recommendations: null,
         medicalEntityId: '123',
         visitCompleted: false,
-        medicalArea: 'Medicina General'
+        medicalArea: 'Medicina General',
+        patientVisitsCount: 5
       },
       {
         id: '2',
@@ -111,7 +112,8 @@ export class ScheduleAppointmentsComponent implements OnInit {
         recommendations: null,
         medicalEntityId: '123',
         visitCompleted: false,
-        medicalArea: 'Cirugía'
+        medicalArea: 'Cirugía',
+        patientVisitsCount: 12
       },
       {
         id: '3',
@@ -125,7 +127,8 @@ export class ScheduleAppointmentsComponent implements OnInit {
         recommendations: null,
         medicalEntityId: '123',
         visitCompleted: false,
-        medicalArea: 'Cardiología'
+        medicalArea: 'Cardiología',
+        patientVisitsCount: 1
       },
       {
         id: '4',
@@ -139,7 +142,8 @@ export class ScheduleAppointmentsComponent implements OnInit {
         recommendations: null,
         medicalEntityId: '123',
         visitCompleted: false,
-        medicalArea: 'Medicina Interna'
+        medicalArea: 'Medicina Interna',
+        patientVisitsCount: 3
       }
     ];
     this.groupAppointmentsByDate();

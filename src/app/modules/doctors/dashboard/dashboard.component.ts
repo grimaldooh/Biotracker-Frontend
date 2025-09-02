@@ -114,7 +114,8 @@ export class DashboardComponent implements OnInit {
         recommendations: null,
         medicalEntityId: '123',
         visitCompleted: false,
-        medicalArea: 'Medicina General'
+        medicalArea: 'Medicina General',
+        patientVisitsCount: 5
       },
       {
         id: '2',
@@ -128,7 +129,8 @@ export class DashboardComponent implements OnInit {
         recommendations: null,
         medicalEntityId: '123',
         visitCompleted: false,
-        medicalArea: 'Cirugía'
+        medicalArea: 'Cirugía',
+        patientVisitsCount: 12
       }
     ];
 
@@ -145,7 +147,8 @@ export class DashboardComponent implements OnInit {
         recommendations: null,
         medicalEntityId: '123',
         visitCompleted: false,
-        medicalArea: 'Cardiología'
+        medicalArea: 'Cardiología',
+        patientVisitsCount: 1
       },
       {
         id: '4',
@@ -159,7 +162,8 @@ export class DashboardComponent implements OnInit {
         recommendations: null,
         medicalEntityId: '123',
         visitCompleted: false,
-        medicalArea: 'Medicina Interna'
+        medicalArea: 'Medicina Interna',
+        patientVisitsCount: 3
       }
     ];
   }
